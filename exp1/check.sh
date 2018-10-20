@@ -5,24 +5,28 @@ rm -r build > /dev/null
 make > /dev/null
 
 echo "testing..."
-type="ConstantProp"
+tpe="flow.ConstantProp"
+tar="test.$1"
+file="$1.$2"
 
 if [ $2 = "lv" ] ; then
-    type="Liveness"
+    tpe="flow.Liveness"
 elif [ $2 = "rd" ] ; then
-    type="ReachingDefs"
-elif [ $2 = "ft" ] ; then
-    type="Faintness"
+    tpe="submit.ReachingDefs"
+elif [ $2 = "tf" ] ; then
+    tpe="submit.Faintness"
+    tar="submit.$1"
+    file="$1"
 fi
 
-rm res/$1.$2 > /dev/null 2>&1
-./run.sh flow.Flow submit.MySolver flow.$type test.$1 > res/$1.$2
+rm res/$file > /dev/null 2>&1
+./run.sh flow.Flow submit.MySolver $tpe $tar > res/$file
 
-diff res/$1.$2 src/test/$1.$2.out;
+diff res/$file src/test/$file.out;
 if [ $? -eq 0 ]; then
     echo "AC"
 else
     echo "fail"
-    rm res/$1.$2
+    rm res/$file
 fi
 
