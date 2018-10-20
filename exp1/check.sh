@@ -27,6 +27,6 @@ if [ $? -eq 0 ]; then
     echo "AC"
 else
     echo "fail"
-    rm res/$1.$2
+    rm res/$file
 fi
 
