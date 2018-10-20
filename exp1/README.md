@@ -15,6 +15,7 @@
 ## 1. 实验过程
 
 本实验分为三步，按照下面的顺序完成：
+
 1. 补全MySolver框架，即 Data Flow 算法框架
 2. 实现Reaching Definition（一个前向算法）
 3. 实现Faintness（一个后向算法），并设计相关测例
@@ -22,6 +23,7 @@
 ## 2. MySolver
 
 这部分主要实现课本上的算法9-25，有以下要点：
+
 1. 注册analysis：由于是框架，需要可扩充不同的分析器，在`registerAnalysis`中为`this.analysis`赋值
 2. 确定分析方向：分为前向和后向两类，直接调用analysis的接口`isForward()`即可获取
 3. 获取TOP：不同的算法有各自的TOP值，调用analysis的接口`newTempVar()`获取一个变量，再调用其`setToTop()`
@@ -36,6 +38,7 @@
 ## 3. Reaching Definition
 
 这部分主要填充`analysis`的算法框架，是一种前向算法：
+
 1. 设计IN/OUT的变量，继承自 `Flow.DataflowObject`，我称为`DefSet`，类似Liveness，用TreeSet保存各定值点，TOP即为空集，BOTTOM即为全集，meet操作为并集，gen为直接添加进集合，kill则是判断所有被定值变量与当前Quad相同的定值点，把它们remove
 2. `preprocess`：在框架基础上，主要添加对BOTTOM全集的初始化，遍历所有Quad找出所有定值点，建立定值点到被定值变量的MAP，用TreeMap保存
 3. `postprocess`：不变
@@ -45,6 +48,7 @@
 ## 4. Faintness
 
 这部分主要填充`analysis`的算法框架，是一种后向算法：
+
 1. 设计IN/OUT的变量，继承自 `Flow.DataflowObject`，我称为`VarSet`，类似Liveness，用TreeSet保存各变量，TOP即为全集，BOTTOM即为空集，meet操作为交集
 2. 定义两个操作：`wakeVar`为直接从Faint变量集合中remove该变量（即该变量活跃，或awake），`faintVar`则是用来传递faint，参数为use和def，若def为faint，则use也为faint，否则`wakeVar(use)`
 3. `preprocess`：在框架基础上，主要添加对全集的初始化，遍历所有Quad找出所有变量
@@ -65,7 +69,7 @@
 
 另外，为了保证结果为最新的，每次测试将重新make，这是吸取了IDE有时忘记build就测试的教训。
 
-类似的，在IDE环境下我也写了一个测试脚本`src/test/check.sh`，对IDE配置做一些修改，运行时将log写入指定文件，执行脚本进行`diff`即可。
+类似的，在IDE环境下我也写了一个测试脚本，对IDE配置做一些修改，运行时将log写入指定文件，执行脚本进行`diff`即可。
 
 ## 6. 一点感想
 
