@@ -140,6 +140,10 @@ public class NonNull implements Flow.Analysis {
             return map.hashCode();
         }
 
+        public boolean isChecked(String v) {
+            return map.get(v).checked;
+        }
+
         public void killVar(String v) {
             SingleVar var = map.get(v);
             var.reDefine();
@@ -207,7 +211,19 @@ public class NonNull implements Flow.Analysis {
 //            System.out.println(i + " out: " + out[i].toString());
 //        }
 //        System.out.println("exit: " + exit.toString());
-        System.out.println("Finished!");
+        List<Integer> redundant = new ArrayList<Integer>();
+        QuadIterator qit = new QuadIterator(cfg);
+        while (qit.hasNext()) {
+            Quad q = qit.next();
+            Operator oprt = q.getOperator();
+            if (oprt instanceof Operator.NullCheck) {
+                String reg = q.getUsedRegisters().get(0).getRegister().toString();
+                if (in[q.getID()].isChecked(reg)) {
+                    redundant.add(q.getID());
+                }
+            }
+        }
+        System.out.println("Finished: " + cfg.getMethod().getName().toString() + redundant);
     }
 
     /* Is this a forward dataflow analysis? */
