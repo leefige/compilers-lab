@@ -1,5 +1,10 @@
 package submit;
 
+import flow.Flow;
+import flow.FlowSolver;
+import joeq.Class.jq_Class;
+import joeq.Main.Helper;
+
 import java.util.*;
 
 public class FindRedundantNullChecks {
@@ -17,6 +22,29 @@ public class FindRedundantNullChecks {
         if (extra)
             args.remove("-e");
         // TODO: Fill in this
+
+        // get an instance of the solver class.
+        Flow.Solver solver = new FlowSolver();
+
+
+        // get an instance of the analysis class.
+        Flow.Analysis analysis = new NonNull();
+
+        // get the classes we will be visiting.
+        jq_Class[] classes = new jq_Class[args.size()];
+        for (int i = 0; i < classes.length; i++)
+            classes[i] = (jq_Class) Helper.load(args.get(i));
+
+        // register the analysis with the solver.
+        solver.registerAnalysis(analysis);
+
+        // visit each of the specified classes with the solver.
+        for (int i = 0; i < classes.length; i++) {
+            System.out.println("Now analyzing " + classes[i].getName());
+            Helper.runPass(classes[i], solver);
+//            classes[i].
+        }
+
 
     }
 }

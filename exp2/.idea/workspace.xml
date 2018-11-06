@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c4d79337-8445-4159-bf98-246af0e43bb5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/src/submit/NonNull.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/RedunNullCheck.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/RedunNullCheck.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/submit/NonNull.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/NonNull.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,8 +18,8 @@
       <file leaf-file-name="NonNull.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/submit/NonNull.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3496">
-              <caret line="191" selection-start-line="191" selection-end-line="191" />
+            <state relative-caret-position="-76">
+              <caret line="204" column="7" lean-forward="true" selection-start-line="204" selection-start-column="7" selection-end-line="204" selection-end-column="7" />
               <folding>
                 <element signature="e#387#388#0" expanded="true" />
                 <element signature="e#421#422#0" expanded="true" />
@@ -65,8 +64,11 @@
       <file leaf-file-name="FindRedundantNullChecks.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="361">
-              <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+            <state relative-caret-position="219">
+              <caret line="42" column="36" lean-forward="true" selection-start-line="42" selection-start-column="36" selection-end-line="42" selection-end-column="36" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -74,47 +76,32 @@
       <file leaf-file-name="Helper.class" pinned="false" current-in-tab="false">
         <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Main/Helper.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="161">
-              <caret line="188" selection-start-line="188" selection-end-line="188" />
+            <state relative-caret-position="153">
+              <caret line="131" column="13" lean-forward="true" selection-start-line="131" selection-start-column="13" selection-end-line="131" selection-end-column="13" />
               <folding>
-                <element signature="e#5927#5928#0" expanded="true" />
+                <element signature="e#3945#3946#0" expanded="true" />
+                <element signature="e#3973#3974#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Quad.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/Quad.class">
+      <file leaf-file-name="jq_Class.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Class/jq_Class.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="163">
-              <caret line="204" selection-start-line="204" selection-end-line="204" />
-              <folding>
-                <element signature="e#5917#5918#0" expanded="true" />
-                <element signature="e#5963#5964#0" expanded="true" />
-                <element signature="e#6026#6027#0" expanded="true" />
-                <element signature="e#6611#6612#0" expanded="true" />
-                <element signature="e#6670#6671#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="172">
+              <caret line="163" column="21" selection-start-line="163" selection-start-column="21" selection-end-line="163" selection-end-column="21" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Operator.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/Operator.class">
+      <file leaf-file-name="jq_TypeVisitor.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Class/jq_TypeVisitor.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="2718" selection-start-line="2718" selection-end-line="2718" />
-              <folding>
-                <element signature="e#95009#95010#0" expanded="true" />
-                <element signature="e#95053#95054#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="95">
+              <caret line="8" column="15" lean-forward="true" selection-start-line="8" selection-start-column="15" selection-end-line="8" selection-end-column="15" />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="NullTest.basic.out" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/NullTest.basic.out">
-          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file leaf-file-name="FlowSolver.java" pinned="false" current-in-tab="false">
@@ -129,17 +116,26 @@
       <file leaf-file-name="Flow.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/flow/Flow.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="56" column="9" lean-forward="true" selection-start-line="17" selection-start-column="8" selection-end-line="56" selection-end-column="9" />
+            <state relative-caret-position="202">
+              <caret line="143" column="40" selection-start-line="143" selection-start-column="40" selection-end-line="143" selection-end-column="40" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="QuadIterator.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/QuadIterator.class">
+      <file leaf-file-name="ControlFlowGraphVisitor.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/ControlFlowGraphVisitor.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="163">
-              <caret line="273" selection-start-line="273" selection-end-line="273" />
+            <state relative-caret-position="76">
+              <caret line="11" column="23" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ControlFlowGraph.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/ControlFlowGraph.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="57">
+              <caret line="30" column="13" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -191,12 +187,12 @@
       <list>
         <option value="$PROJECT_DIR$/exp2.properties" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java" />
         <option value="$PROJECT_DIR$/src/flow/ReachingDefs.java" />
         <option value="$PROJECT_DIR$/src/flow/Flow.java" />
         <option value="$PROJECT_DIR$/src/submit/RedunNullCheck.java" />
         <option value="$PROJECT_DIR$/src/test/Testt.java" />
         <option value="$PROJECT_DIR$/src/submit/NonNull.java" />
+        <option value="$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java" />
       </list>
     </option>
   </component>
@@ -351,7 +347,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.NonNull NullTest">
+  <component name="RunManager" selected="Application.Find NullTest">
     <configuration name="Find NullTest" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="submit.FindRedundantNullChecks" />
       <module name="exp2" />
@@ -446,12 +442,12 @@
       <updated>1540370082327</updated>
       <workItem from="1540370087162" duration="1007000" />
       <workItem from="1541490826109" duration="292000" />
-      <workItem from="1541491183772" duration="19505000" />
+      <workItem from="1541491183772" duration="20200000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="20804000" />
+    <option name="totallyTimeSpent" value="21499000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1519" height="977" extended-state="6" />
@@ -465,10 +461,10 @@
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.3297619" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.42857143" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.42857143" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18206708" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18206708" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="right" id="SciView" order="3" />
@@ -500,14 +496,8 @@
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/submit/RedunNullCheck.java</url>
-          <line>273</line>
-          <properties />
-          <option name="timeStamp" value="11" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/submit/NonNull.java</url>
-          <line>264</line>
+          <line>265</line>
           <properties />
           <option name="timeStamp" value="15" />
         </line-breakpoint>
@@ -544,6 +534,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="76">
           <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -767,16 +760,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Main/Helper.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="188" selection-start-line="188" selection-end-line="188" />
-          <folding>
-            <element signature="e#5927#5928#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/Quad.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="163">
@@ -808,10 +791,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/flow/FlowSolver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="475">
+          <caret line="31" column="52" selection-start-line="31" selection-start-column="52" selection-end-line="31" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/submit/NonNull.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3496">
-          <caret line="191" selection-start-line="191" selection-end-line="191" />
+        <state relative-caret-position="-76">
+          <caret line="204" column="7" lean-forward="true" selection-start-line="204" selection-start-column="7" selection-end-line="204" selection-end-column="7" />
           <folding>
             <element signature="e#387#388#0" expanded="true" />
             <element signature="e#421#422#0" expanded="true" />
@@ -852,24 +842,59 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/flow/FlowSolver.java">
+    <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Class/jq_Class.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
-          <caret line="31" column="52" selection-start-line="31" selection-start-column="52" selection-end-line="31" selection-end-column="52" />
+        <state relative-caret-position="172">
+          <caret line="163" column="21" selection-start-line="163" selection-start-column="21" selection-end-line="163" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Class/jq_TypeVisitor.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="8" column="15" lean-forward="true" selection-start-line="8" selection-start-column="15" selection-end-line="8" selection-end-column="15" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/flow/Flow.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="56" column="9" lean-forward="true" selection-start-line="17" selection-start-column="8" selection-end-line="56" selection-end-column="9" />
+        <state relative-caret-position="202">
+          <caret line="143" column="40" selection-start-line="143" selection-start-column="40" selection-end-line="143" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/ControlFlowGraphVisitor.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="76">
+          <caret line="11" column="23" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/ControlFlowGraph.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="30" column="13" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Main/Helper.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="131" column="13" lean-forward="true" selection-start-line="131" selection-start-column="13" selection-end-line="131" selection-end-column="13" />
+          <folding>
+            <element signature="e#3945#3946#0" expanded="true" />
+            <element signature="e#3973#3974#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+        <state relative-caret-position="219">
+          <caret line="42" column="36" lean-forward="true" selection-start-line="42" selection-start-column="36" selection-end-line="42" selection-end-column="36" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

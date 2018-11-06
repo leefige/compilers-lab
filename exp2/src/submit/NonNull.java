@@ -201,12 +201,13 @@ public class NonNull implements Flow.Analysis {
     }
 
     public void postprocess(ControlFlowGraph cfg) {
-        System.out.println("entry: " + entry.toString());
-        for (int i = 0; i < in.length; i++) {
-            System.out.println(i + " in:  " + in[i].toString());
-            System.out.println(i + " out: " + out[i].toString());
-        }
-        System.out.println("exit: " + exit.toString());
+//        System.out.println("entry: " + entry.toString());
+//        for (int i = 0; i < in.length; i++) {
+//            System.out.println(i + " in:  " + in[i].toString());
+//            System.out.println(i + " out: " + out[i].toString());
+//        }
+//        System.out.println("exit: " + exit.toString());
+        System.out.println("Finished!");
     }
 
     /* Is this a forward dataflow analysis? */
