@@ -90,20 +90,29 @@ public class NullTest {
         }
 
         a.toString();
+        // i: R10
+        // LOOP CHECK: BB6
+        // loop: BB7
         for (int i = 0; i < 2; ++i) {
             a.toString();
             a = getInteger(true);
         }
 
+        // BB8
         Integer[] arr;
         if (q) {
+            // BB9
             arr = new Integer[1];
         } else {
+            // BB10
             arr = null;
         }
 
+        // BB11
+        // ARR: R11
         arr.toString();
         arr = new Integer[2];
+        // QID=35, NULL CHECK R11
         arr[0] = a;
         arr.toString();
         arr[0].toString();

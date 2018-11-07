@@ -2,9 +2,13 @@ package submit;
 
 import flow.Flow;
 import flow.Liveness;
+import joeq.Class.jq_Reference;
 import joeq.Compiler.Quad.*;
 import joeq.Compiler.Quad.Operand.IConstOperand;
+import joeq.Compiler.Quad.Operand.AConstOperand;
 import joeq.Compiler.Quad.Operand.RegisterOperand;
+import joeq.Compiler.Quad.Operand.ConditionOperand;
+
 import joeq.Main.Helper;
 
 import java.util.*;
@@ -331,7 +335,9 @@ public class NonNull implements Flow.Analysis {
             } else {
                 Operator oprt = q.getOperator();
                 if (oprt instanceof Operator.NullCheck ||
-                        q.getOperator() instanceof Operator.AStore) {
+                        oprt instanceof Operator.IntIfCmp ||
+                        oprt instanceof Operator.Move ||
+                        oprt instanceof Operator.Unary) {
                     return;
                 }
             }
@@ -351,6 +357,97 @@ public class NonNull implements Flow.Analysis {
                 // has been checked
                 val.checkVar(reg);
             }
+        }
+
+        /**COND for IntIfCmp
+         * SHIT JOEQ DOC!!!
+         * Cond:
+         *  0 for EQ
+         *  1 for NE
+         * */
+//        @Override
+//        public void visitIntIfCmp(Quad q) {
+//            final byte EQ = 0;
+//            final byte NE = 1;
+//            if (checkLevel != NonNull.LEVEL_NORMAL) {
+//                Operand s1 = Operator.IntIfCmp.getSrc1(q);
+//                Operand s2 = Operator.IntIfCmp.getSrc2(q);
+//
+//                // only do this when at least one of opr is reg
+//                if (s1 instanceof RegisterOperand && !(s2 instanceof RegisterOperand) ||
+//                        s2 instanceof RegisterOperand && !(s1 instanceof RegisterOperand)) {
+//                    byte cond = Operator.IntIfCmp.getCond(q).getCondition();
+//                    Operand reg = s1 instanceof RegisterOperand ? s1 : s2;
+//                    Operand other = s1 instanceof RegisterOperand ? s2 : s1;
+//                    String regName = ((RegisterOperand) reg).getRegister().toString();
+//                    // now ensure reg is register oprd
+//                    if (cond == EQ) {
+//                        if (isChecked(other)) {
+//                            val.checkVar(regName);
+//                        }
+//                    } else if (cond == NE) {
+//                        if (!isChecked(other)) {
+//                            val.checkVar(regName);
+//                        }
+//                    }
+//                } else if (s1 instanceof RegisterOperand && s2 instanceof RegisterOperand) {
+//                    RegisterOperand r1 = (RegisterOperand) s1;
+//                    RegisterOperand r2 = (RegisterOperand) s2;
+//                    String reg1 = r1.getRegister().toString();
+//                    String reg2 = r2.getRegister().toString();
+//                    byte cond = Operator.IntIfCmp.getCond(q).getCondition();
+//                    if (cond == EQ) {
+//                        if (isChecked(r1)) {
+//                            val.checkVar(reg2);
+//                        }
+//                        if (isChecked(r2)) {
+//                            val.checkVar(reg1);
+//                        }
+//                    } else if (cond == NE) {
+//                        if (!isChecked(r1)) {
+//                            val.checkVar(reg2);
+//                        }
+//                        if (!isChecked(r2)) {
+//                            val.checkVar(reg1);
+//                        }
+//                    }
+//
+//                }
+//            }
+//        }
+
+        @Override
+        public void visitMove(Quad q) {
+            if (checkLevel != NonNull.LEVEL_NORMAL) {
+                Operand src = Operator.Move.getSrc(q);
+                String dst = Operator.Move.getDest(q).getRegister().toString();
+                if (isChecked(src)){
+                    val.checkVar(dst);
+                } else {
+                    val.killVar(dst);
+                }
+            }
+        }
+
+        @Override
+        public void visitUnary(Quad q) {
+            if (checkLevel != NonNull.LEVEL_NORMAL) {
+                String dst = Operator.Unary.getDest(q).getRegister().toString();
+                Operand src = Operator.Unary.getSrc(q);
+                if (isChecked(src)){
+                    val.checkVar(dst);
+                } else {
+                    val.killVar(dst);
+                }
+            }
+        }
+
+        private boolean isChecked(Operand op) {
+            return (op instanceof Operand.IConstOperand ||
+                    op instanceof Operand.AConstOperand &&
+                            ((AConstOperand) op).getType() != jq_Reference.jq_NullType.NULL_TYPE) ||
+                    (op instanceof RegisterOperand &&
+                            val.isChecked(((RegisterOperand) op).getRegister().toString()));
         }
     }
 }
