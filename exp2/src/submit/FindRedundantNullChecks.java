@@ -19,8 +19,13 @@ public class FindRedundantNullChecks {
     public static void main(String[] _args) {
         List<String> args = new ArrayList<String>(Arrays.asList(_args));
         boolean extra = args.contains("-e");
-        if (extra)
+        int checkLevel;
+        if (extra) {
             args.remove("-e");
+            checkLevel = NonNull.LEVEL_HIGH;
+        } else {
+            checkLevel = NonNull.LEVEL_NORMAL;
+        }
         // TODO: Fill in this
 
         // get an instance of the solver class.
@@ -28,7 +33,7 @@ public class FindRedundantNullChecks {
 
 
         // get an instance of the analysis class.
-        Flow.Analysis analysis = new NonNull();
+        Flow.Analysis analysis = new NonNull(checkLevel);
 
         // get the classes we will be visiting.
         jq_Class[] classes = new jq_Class[args.size()];
@@ -40,7 +45,7 @@ public class FindRedundantNullChecks {
 
         // visit each of the specified classes with the solver.
         for (int i = 0; i < classes.length; i++) {
-            System.out.println("Now analyzing " + classes[i].getName());
+//            System.out.println("Now analyzing " + classes[i].getName());
             Helper.runPass(classes[i], solver);
         }
     }

@@ -155,12 +155,34 @@ public class NonNull implements Flow.Analysis {
         }
     }
 
+    final public static int LEVEL_NORMAL = 0;
+    final public static int LEVEL_HIGH = 1;
+    private int level;
     private CheckTable[] in, out;
     private CheckTable entry, exit;
-    private TransferFunction transferfn = new TransferFunction();
+    private TransferFunction transferfn;
+
+    public NonNull() {
+        level = LEVEL_NORMAL;
+        transferfn = new TransferFunction(level);
+    }
+
+    public NonNull(int lv) {
+        switch (lv) {
+            case LEVEL_HIGH:
+                level = lv;
+                break;
+            case LEVEL_NORMAL:
+            default:
+                level = LEVEL_NORMAL;
+                break;
+        }
+        transferfn = new TransferFunction(level);
+    }
 
     public void preprocess(ControlFlowGraph cfg) {
-        System.out.println("Method: " + cfg.getMethod().getName().toString());
+//        System.out.println("Method: " + cfg.getMethod().getName().toString());
+        System.out.print(cfg.getMethod().getName().toString());
         /* Generate initial conditions. */
         QuadIterator qit = new QuadIterator(cfg);
         int max = 0;
@@ -201,7 +223,7 @@ public class NonNull implements Flow.Analysis {
             out[i] = new CheckTable();
         }
 
-        System.out.println("Initialization completed. VarSet.core: " + CheckTable.core);
+//        System.out.println("Initialization completed. VarSet.core: " + CheckTable.core);
     }
 
     public void postprocess(ControlFlowGraph cfg) {
@@ -211,7 +233,7 @@ public class NonNull implements Flow.Analysis {
 //            System.out.println(i + " out: " + out[i].toString());
 //        }
 //        System.out.println("exit: " + exit.toString());
-        List<Integer> redundant = new ArrayList<Integer>();
+        Set<Integer> redundant = new TreeSet<Integer>();
         QuadIterator qit = new QuadIterator(cfg);
         while (qit.hasNext()) {
             Quad q = qit.next();
@@ -223,7 +245,11 @@ public class NonNull implements Flow.Analysis {
                 }
             }
         }
-        System.out.println("Finished: " + cfg.getMethod().getName().toString() + redundant);
+//        System.out.println(redundant);
+        for (Integer qid : redundant) {
+            System.out.print(" " + qid);
+        }
+        System.out.println();
     }
 
     /* Is this a forward dataflow analysis? */
@@ -290,11 +316,24 @@ public class NonNull implements Flow.Analysis {
     /* The QuadVisitor that actually does the computation */
     public static class TransferFunction extends QuadVisitor.EmptyVisitor {
         CheckTable val;
+        int checkLevel;
+
+        TransferFunction(int lv) {
+            checkLevel = lv;
+        }
 
         @Override
         public void visitQuad(Quad q) {
-            if (q.getOperator() instanceof Operator.NullCheck) {
-                return;
+            if (checkLevel == NonNull.LEVEL_NORMAL) {
+                if (q.getOperator() instanceof Operator.NullCheck) {
+                    return;
+                }
+            } else {
+                Operator oprt = q.getOperator();
+                if (oprt instanceof Operator.NullCheck ||
+                        q.getOperator() instanceof Operator.AStore) {
+                    return;
+                }
             }
 
             for (RegisterOperand def : q.getDefinedRegisters()) {
