@@ -373,9 +373,12 @@ public class NonNull implements Flow.Analysis {
             Quad q = qit.next();
             Operator oprt = q.getOperator();
             if (oprt instanceof Operator.NullCheck) {
-                String reg = q.getUsedRegisters().get(0).getRegister().toString();
-                if (in[q.getID()].isNotNull(reg)) {
-                    redundant.add(q.getID());
+                for (RegisterOperand target : q.getUsedRegisters()) {
+                    String reg = target.getRegister().toString();
+                    // has been checked
+                    if (in[q.getID()].isNotNull(reg)) {
+                        redundant.add(q.getID());
+                    }
                 }
             }
         }

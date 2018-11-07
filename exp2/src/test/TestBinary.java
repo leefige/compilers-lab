@@ -1,5 +1,10 @@
 package test;
 
+import joeq.Compiler.Quad.Operator;
+
+import java.util.Set;
+import java.util.TreeSet;
+
 public class TestBinary {
     int binary(int a) {
         Integer aa = new Integer(a);
@@ -16,5 +21,13 @@ public class TestBinary {
         new Integer(a).toString();
         new Integer(-a);
         return a;
+    }
+
+    void cmp() {
+        Integer set = new Integer(0);
+        if (set != null) {
+            set.toString();
+        }
+        set.toString();
     }
 }
