@@ -360,6 +360,8 @@ public class NonNull implements Flow.Analysis {
 //        System.out.println("Initialization completed. VarSet.core: " + CheckTable.core);
     }
 
+    public Map<String, Set<Integer>> allResult = new HashMap<String, Set<Integer>>();
+
     public void postprocess(ControlFlowGraph cfg) {
 //        System.out.println("entry: " + entry.toString());
 //        for (int i = 0; i < in.length; i++) {
@@ -387,6 +389,7 @@ public class NonNull implements Flow.Analysis {
             System.out.print(" " + qid);
         }
         System.out.println();
+        allResult.put(cfg.getMethod().getName().toString(), redundant);
     }
 
     /* Is this a forward dataflow analysis? */

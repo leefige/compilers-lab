@@ -1,15 +1,14 @@
 package submit;
 
 import examples.PrintQuads;
+import flow.Flow;
+import flow.FlowSolver;
 import joeq.Class.jq_Class;
 import joeq.Interpreter.QuadInterpreter;
 import joeq.Main.Driver;
 import joeq.Main.Helper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 class Optimize {
     /**
@@ -17,11 +16,26 @@ class Optimize {
      * @param nullCheckOnly   if set to true, disable all optimizations except "remove redundant NULL_CHECKs."
      */
     private static List<jq_Class> optimize(List<String> optimizeClasses, boolean nullCheckOnly) {
+        // get an instance of the solver class.
+        Flow.Solver solver = new FlowSolver();
+
+        // get an instance of the analysis class.
+        Flow.Analysis nonNull = new NonNull(NonNull.LEVEL_NORMAL);
+
         List<jq_Class> outputs = new ArrayList<jq_Class>();
         for (String className : optimizeClasses) {
             jq_Class clazz = (jq_Class) Helper.load(className);
 
             // TODO: Remove redundant null checks
+
+            // register the analysis with the solver.
+            solver.registerAnalysis(nonNull);
+            Helper.runPass(clazz, solver);
+            Map<String, Set<Integer>> redundant = new HashMap<String, Set<Integer>>(((NonNull) nonNull).allResult);
+            System.out.println("all result: " + redundant);
+            System.out.println();
+
+//            clazz.
 
             if (!nullCheckOnly) {
                 // TODO: Run your extra optimizations. (Not required)
