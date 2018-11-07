@@ -1,13 +1,10 @@
 package submit;
 
 import flow.Flow;
-import flow.Liveness;
 import joeq.Class.jq_Reference;
 import joeq.Compiler.Quad.*;
-import joeq.Compiler.Quad.Operand.IConstOperand;
 import joeq.Compiler.Quad.Operand.AConstOperand;
 import joeq.Compiler.Quad.Operand.RegisterOperand;
-import joeq.Compiler.Quad.Operand.ConditionOperand;
 import joeq.Compiler.Quad.Operand.TargetOperand;
 
 import joeq.Main.Helper;
@@ -17,60 +14,146 @@ import java.util.*;
 public class NonNull implements Flow.Analysis {
 
     public static class SingleVar implements Flow.DataflowObject {
-        public boolean checked;
+        public final static int UDF = 0;    // UNDEF
+        public final static int CHK = 1;    // CHECKED
+        public final static int UKN = 2;    // UKNOWN
+
+
+        private int state;
+        private boolean notNull;
+        private int target;
 
         public SingleVar() {
-            setToTop();
+            setUndef();
         }
 
         public void setToTop() {
-            checked = true;
+            setUndef();
         }
 
         public void setToBottom() {
-            checked = false;
+            setUnkown();
         }
 
         public void meetWith(Flow.DataflowObject o) {
             SingleVar a = (SingleVar) o;
-            checked = checked && a.checked;
+            if (a.state == UDF)
+                return;
+            if (state == UDF) {
+                state = a.state;
+                target = a.target;
+                notNull = a.notNull;
+                return;
+            }
+
+            if (state == UKN || a.state == UKN) {
+                setUnkown();
+                return;
+            }
+            /* otherwise, both are checked */
+            // only consider when possible val is the same
+            if (notNull == a.notNull) {
+                if (a.target == -1 || target == a.target) {
+                    return;
+                } else if (target == -1) {
+                    target = a.target;
+                    return;
+                }
+            }
+            setUnkown();
         }
 
         public void copy(Flow.DataflowObject o) {
             SingleVar a = (SingleVar) o;
-            checked = a.checked;
+            state = a.state;
+            notNull = a.notNull;
+            target = a.target;
         }
 
         @Override
         public boolean equals(Object o) {
             if (o instanceof SingleVar) {
                 SingleVar a = (SingleVar) o;
-                return checked == a.checked;
+                if (state != CHK) {
+                    return a.state == state;
+                } else {
+                    return a.state == state && a.notNull == notNull;
+                }
             }
             return false;
         }
 
-        // same as Boolean
         @Override
         public int hashCode() {
-            return checked ? 1231 : 1237;
+            return state;
         }
 
         @Override
         public String toString() {
-            if (checked) {
-                return "Checked";
-            } else {
-                return "Unknown";
+            switch (state) {
+                case UDF:
+                    return "UDF";
+                case CHK:
+                    String res = notNull ? "NN" : "NUL";
+                    return target != -1 ? res + "(" + target + ")" : res;
+                case UKN:
+                    return "UKN";
+                default:
+                    break;
             }
+            return ("<invalid state " + state + ">");
         }
 
-        public void reDefine() {
-            checked = false;
+        public void setUndef() {
+            state = UDF;
+            target = -1;
         }
 
-        public void check() {
-            checked = true;
+        public void setUnkown() {
+            state = UKN;
+            target = -1;
+        }
+
+        public boolean isUndef() {
+            return state == UDF;
+        }
+
+        public boolean isChecked() {
+            return state == CHK;
+        }
+
+        public boolean isNotNull() {
+            return isChecked() && notNull;
+        }
+
+        public boolean isUnknown() {
+            return state == UKN;
+        }
+
+        public boolean hasBranch() {
+            return target != -1;
+        }
+
+        public int getTarget() {
+            return target;
+        }
+
+        public void setCheck(boolean val, int tar) {
+            state = CHK;
+            notNull = val;
+            target = tar;
+        }
+
+        public void setCheck(boolean val) {
+            setCheck(val, -1);
+        }
+
+        public void confirm() {
+            setCheck(notNull);
+        }
+
+        public void reject() {
+            setCheck(!notNull);
         }
     }
 
@@ -80,11 +163,9 @@ public class NonNull implements Flow.Analysis {
         private static Set<String> core = new HashSet<String>();
         private static Map<Integer, Integer> quadBBMap = new TreeMap<Integer, Integer>();
         private SortedMap<String, SingleVar> map;
-        private Map<String, Integer> branchChecked;
 
         public CheckTable() {
             map = new TreeMap<String, SingleVar>();
-            branchChecked = new TreeMap<String, Integer>();
             for (String key : core) {
                 map.put(key, new SingleVar());
             }
@@ -122,14 +203,6 @@ public class NonNull implements Flow.Analysis {
                 SingleVar mine = map.get(e.getKey());
                 mine.meetWith(e.getValue());
             }
-            Map<String, Integer> origin = branchChecked;
-            branchChecked = new TreeMap<String, Integer>();
-            for (String key : origin.keySet()) {
-                if (a.branchChecked.containsKey(key) &&
-                        a.branchChecked.get(key).equals(origin.get(key))) {
-                    branchChecked.put(key, origin.get(key));
-                }
-            }
         }
 
         public void copy(Flow.DataflowObject o) {
@@ -138,7 +211,6 @@ public class NonNull implements Flow.Analysis {
                 SingleVar mine = map.get(e.getKey());
                 mine.copy(e.getValue());
             }
-            branchChecked = new TreeMap<String, Integer>(a.branchChecked);
         }
 
         @Override
@@ -164,33 +236,44 @@ public class NonNull implements Flow.Analysis {
         }
 
         public boolean isChecked(String v) {
-            return map.get(v).checked;
+            return map.get(v).isChecked();
+        }
+
+        public boolean isNotNull(String v) {
+            return map.get(v).isNotNull();
         }
 
         public void killVar(String v) {
             SingleVar var = map.get(v);
-            var.reDefine();
+            var.setUnkown();
+        }
+
+        public void checkVar(String v, boolean notNull) {
+            SingleVar var = map.get(v);
+            var.setCheck(notNull);
         }
 
         public void checkVar(String v) {
             SingleVar var = map.get(v);
-            var.check();
+            var.setCheck(true);
         }
 
-        public void setBranch(String reg, int bid) {
-            branchChecked.put(reg, bid);
+        public void checkVarWithBranch(String v, boolean notNull, int target) {
+            SingleVar var = map.get(v);
+            var.setCheck(notNull, target);
         }
 
         public void checkBranch(int qid) {
             int bbid = quadBBMap.get(qid);
-            if (!branchChecked.isEmpty()) {
-                for (String reg : branchChecked.keySet()) {
-                    SingleVar var = map.get(reg);
-                    if (branchChecked.get(reg).equals(bbid)) {
-                        var.check();
+            for (String reg : map.keySet()) {
+                SingleVar var = map.get(reg);
+                if (var.isChecked() && var.hasBranch()) {
+                    if (var.getTarget() == bbid) {
+                        var.confirm();
+                    } else {
+                        var.reject();
                     }
                 }
-                branchChecked.clear();
             }
         }
     }
@@ -291,7 +374,7 @@ public class NonNull implements Flow.Analysis {
             Operator oprt = q.getOperator();
             if (oprt instanceof Operator.NullCheck) {
                 String reg = q.getUsedRegisters().get(0).getRegister().toString();
-                if (in[q.getID()].isChecked(reg)) {
+                if (in[q.getID()].isNotNull(reg)) {
                     redundant.add(q.getID());
                 }
             }
@@ -355,8 +438,9 @@ public class NonNull implements Flow.Analysis {
     }
 
     public void processQuad(Quad q) {
+        // modify 'in' to check if there is branch condition
+        in[q.getID()].checkBranch(q.getID());
         transferfn.val.copy(in[q.getID()]);
-        transferfn.val.checkBranch(q.getID());
         Helper.runPass(q, transferfn);
         out[q.getID()].copy(transferfn.val);
     }
@@ -436,11 +520,15 @@ public class NonNull implements Flow.Analysis {
 
                     if (cond == EQ) {
                         if (isChecked(other)) {
-                            val.setBranch(regName, targBBid);
+                            val.checkVarWithBranch(regName, true, targBBid);
+                        } else if (isNull(other)) {
+                            val.checkVarWithBranch(regName, false, targBBid);
                         }
                     } else if (cond == NE) {
                         if (isNull(other)) {
-                            val.setBranch(regName, targBBid);
+                            val.checkVarWithBranch(regName, true, targBBid);
+                        } else if (isChecked(other)) {
+                            val.checkVarWithBranch(regName, false, targBBid);
                         }
                     }
                 } else if (s1 instanceof RegisterOperand && s2 instanceof RegisterOperand) {
@@ -450,17 +538,23 @@ public class NonNull implements Flow.Analysis {
                     String reg2 = r2.getRegister().toString();
                     if (cond == EQ) {
                         if (isChecked(r1)) {
-                            val.setBranch(reg2, targBBid);
-                        }
-                        else if (isChecked(r2)) {
-                            val.setBranch(reg1, targBBid);
+                            val.checkVarWithBranch(reg2, true, targBBid);
+                        } else if (isNull(r1)) {
+                            val.checkVarWithBranch(reg2, false, targBBid);
+                        } else if (isChecked(r2)) {
+                            val.checkVarWithBranch(reg1, true, targBBid);
+                        } else if (isNull(r2)) {
+                            val.checkVarWithBranch(reg1, false, targBBid);
                         }
                     } else if (cond == NE) {
-                        if (isNull(r1)) {
-                            val.setBranch(reg2, targBBid);
-                        }
-                        else if (isNull(r2)) {
-                            val.setBranch(reg1, targBBid);
+                        if (isChecked(r1)) {
+                            val.checkVarWithBranch(reg2, false, targBBid);
+                        } else if (isNull(r1)) {
+                            val.checkVarWithBranch(reg2, true, targBBid);
+                        } else if (isChecked(r2)) {
+                            val.checkVarWithBranch(reg1, false, targBBid);
+                        } else if (isNull(r2)) {
+                            val.checkVarWithBranch(reg1, true, targBBid);
                         }
                     }
 

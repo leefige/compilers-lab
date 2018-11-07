@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c4d79337-8445-4159-bf98-246af0e43bb5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/src/submit/QuadBBVisitor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/TestBinary.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/submit/NonNull.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/NonNull.java" afterDir="false" />
     </list>
@@ -31,14 +29,27 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="NonNull.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="NonNull.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/submit/NonNull.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5996">
-              <caret line="456" column="25" lean-forward="true" selection-start-line="456" selection-start-column="25" selection-end-line="456" selection-end-column="25" />
+            <state relative-caret-position="266">
+              <caret line="443" selection-start-line="443" selection-end-line="443" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="class#SingleVar#0;class#NonNull#0" />
+                <element signature="e#660#661#0" expanded="true" />
+                <element signature="e#698#699#0" expanded="true" />
+                <element signature="e#3196#3197#0" expanded="true" />
+                <element signature="e#3248#3249#0" expanded="true" />
+                <element signature="e#3353#3354#0" expanded="true" />
+                <element signature="e#3396#3397#0" expanded="true" />
+                <element signature="e#3422#3423#0" expanded="true" />
+                <element signature="e#3459#3460#0" expanded="true" />
+                <element signature="e#3494#3495#0" expanded="true" />
+                <element signature="e#3528#3529#0" expanded="true" />
+                <element signature="e#3728#3729#0" expanded="true" />
+                <element signature="e#3762#3763#0" expanded="true" />
+                <element signature="e#3897#3898#0" expanded="true" />
+                <element signature="e#3938#3939#0" expanded="true" />
                 <element signature="e#2019#2037#0" expanded="true" />
                 <element signature="e#2510#2511#0" expanded="true" />
                 <element signature="e#2547#2548#0" expanded="true" />
@@ -50,8 +61,8 @@
                 <element signature="e#4029#4030#0" expanded="true" />
                 <element signature="e#4075#4076#0" expanded="true" />
                 <element signature="e#4124#4125#0" expanded="true" />
-                <element signature="e#4414#4415#0" expanded="true" />
-                <element signature="e#4465#4466#0" expanded="true" />
+                <element signature="e#6211#6212#0" expanded="true" />
+                <element signature="e#6264#6265#0" expanded="true" />
                 <element signature="e#5924#5933#0" expanded="true" />
                 <element signature="method#getEntry#0;class#NonNull#0" />
                 <element signature="method#getExit#0;class#NonNull#0" />
@@ -64,11 +75,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PrintNullTest.log" pinned="false" current-in-tab="true">
+      <file leaf-file-name="PrintNullTest.log" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/res/PrintNullTest.log">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="62" column="42" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="42" />
+            <state relative-caret-position="171">
+              <caret line="87" column="30" selection-start-line="87" selection-start-column="28" selection-end-line="87" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -76,7 +87,7 @@
       <file leaf-file-name="NullTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/NullTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1995">
+            <state relative-caret-position="1938">
               <caret line="114" column="33" selection-start-line="114" selection-start-column="33" selection-end-line="114" selection-end-column="33" />
             </state>
           </provider>
@@ -103,7 +114,7 @@
       <file leaf-file-name="ConstantProp.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/flow/ConstantProp.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="86">
+            <state relative-caret-position="380">
               <caret line="25" column="10" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="10" />
             </state>
           </provider>
@@ -128,15 +139,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="148">
               <caret line="76" selection-start-line="76" selection-end-line="76" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Flow.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/flow/Flow.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2641">
-              <caret line="143" column="40" selection-start-line="143" selection-start-column="40" selection-end-line="143" selection-end-column="40" />
             </state>
           </provider>
         </entry>
@@ -169,7 +171,6 @@
       <find>MyDataflowObject</find>
       <find>checkMap</find>
       <find>notNull</find>
-      <find>SingleCP</find>
       <find>ConstantPropTable</find>
       <find>universalSet</find>
       <find>q</find>
@@ -177,15 +178,16 @@
       <find>GE</find>
       <find>choosePowers</find>
       <find>null</find>
+      <find>SingleCP</find>
     </findStrings>
     <replaceStrings>
       <replace>CheckSet</replace>
       <replace>checkMap</replace>
       <replace>QuadSet</replace>
       <replace>checked</replace>
-      <replace>SingleVar</replace>
       <replace>CheckTable</replace>
       <replace>varQuadMap</replace>
+      <replace>SingleVar</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -354,7 +356,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Find-e NullTest">
+  <component name="RunManager" selected="Application.Find NullTest">
     <configuration name="Find NullTest" type="Application" factoryName="Application">
       <output_file path="$PROJECT_DIR$/res/NullTest.basic.log" is_save="true" />
       <option name="MAIN_CLASS_NAME" value="submit.FindRedundantNullChecks" />
@@ -524,12 +526,12 @@
       <workItem from="1540370087162" duration="1007000" />
       <workItem from="1541490826109" duration="292000" />
       <workItem from="1541491183772" duration="20705000" />
-      <workItem from="1541562195679" duration="18542000" />
+      <workItem from="1541562195679" duration="25318000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="40546000" />
+    <option name="totallyTimeSpent" value="47322000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1519" height="977" extended-state="6" />
@@ -543,10 +545,10 @@
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.3297619" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.42857143" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.42857143" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18480493" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.18480493" />
       <window_info anchor="right" id="Database" order="3" weight="0.32991102" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3297619" />
       <window_info anchor="right" id="SciView" order="3" weight="0.32991102" />
@@ -579,7 +581,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/submit/NonNull.java</url>
-          <line>377</line>
+          <line>461</line>
           <properties class="submit.NonNull.TransferFunction" method="visitQuad">
             <option name="EMULATED" value="true" />
           </properties>
@@ -587,7 +589,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/submit/NonNull.java</url>
-          <line>401</line>
+          <line>485</line>
           <properties class="submit.NonNull.TransferFunction" method="visitNullCheck">
             <option name="EMULATED" value="true" />
           </properties>
@@ -595,7 +597,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/submit/NonNull.java</url>
-          <line>417</line>
+          <line>501</line>
           <properties class="submit.NonNull.TransferFunction" method="visitIntIfCmp">
             <option name="EMULATED" value="true" />
           </properties>
@@ -623,16 +625,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/SkipList.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="494">
@@ -917,13 +909,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/flow/ConstantProp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="86">
-          <caret line="25" column="10" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/flow/Faintness.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-342">
@@ -935,20 +920,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="148">
           <caret line="76" selection-start-line="76" selection-end-line="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/SkipList.basic.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/NullTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1995">
-          <caret line="114" column="33" selection-start-line="114" selection-start-column="33" selection-end-line="114" selection-end-column="33" />
         </state>
       </provider>
     </entry>
@@ -964,13 +935,65 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/flow/ConstantProp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="380">
+          <caret line="25" column="10" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Develop/Java/jdk1.5.0_22/src.zip!/java/lang/Object.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="151">
+          <caret line="207" column="18" selection-start-line="207" selection-start-column="18" selection-end-line="207" selection-end-column="18" />
+          <folding>
+            <element signature="e#9980#9981#0" expanded="true" />
+            <element signature="e#10056#10057#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/SkipList.basic.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/PrintNullTest.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="87" column="30" selection-start-line="87" selection-start-column="28" selection-end-line="87" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/NullTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1938">
+          <caret line="114" column="33" selection-start-line="114" selection-start-column="33" selection-end-line="114" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/submit/NonNull.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5996">
-          <caret line="456" column="25" lean-forward="true" selection-start-line="456" selection-start-column="25" selection-end-line="456" selection-end-column="25" />
+        <state relative-caret-position="266">
+          <caret line="443" selection-start-line="443" selection-end-line="443" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="class#SingleVar#0;class#NonNull#0" />
+            <element signature="e#660#661#0" expanded="true" />
+            <element signature="e#698#699#0" expanded="true" />
+            <element signature="e#3196#3197#0" expanded="true" />
+            <element signature="e#3248#3249#0" expanded="true" />
+            <element signature="e#3353#3354#0" expanded="true" />
+            <element signature="e#3396#3397#0" expanded="true" />
+            <element signature="e#3422#3423#0" expanded="true" />
+            <element signature="e#3459#3460#0" expanded="true" />
+            <element signature="e#3494#3495#0" expanded="true" />
+            <element signature="e#3528#3529#0" expanded="true" />
+            <element signature="e#3728#3729#0" expanded="true" />
+            <element signature="e#3762#3763#0" expanded="true" />
+            <element signature="e#3897#3898#0" expanded="true" />
+            <element signature="e#3938#3939#0" expanded="true" />
             <element signature="e#2019#2037#0" expanded="true" />
             <element signature="e#2510#2511#0" expanded="true" />
             <element signature="e#2547#2548#0" expanded="true" />
@@ -982,8 +1005,8 @@
             <element signature="e#4029#4030#0" expanded="true" />
             <element signature="e#4075#4076#0" expanded="true" />
             <element signature="e#4124#4125#0" expanded="true" />
-            <element signature="e#4414#4415#0" expanded="true" />
-            <element signature="e#4465#4466#0" expanded="true" />
+            <element signature="e#6211#6212#0" expanded="true" />
+            <element signature="e#6264#6265#0" expanded="true" />
             <element signature="e#5924#5933#0" expanded="true" />
             <element signature="method#getEntry#0;class#NonNull#0" />
             <element signature="method#getExit#0;class#NonNull#0" />
@@ -992,13 +1015,6 @@
             <element signature="e#9992#9993#0" expanded="true" />
             <element signature="e#10031#10032#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/PrintNullTest.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="62" column="42" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="42" />
         </state>
       </provider>
     </entry>
