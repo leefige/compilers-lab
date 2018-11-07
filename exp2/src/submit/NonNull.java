@@ -8,6 +8,7 @@ import joeq.Compiler.Quad.Operand.IConstOperand;
 import joeq.Compiler.Quad.Operand.AConstOperand;
 import joeq.Compiler.Quad.Operand.RegisterOperand;
 import joeq.Compiler.Quad.Operand.ConditionOperand;
+import joeq.Compiler.Quad.Operand.TargetOperand;
 
 import joeq.Main.Helper;
 
@@ -77,10 +78,13 @@ public class NonNull implements Flow.Analysis {
         /* 'core' is used to keep track of which variables we need to
          * track */
         private static Set<String> core = new HashSet<String>();
+        private static Map<Integer, Integer> quadBBMap = new TreeMap<Integer, Integer>();
         private SortedMap<String, SingleVar> map;
+        private Map<String, Integer> branchChecked;
 
         public CheckTable() {
             map = new TreeMap<String, SingleVar>();
+            branchChecked = new TreeMap<String, Integer>();
             for (String key : core) {
                 map.put(key, new SingleVar());
             }
@@ -88,10 +92,16 @@ public class NonNull implements Flow.Analysis {
 
         public static void reset() {
             core.clear();
+            quadBBMap.clear();
         }
 
         public static void register(String key) {
             core.add(key);
+        }
+
+        public static void registerQuadBBMap(Map<Integer, Integer> qbm) {
+            assert quadBBMap.isEmpty();
+            quadBBMap.putAll(qbm);
         }
 
         public void setToTop() {
@@ -112,6 +122,14 @@ public class NonNull implements Flow.Analysis {
                 SingleVar mine = map.get(e.getKey());
                 mine.meetWith(e.getValue());
             }
+            Map<String, Integer> origin = branchChecked;
+            branchChecked = new TreeMap<String, Integer>();
+            for (String key : origin.keySet()) {
+                if (a.branchChecked.containsKey(key) &&
+                        a.branchChecked.get(key).equals(origin.get(key))) {
+                    branchChecked.put(key, origin.get(key));
+                }
+            }
         }
 
         public void copy(Flow.DataflowObject o) {
@@ -120,6 +138,7 @@ public class NonNull implements Flow.Analysis {
                 SingleVar mine = map.get(e.getKey());
                 mine.copy(e.getValue());
             }
+            branchChecked = new TreeMap<String, Integer>(a.branchChecked);
         }
 
         @Override
@@ -157,6 +176,23 @@ public class NonNull implements Flow.Analysis {
             SingleVar var = map.get(v);
             var.check();
         }
+
+        public void setBranch(String reg, int bid) {
+            branchChecked.put(reg, bid);
+        }
+
+        public void checkBranch(int qid) {
+            int bbid = quadBBMap.get(qid);
+            if (!branchChecked.isEmpty()) {
+                for (String reg : branchChecked.keySet()) {
+                    SingleVar var = map.get(reg);
+                    if (branchChecked.get(reg).equals(bbid)) {
+                        var.check();
+                    }
+                }
+                branchChecked.clear();
+            }
+        }
     }
 
     final public static int LEVEL_NORMAL = 0;
@@ -165,6 +201,7 @@ public class NonNull implements Flow.Analysis {
     private CheckTable[] in, out;
     private CheckTable entry, exit;
     private TransferFunction transferfn;
+    private ControlFlowGraph graph;
 
     public NonNull() {
         level = LEVEL_NORMAL;
@@ -185,8 +222,18 @@ public class NonNull implements Flow.Analysis {
     }
 
     public void preprocess(ControlFlowGraph cfg) {
-//        System.out.println("Method: " + cfg.getMethod().getName().toString());
+        // System.out.println("Method: " + cfg.getMethod().getName().toString());
         System.out.print(cfg.getMethod().getName().toString());
+
+        // register graph
+        graph = cfg;
+        QuadBBVisitor bbVisitor = new QuadBBVisitor();
+        graph.visitBasicBlocks(bbVisitor);
+
+        // reset & register quad-bb-map
+        CheckTable.reset();
+        CheckTable.registerQuadBBMap(bbVisitor.quadBBMap);
+
         /* Generate initial conditions. */
         QuadIterator qit = new QuadIterator(cfg);
         int max = 0;
@@ -195,11 +242,11 @@ public class NonNull implements Flow.Analysis {
             if (x > max) max = x;
         }
         max += 1;
+        // note: this is just declaration of arrays instead of newing CheckTable
         in = new CheckTable[max];
         out = new CheckTable[max];
         qit = new QuadIterator(cfg);
 
-        CheckTable.reset();
 
         /* Arguments are always there. */
         int numargs = cfg.getMethod().getParamTypes().length;
@@ -309,6 +356,7 @@ public class NonNull implements Flow.Analysis {
 
     public void processQuad(Quad q) {
         transferfn.val.copy(in[q.getID()]);
+        transferfn.val.checkBranch(q.getID());
         Helper.runPass(q, transferfn);
         out[q.getID()].copy(transferfn.val);
     }
@@ -337,6 +385,7 @@ public class NonNull implements Flow.Analysis {
                 if (oprt instanceof Operator.NullCheck ||
                         oprt instanceof Operator.IntIfCmp ||
                         oprt instanceof Operator.Move ||
+                        oprt instanceof Operator.Binary ||
                         oprt instanceof Operator.Unary) {
                     return;
                 }
@@ -365,56 +414,59 @@ public class NonNull implements Flow.Analysis {
          *  0 for EQ
          *  1 for NE
          * */
-//        @Override
-//        public void visitIntIfCmp(Quad q) {
-//            final byte EQ = 0;
-//            final byte NE = 1;
-//            if (checkLevel != NonNull.LEVEL_NORMAL) {
-//                Operand s1 = Operator.IntIfCmp.getSrc1(q);
-//                Operand s2 = Operator.IntIfCmp.getSrc2(q);
-//
-//                // only do this when at least one of opr is reg
-//                if (s1 instanceof RegisterOperand && !(s2 instanceof RegisterOperand) ||
-//                        s2 instanceof RegisterOperand && !(s1 instanceof RegisterOperand)) {
-//                    byte cond = Operator.IntIfCmp.getCond(q).getCondition();
-//                    Operand reg = s1 instanceof RegisterOperand ? s1 : s2;
-//                    Operand other = s1 instanceof RegisterOperand ? s2 : s1;
-//                    String regName = ((RegisterOperand) reg).getRegister().toString();
-//                    // now ensure reg is register oprd
-//                    if (cond == EQ) {
-//                        if (isChecked(other)) {
-//                            val.checkVar(regName);
-//                        }
-//                    } else if (cond == NE) {
-//                        if (!isChecked(other)) {
-//                            val.checkVar(regName);
-//                        }
-//                    }
-//                } else if (s1 instanceof RegisterOperand && s2 instanceof RegisterOperand) {
-//                    RegisterOperand r1 = (RegisterOperand) s1;
-//                    RegisterOperand r2 = (RegisterOperand) s2;
-//                    String reg1 = r1.getRegister().toString();
-//                    String reg2 = r2.getRegister().toString();
-//                    byte cond = Operator.IntIfCmp.getCond(q).getCondition();
-//                    if (cond == EQ) {
-//                        if (isChecked(r1)) {
-//                            val.checkVar(reg2);
-//                        }
-//                        if (isChecked(r2)) {
-//                            val.checkVar(reg1);
-//                        }
-//                    } else if (cond == NE) {
-//                        if (!isChecked(r1)) {
-//                            val.checkVar(reg2);
-//                        }
-//                        if (!isChecked(r2)) {
-//                            val.checkVar(reg1);
-//                        }
-//                    }
-//
-//                }
-//            }
-//        }
+        @Override
+        public void visitIntIfCmp(Quad q) {
+            final byte EQ = 0;
+            final byte NE = 1;
+            if (checkLevel != NonNull.LEVEL_NORMAL) {
+                Operand s1 = Operator.IntIfCmp.getSrc1(q);
+                Operand s2 = Operator.IntIfCmp.getSrc2(q);
+                TargetOperand targBranch = Operator.IntIfCmp.getTarget(q);
+
+                byte cond = Operator.IntIfCmp.getCond(q).getCondition();
+                int targBBid = targBranch.getTarget().getID();
+
+                // only do this when at least one of opr is reg
+                if (s1 instanceof RegisterOperand && !(s2 instanceof RegisterOperand) ||
+                        s2 instanceof RegisterOperand && !(s1 instanceof RegisterOperand)) {
+                    Operand reg = s1 instanceof RegisterOperand ? s1 : s2;
+                    Operand other = s1 instanceof RegisterOperand ? s2 : s1;
+                    String regName = ((RegisterOperand) reg).getRegister().toString();
+                    // now ensure reg is register oprd
+
+                    if (cond == EQ) {
+                        if (isChecked(other)) {
+                            val.setBranch(regName, targBBid);
+                        }
+                    } else if (cond == NE) {
+                        if (isNull(other)) {
+                            val.setBranch(regName, targBBid);
+                        }
+                    }
+                } else if (s1 instanceof RegisterOperand && s2 instanceof RegisterOperand) {
+                    RegisterOperand r1 = (RegisterOperand) s1;
+                    RegisterOperand r2 = (RegisterOperand) s2;
+                    String reg1 = r1.getRegister().toString();
+                    String reg2 = r2.getRegister().toString();
+                    if (cond == EQ) {
+                        if (isChecked(r1)) {
+                            val.setBranch(reg2, targBBid);
+                        }
+                        else if (isChecked(r2)) {
+                            val.setBranch(reg1, targBBid);
+                        }
+                    } else if (cond == NE) {
+                        if (isNull(r1)) {
+                            val.setBranch(reg2, targBBid);
+                        }
+                        else if (isNull(r2)) {
+                            val.setBranch(reg1, targBBid);
+                        }
+                    }
+
+                }
+            }
+        }
 
         @Override
         public void visitMove(Quad q) {
@@ -442,12 +494,31 @@ public class NonNull implements Flow.Analysis {
             }
         }
 
+        @Override
+        public void visitBinary(Quad q) {
+            if (checkLevel != NonNull.LEVEL_NORMAL) {
+                String dst = Operator.Binary.getDest(q).getRegister().toString();
+                Operand src1 = Operator.Binary.getSrc1(q);
+                Operand src2 = Operator.Binary.getSrc2(q);
+                if (isChecked(src1) && isChecked(src2)){
+                    val.checkVar(dst);
+                } else {
+                    val.killVar(dst);
+                }
+            }
+        }
+
         private boolean isChecked(Operand op) {
             return (op instanceof Operand.IConstOperand ||
                     op instanceof Operand.AConstOperand &&
                             ((AConstOperand) op).getType() != jq_Reference.jq_NullType.NULL_TYPE) ||
                     (op instanceof RegisterOperand &&
                             val.isChecked(((RegisterOperand) op).getRegister().toString()));
+        }
+
+        private boolean isNull(Operand op) {
+            return (op instanceof Operand.AConstOperand &&
+                            ((AConstOperand) op).getType() == jq_Reference.jq_NullType.NULL_TYPE);
         }
     }
 }
