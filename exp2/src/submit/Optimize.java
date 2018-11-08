@@ -22,7 +22,7 @@ class Optimize {
         Flow.Solver solver = new FlowSolver();
 
         // generate driver
-        submit.Driver driver = new submit.Driver();
+        OptDriver driver = new OptDriver();
         driver.registerSolver(solver);
 
         // a list of analysis classes.
@@ -39,7 +39,6 @@ class Optimize {
             driver.registerAnalysis(nonNullAnalysis);
             driver.registerOptimizer(nullCheck);
             driver.run(clazz);
-
 
             if (!nullCheckOnly) {
                 // TODO: Run your extra optimizations. (Not required)

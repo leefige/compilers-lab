@@ -2,15 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c4d79337-8445-4159-bf98-246af0e43bb5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/submit/Driver.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/submit/Modifier.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/nullCheck.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/optimize.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/NonNull.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/null_check/NonNull.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/submit/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/OptDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/submit/Optimize.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/Optimize.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/QuadBBVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/null_check/QuadBBVisitor.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -54,10 +50,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NullTest.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="NullTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/NullTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2166">
+            <state relative-caret-position="88">
               <caret line="114" column="33" selection-start-line="114" selection-start-column="33" selection-end-line="114" selection-end-column="33" />
             </state>
           </provider>
@@ -66,12 +62,39 @@
       <file leaf-file-name="Optimize.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="41" selection-start-line="41" selection-end-line="41" />
+            <state relative-caret-position="-190">
+              <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1081#1107#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="run.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/run.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="19">
+              <caret line="1" column="52" lean-forward="true" selection-start-line="1" selection-start-column="50" selection-end-line="1" selection-end-column="52" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="nullCheck.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/nullCheck.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="38">
+              <caret line="2" selection-end-line="2" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="optimize.sh" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/optimize.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="19">
+              <caret line="1" column="48" selection-start-line="1" selection-start-column="48" selection-end-line="1" selection-end-column="48" />
             </state>
           </provider>
         </entry>
@@ -88,8 +111,8 @@
       <file leaf-file-name="NullCheckEliminate.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="608">
-              <caret line="32" column="9" lean-forward="true" selection-start-line="32" selection-start-column="9" selection-end-line="32" selection-end-column="9" />
+            <state relative-caret-position="240">
+              <caret line="31" column="13" lean-forward="true" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -97,32 +120,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Modifier.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/submit/Modifier.java">
+      <file leaf-file-name="exp2.properties" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/exp2.properties">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="57">
-              <caret line="3" selection-start-line="3" selection-end-line="3" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FlowSolver.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/flow/FlowSolver.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
-              <caret line="80" selection-start-line="80" selection-end-line="81" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Driver.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/submit/Driver.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="532">
-              <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="19">
+              <caret line="1" lean-forward="true" selection-end-line="1" />
             </state>
           </provider>
         </entry>
@@ -180,11 +182,14 @@
         <option value="$PROJECT_DIR$/src/submit/QuadBBVisitor.java" />
         <option value="$PROJECT_DIR$/src/test/TestBinary.java" />
         <option value="$PROJECT_DIR$/src/submit/NonNull.java" />
-        <option value="$PROJECT_DIR$/src/submit/Optimize.java" />
         <option value="$PROJECT_DIR$/src/submit/Optimizer.java" />
         <option value="$PROJECT_DIR$/src/submit/Driver.java" />
         <option value="$PROJECT_DIR$/src/submit/null_check/NonNull.java" />
         <option value="$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java" />
+        <option value="$PROJECT_DIR$/src/submit/Optimize.java" />
+        <option value="$PROJECT_DIR$/test.sh" />
+        <option value="$PROJECT_DIR$/NullCheck.sh" />
+        <option value="$PROJECT_DIR$/optimize.sh" />
       </list>
     </option>
   </component>
@@ -397,7 +402,7 @@
       <output_file path="$PROJECT_DIR$/res/opt/NullTest.log" is_save="true" />
       <option name="MAIN_CLASS_NAME" value="submit.Optimize" />
       <module name="exp2" />
-      <option name="PROGRAM_PARAMETERS" value="test.NullTest --print -m test.NullTest" />
+      <option name="PROGRAM_PARAMETERS" value="test.NullTest -m test.NullTest" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration name="PrintQuads NullTest" type="Application" factoryName="Application">
@@ -508,15 +513,16 @@
       <workItem from="1541490826109" duration="292000" />
       <workItem from="1541491183772" duration="20705000" />
       <workItem from="1541562195679" duration="28001000" />
-      <workItem from="1541635604256" duration="4140000" />
+      <workItem from="1541635604256" duration="5757000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="54145000" />
+    <option name="totallyTimeSpent" value="55762000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1519" height="977" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -606,45 +612,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/SkipList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-342">
-          <caret line="48" column="34" lean-forward="true" selection-start-line="48" selection-start-column="34" selection-end-line="48" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/run.sh">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/flow/ReachingDefs.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="19" column="13" selection-start-line="19" selection-start-column="13" selection-end-line="19" selection-end-column="13" />
-          <folding>
-            <element signature="e#771#780#0" expanded="true" />
-            <element signature="e#4059#4060#0" expanded="true" />
-            <element signature="e#4086#4087#0" expanded="true" />
-            <element signature="e#4294#4295#0" expanded="true" />
-            <element signature="e#4327#4328#0" expanded="true" />
-            <element signature="e#4532#4533#0" expanded="true" />
-            <element signature="e#4564#4565#0" expanded="true" />
-            <element signature="e#4954#4955#0" expanded="true" />
-            <element signature="e#4995#4996#0" expanded="true" />
-            <element signature="e#5056#5057#0" expanded="true" />
-            <element signature="e#5098#5099#0" expanded="true" />
-            <element signature="e#5145#5146#0" expanded="true" />
-            <element signature="e#5190#5191#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Develop/Java/jdk1.5.0_22/src.zip!/java/util/Set.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="302">
-          <caret line="330" column="8" selection-start-line="330" selection-start-column="8" selection-end-line="330" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/QuadVisitor.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="87">
@@ -860,7 +827,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/Driver.java">
+    <entry file="file://$PROJECT_DIR$/src/submit/OptDriver.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="532">
           <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
@@ -898,48 +865,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="608">
-          <caret line="32" column="9" lean-forward="true" selection-start-line="32" selection-start-column="9" selection-end-line="32" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/submit/Modifier.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="57">
           <caret line="3" selection-start-line="3" selection-end-line="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="49" column="22" lean-forward="true" selection-start-line="49" selection-start-column="22" selection-end-line="49" selection-end-column="22" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="41" selection-start-line="41" selection-end-line="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1081#1107#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/NullTest.basic.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="3" column="10" lean-forward="true" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
         </state>
       </provider>
     </entry>
@@ -959,10 +888,76 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/res/NullTest.basic.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="3" column="10" lean-forward="true" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/exp2.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19">
+          <caret line="1" lean-forward="true" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/NullTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2166">
+        <state relative-caret-position="88">
           <caret line="114" column="33" selection-start-line="114" selection-start-column="33" selection-end-line="114" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="31" column="13" lean-forward="true" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-190">
+          <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1081#1107#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="701">
+          <caret line="49" column="22" lean-forward="true" selection-start-line="49" selection-start-column="22" selection-end-line="49" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19">
+          <caret line="1" column="52" lean-forward="true" selection-start-line="1" selection-start-column="50" selection-end-line="1" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nullCheck.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="38">
+          <caret line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/optimize.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19">
+          <caret line="1" column="48" selection-start-line="1" selection-start-column="48" selection-end-line="1" selection-end-column="48" />
         </state>
       </provider>
     </entry>

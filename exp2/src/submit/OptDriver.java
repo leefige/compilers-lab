@@ -4,7 +4,7 @@ import flow.Flow;
 import joeq.Class.jq_Class;
 import joeq.Main.Helper;
 
-public class Driver {
+public class OptDriver {
 
     private Flow.Solver solver;
     private Flow.Analysis analysis;
