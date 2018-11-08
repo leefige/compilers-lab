@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c4d79337-8445-4159-bf98-246af0e43bb5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/nullCheck.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/optimize.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/OptDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/Optimize.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/Optimize.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,24 +28,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="NonNull.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/submit/null_check/NonNull.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2508">
-              <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
-              <folding>
-                <element signature="class#SingleVar#0;class#NonNull#0" />
-                <element signature="class#CheckTable#0;class#NonNull#0" />
-                <element signature="e#10094#10119#0" expanded="true" />
-                <element signature="method#getEntry#0;class#NonNull#0" />
-                <element signature="method#getExit#0;class#NonNull#0" />
-                <element signature="method#getIn#0;class#NonNull#0" />
-                <element signature="method#getOut#0;class#NonNull#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="NullTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/NullTest.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -62,12 +40,30 @@
       <file leaf-file-name="Optimize.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-190">
+            <state relative-caret-position="266">
               <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1081#1107#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SkipList.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/SkipList.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-532">
+              <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="QuickSort.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/QuickSort.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-843">
+              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -90,11 +86,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="optimize.sh" pinned="false" current-in-tab="true">
+      <file leaf-file-name="optimize.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/optimize.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="19">
-              <caret line="1" column="48" selection-start-line="1" selection-start-column="48" selection-end-line="1" selection-end-column="48" />
+              <caret line="1" column="51" selection-start-line="1" selection-start-column="51" selection-end-line="1" selection-end-column="51" />
             </state>
           </provider>
         </entry>
@@ -108,7 +104,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NullCheckEliminate.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="NullCheckEliminate.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="240">
@@ -185,11 +181,11 @@
         <option value="$PROJECT_DIR$/src/submit/Optimizer.java" />
         <option value="$PROJECT_DIR$/src/submit/Driver.java" />
         <option value="$PROJECT_DIR$/src/submit/null_check/NonNull.java" />
-        <option value="$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java" />
         <option value="$PROJECT_DIR$/src/submit/Optimize.java" />
         <option value="$PROJECT_DIR$/test.sh" />
         <option value="$PROJECT_DIR$/NullCheck.sh" />
         <option value="$PROJECT_DIR$/optimize.sh" />
+        <option value="$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java" />
       </list>
     </option>
   </component>
@@ -303,7 +299,8 @@
               <item name="exp2" type="b2602c69:ProjectViewProjectNode" />
               <item name="exp2" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="submit" type="462c0819:PsiDirectoryNode" />
+              <item name="null_check" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -334,7 +331,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Optimize NullTest">
+  <component name="RunManager" selected="Application.Optimize QuickSort">
     <configuration name="Find NullTest" type="Application" factoryName="Application">
       <output_file path="$PROJECT_DIR$/res/NullTest.basic.log" is_save="true" />
       <option name="MAIN_CLASS_NAME" value="submit.FindRedundantNullChecks" />
@@ -391,18 +388,25 @@
       <option name="PROGRAM_PARAMETERS" value="test.TestBinary -e" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
-    <configuration name="NonNull NullTest" type="Application" factoryName="Application">
-      <output_file path="$PROJECT_DIR$/res/NonNull_NullCheck.log" is_save="true" />
-      <option name="MAIN_CLASS_NAME" value="flow.Flow" />
-      <module name="exp2" />
-      <option name="PROGRAM_PARAMETERS" value="flow.FlowSolver submit.NonNull test.NullTest" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-    </configuration>
     <configuration name="Optimize NullTest" type="Application" factoryName="Application">
       <output_file path="$PROJECT_DIR$/res/opt/NullTest.log" is_save="true" />
       <option name="MAIN_CLASS_NAME" value="submit.Optimize" />
       <module name="exp2" />
-      <option name="PROGRAM_PARAMETERS" value="test.NullTest -m test.NullTest" />
+      <option name="PROGRAM_PARAMETERS" value="test.NullTest -m test.NullTest --print" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+    </configuration>
+    <configuration name="Optimize QuickSort" type="Application" factoryName="Application">
+      <output_file path="$PROJECT_DIR$/res/opt/QuickSort.log" is_save="true" />
+      <option name="MAIN_CLASS_NAME" value="submit.Optimize" />
+      <module name="exp2" />
+      <option name="PROGRAM_PARAMETERS" value="test.QuickSort -m test.QuickSort --print -p 10" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+    </configuration>
+    <configuration name="Optimize SkipList" type="Application" factoryName="Application">
+      <output_file path="$PROJECT_DIR$/res/opt/SkipList.log" is_save="true" />
+      <option name="MAIN_CLASS_NAME" value="submit.Optimize" />
+      <module name="exp2" />
+      <option name="PROGRAM_PARAMETERS" value="test.SkipList -m test.SkipList --print -p 5" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration name="PrintQuads NullTest" type="Application" factoryName="Application">
@@ -431,13 +435,6 @@
       <option name="MAIN_CLASS_NAME" value="examples.PrintQuads" />
       <module name="exp2" />
       <option name="PROGRAM_PARAMETERS" value="test.TestBinary" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-    </configuration>
-    <configuration name="RedunNullCheck NullTest" type="Application" factoryName="Application">
-      <output_file path="$PROJECT_DIR$/res/RedunNullCheck.log" is_save="true" />
-      <option name="MAIN_CLASS_NAME" value="flow.Flow" />
-      <module name="exp2" />
-      <option name="PROGRAM_PARAMETERS" value="flow.FlowSolver submit.RedunNullCheck test.NullTest" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -486,17 +483,17 @@
       <item itemvalue="Application.PrintQuads TestBinary" />
       <item itemvalue="Application.PrintQuads QuickSort" />
       <item itemvalue="Application.PrintQuads SkipList" />
-      <item itemvalue="Application.NonNull NullTest" />
       <item itemvalue="Application.Find NullTest" />
       <item itemvalue="Application.Find SkipList" />
       <item itemvalue="Application.Find QuickSort" />
       <item itemvalue="Application.Find TestBinary" />
       <item itemvalue="Application.Find-e NullTest" />
-      <item itemvalue="Application.Optimize NullTest" />
       <item itemvalue="Application.Find-e QuickSort" />
       <item itemvalue="Application.Find-e SkipList" />
       <item itemvalue="Application.Find-e TestBinary" />
-      <item itemvalue="Application.RedunNullCheck NullTest" />
+      <item itemvalue="Application.Optimize NullTest" />
+      <item itemvalue="Application.Optimize SkipList" />
+      <item itemvalue="Application.Optimize QuickSort" />
     </list>
   </component>
   <component name="SvnConfiguration">
@@ -513,12 +510,12 @@
       <workItem from="1541490826109" duration="292000" />
       <workItem from="1541491183772" duration="20705000" />
       <workItem from="1541562195679" duration="28001000" />
-      <workItem from="1541635604256" duration="5757000" />
+      <workItem from="1541635604256" duration="7087000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="55762000" />
+    <option name="totallyTimeSpent" value="57092000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1519" height="977" extended-state="6" />
@@ -532,10 +529,10 @@
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.3297619" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.42857143" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.42857143" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18754278" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18754278" />
       <window_info anchor="right" id="Database" order="3" weight="0.32991102" />
       <window_info anchor="right" id="SciView" order="3" weight="0.32991102" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -612,20 +609,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/QuadVisitor.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="87">
-          <caret line="148" selection-start-line="148" selection-end-line="148" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/RegisterFactory.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
-          <caret line="335" selection-start-line="335" selection-end-line="335" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/flow/Liveness.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="228">
@@ -909,27 +892,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="31" column="13" lean-forward="true" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-190">
-          <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1081#1107#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="701">
@@ -957,7 +919,42 @@
     <entry file="file://$PROJECT_DIR$/optimize.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
-          <caret line="1" column="48" selection-start-line="1" selection-start-column="48" selection-end-line="1" selection-end-column="48" />
+          <caret line="1" column="51" selection-start-line="1" selection-start-column="51" selection-end-line="1" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="41" lean-forward="true" selection-start-line="41" selection-end-line="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1081#1107#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/SkipList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-532">
+          <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/QuickSort.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-843">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="31" column="13" lean-forward="true" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
