@@ -7,6 +7,8 @@ import joeq.Class.jq_Class;
 import joeq.Interpreter.QuadInterpreter;
 import joeq.Main.Driver;
 import joeq.Main.Helper;
+import submit.const_folding.ConstDetect;
+import submit.const_folding.ConstFolding;
 import submit.null_check.NonNull;
 import submit.null_check.NullCheckEliminate;
 
@@ -30,6 +32,7 @@ class Optimize {
         NullCheckEliminate nullCheck = new NullCheckEliminate();
 
         Map<Flow.Analysis, Modifier> optMap = new HashMap<Flow.Analysis, Modifier>();
+        optMap.put(new ConstDetect(), new ConstFolding());
 
         List<jq_Class> outputs = new ArrayList<jq_Class>();
         for (String className : optimizeClasses) {
@@ -42,6 +45,11 @@ class Optimize {
 
             if (!nullCheckOnly) {
                 // TODO: Run your extra optimizations. (Not required)
+                for (Flow.Analysis analysis : optMap.keySet()) {
+                    driver.registerAnalysis(analysis);
+                    driver.registerOptimizer(optMap.get(analysis));
+                    driver.run(clazz);
+                }
             }
 
             outputs.add(clazz);
