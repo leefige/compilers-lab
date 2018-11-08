@@ -1,4 +1,4 @@
-package submit;
+package submit.null_check;
 
 import joeq.Compiler.Quad.BasicBlock;
 import joeq.Compiler.Quad.BasicBlockVisitor;

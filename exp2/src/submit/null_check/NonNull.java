@@ -1,6 +1,7 @@
-package submit;
+package submit.null_check;
 
 import flow.Flow;
+import joeq.Class.jq_Method;
 import joeq.Class.jq_Reference;
 import joeq.Compiler.Quad.*;
 import joeq.Compiler.Quad.Operand.AConstOperand;
@@ -17,7 +18,6 @@ public class NonNull implements Flow.Analysis {
         public final static int UDF = 0;    // UNDEF
         public final static int CHK = 1;    // CHECKED
         public final static int UKN = 2;    // UKNOWN
-
 
         private int state;
         private boolean notNull;
@@ -360,7 +360,7 @@ public class NonNull implements Flow.Analysis {
 //        System.out.println("Initialization completed. VarSet.core: " + CheckTable.core);
     }
 
-    public Map<String, Set<Integer>> allResult = new HashMap<String, Set<Integer>>();
+    public Map<jq_Method, Set<Integer>> allResult = new HashMap<jq_Method, Set<Integer>>();
 
     public void postprocess(ControlFlowGraph cfg) {
 //        System.out.println("entry: " + entry.toString());
@@ -389,7 +389,7 @@ public class NonNull implements Flow.Analysis {
             System.out.print(" " + qid);
         }
         System.out.println();
-        allResult.put(cfg.getMethod().getName().toString(), redundant);
+        allResult.put(cfg.getMethod(), redundant);
     }
 
     /* Is this a forward dataflow analysis? */

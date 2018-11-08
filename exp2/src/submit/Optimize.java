@@ -7,6 +7,8 @@ import joeq.Class.jq_Class;
 import joeq.Interpreter.QuadInterpreter;
 import joeq.Main.Driver;
 import joeq.Main.Helper;
+import submit.null_check.NonNull;
+import submit.null_check.NullCheckEliminate;
 
 import java.util.*;
 
@@ -19,23 +21,25 @@ class Optimize {
         // get an instance of the solver class.
         Flow.Solver solver = new FlowSolver();
 
-        // get an instance of the analysis class.
-        Flow.Analysis nonNull = new NonNull(NonNull.LEVEL_NORMAL);
+        // generate driver
+        submit.Driver driver = new submit.Driver();
+        driver.registerSolver(solver);
+
+        // a list of analysis classes.
+        Flow.Analysis nonNullAnalysis = new NonNull(NonNull.LEVEL_NORMAL);
+        NullCheckEliminate nullCheck = new NullCheckEliminate();
+
+        Map<Flow.Analysis, Modifier> optMap = new HashMap<Flow.Analysis, Modifier>();
 
         List<jq_Class> outputs = new ArrayList<jq_Class>();
         for (String className : optimizeClasses) {
             jq_Class clazz = (jq_Class) Helper.load(className);
 
             // TODO: Remove redundant null checks
+            driver.registerAnalysis(nonNullAnalysis);
+            driver.registerOptimizer(nullCheck);
+            driver.run(clazz);
 
-            // register the analysis with the solver.
-            solver.registerAnalysis(nonNull);
-            Helper.runPass(clazz, solver);
-            Map<String, Set<Integer>> redundant = new HashMap<String, Set<Integer>>(((NonNull) nonNull).allResult);
-            System.out.println("all result: " + redundant);
-            System.out.println();
-
-//            clazz.
 
             if (!nullCheckOnly) {
                 // TODO: Run your extra optimizations. (Not required)
