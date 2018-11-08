@@ -1,2 +1,2 @@
 #!/bin/bash
-./run submit.FindRedundantNullChecks test.$@
+./run.sh submit.FindRedundantNullChecks test.$@
