@@ -63,6 +63,12 @@ public class GlobCommDetect implements Flow.Analysis {
             return false;
         }
 
+        @Override
+        public int hashCode() {
+            return 13 * 13 * 13 * 13 * qid + 13 * 13 * 13 * op1.hashCode() +
+                    13 * 13 * op2.hashCode() + 13 * oprt.hashCode() + 7;
+        }
+
         /**
          * toString() method for the dataflow objects which is used
          * by postprocess() below.  The format of this method must
@@ -74,7 +80,7 @@ public class GlobCommDetect implements Flow.Analysis {
          */
         @Override
         public String toString() {
-            return oprt.toString() + ":" + op1 + "," + op2;
+            return "(" + qid + ")" + oprt.toString() + ":" + op1 + "," + op2;
         }
 
         public String getOp1() {
@@ -103,15 +109,15 @@ public class GlobCommDetect implements Flow.Analysis {
          * These need to be filled in.
          */
         public ExpSet() {
-            set = new TreeSet<Exprsn>();
+            set = new HashSet<Exprsn>(universalSet);
         }
 
         public void setToTop() {
-            set = new TreeSet<Exprsn>(universalSet);
+            set = new HashSet<Exprsn>(universalSet);
         }
 
         public void setToBottom() {
-            set = new TreeSet<Exprsn>();
+            set = new HashSet<Exprsn>();
         }
 
         /**
@@ -124,7 +130,7 @@ public class GlobCommDetect implements Flow.Analysis {
 
         public void copy(Flow.DataflowObject o) {
             ExpSet t = (ExpSet) o;
-            set = new TreeSet<Exprsn>(t.set);
+            set = new HashSet<Exprsn>(t.set);
         }
 
         @Override
@@ -175,7 +181,7 @@ public class GlobCommDetect implements Flow.Analysis {
      * Class for the dataflow objects in the ReachingDefs analysis.
      * You are free to change this class or move it to another file.
      */
-    public static Set<Exprsn> universalSet = new TreeSet<Exprsn>();
+    public static Set<Exprsn> universalSet = new HashSet<Exprsn>();
     private static HashMap<String, Set<Exprsn>> usedregExpMap;
     /**
      * Dataflow objects for the interior and entry/exit points
@@ -209,18 +215,6 @@ public class GlobCommDetect implements Flow.Analysis {
         }
         max += 1;
 
-        // allocate the in and out arrays.
-        in = new ExpSet[max];
-        out = new ExpSet[max];
-
-        // initialize the contents of in and out.
-        qit = new QuadIterator(cfg);
-        while (qit.hasNext()) {
-            int id = qit.next().getID();
-            in[id] = new ExpSet();
-            out[id] = new ExpSet();
-        }
-
         qit = new QuadIterator(cfg);
         while (qit.hasNext()) {
             Quad q = qit.next();
@@ -238,9 +232,23 @@ public class GlobCommDetect implements Flow.Analysis {
                 }
             }
         }
+
+        // allocate the in and out arrays.
+        in = new ExpSet[max];
+        out = new ExpSet[max];
+
+        // initialize the contents of in and out.
+        qit = new QuadIterator(cfg);
+        while (qit.hasNext()) {
+            int id = qit.next().getID();
+            in[id] = new ExpSet();
+            out[id] = new ExpSet();
+        }
+
         // initialize the entry and exit points.
         transferfn.val = new ExpSet();
         entry = new ExpSet();
+        entry.setToBottom();
         exit = new ExpSet();
     }
 
@@ -332,9 +340,12 @@ public class GlobCommDetect implements Flow.Analysis {
             for (RegisterOperand def : q.getDefinedRegisters()) {
                 String key = def.getRegister().toString();
                 //kill all the definitions with respect to the assigned register
-                Iterator<Exprsn> iter = usedregExpMap.get(key).iterator();
-                while (iter.hasNext())
-                    val.killExp(iter.next());
+                if (usedregExpMap.containsKey(key)) {
+                    Iterator<Exprsn> iter = usedregExpMap.get(key).iterator();
+                    while (iter.hasNext()) {
+                        val.killExp(iter.next());
+                    }
+                }
             }
             val.useExp(q);
         }

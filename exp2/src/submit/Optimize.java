@@ -9,6 +9,8 @@ import joeq.Main.Driver;
 import joeq.Main.Helper;
 import submit.const_folding.ConstDetect;
 import submit.const_folding.ConstFolding;
+import submit.global_common.GlobCommDetect;
+import submit.global_common.GlobCommEliminate;
 import submit.null_check.NonNull;
 import submit.null_check.NullCheckEliminate;
 
@@ -33,6 +35,7 @@ class Optimize {
 
         Map<Flow.Analysis, Modifier> optMap = new HashMap<Flow.Analysis, Modifier>();
         optMap.put(new ConstDetect(), new ConstFolding());
+        optMap.put(new GlobCommDetect(), new GlobCommEliminate());
 
         List<jq_Class> outputs = new ArrayList<jq_Class>();
         for (String className : optimizeClasses) {

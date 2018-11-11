@@ -2,16 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c4d79337-8445-4159-bf98-246af0e43bb5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/Modifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/Modifier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/OptDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/OptDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/const_folding/ConstDetect.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/const_folding/ConstDetect.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/submit/Optimize.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/Optimize.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/null_check/NonNull.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/null_check/NonNull.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/null_check/QuadBBVisitor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/TestBinary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/TestBinary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -36,48 +31,87 @@
     <select />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="ConstFolding.java" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="248">
-                  <caret line="42" column="30" selection-start-line="42" selection-start-column="30" selection-end-line="42" selection-end-column="30" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                    <element signature="e#555#556#0" expanded="true" />
-                    <element signature="e#583#584#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="TestBinary.log" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/res/opt/TestBinary.log">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="209">
-                  <caret line="194" selection-start-line="194" selection-end-line="194" selection-end-column="45" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file leaf-file-name="PrintTestBinary.log" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/res/PrintTestBinary.log">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-319">
-                  <caret line="112" column="23" lean-forward="true" selection-start-line="112" selection-start-column="23" selection-end-line="112" selection-end-column="23" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="ConstFolding.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="343">
+              <caret line="44" column="57" selection-start-line="44" selection-start-column="57" selection-end-line="44" selection-end-column="57" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#555#556#0" expanded="true" />
+                <element signature="e#583#584#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GlobCommEliminate.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="171">
+              <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#248#249#0" expanded="true" />
+                <element signature="e#276#277#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Optimize.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="257">
+              <caret line="37" column="64" selection-start-line="37" selection-start-column="64" selection-end-line="37" selection-end-column="64" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GlobCommDetect.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="278">
+              <caret line="69" column="9" lean-forward="true" selection-start-line="69" selection-start-column="9" selection-end-line="69" selection-end-column="9" />
+              <folding>
+                <element signature="e#2744#2745#0" expanded="true" />
+                <element signature="e#2819#2820#0" expanded="true" />
+                <element signature="e#3181#3182#0" expanded="true" />
+                <element signature="e#3232#3233#0" expanded="true" />
+                <element signature="e#5288#5296#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NullCheckEliminate.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="266">
+              <caret line="14" column="51" selection-start-line="14" selection-start-column="31" selection-end-line="14" selection-end-column="51" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#484#485#0" expanded="true" />
+                <element signature="e#512#513#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TestBinary.log" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/res/opt/TestBinary.log">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-170">
+              <caret line="113" selection-start-line="113" selection-end-line="113" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -146,7 +180,6 @@
         <option value="$PROJECT_DIR$/NullCheck.sh" />
         <option value="$PROJECT_DIR$/optimize.sh" />
         <option value="$PROJECT_DIR$/src/submit/design.MD" />
-        <option value="$PROJECT_DIR$/src/submit/Optimize.java" />
         <option value="$PROJECT_DIR$/src/submit/null_check/QuadBBVisitor.java" />
         <option value="$PROJECT_DIR$/src/submit/null_check/NonNull.java" />
         <option value="$PROJECT_DIR$/src/submit/const_folding/ConstDetect.java" />
@@ -155,8 +188,10 @@
         <option value="$PROJECT_DIR$/src/submit/Modifier.java" />
         <option value="$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java" />
         <option value="$PROJECT_DIR$/src/submit/OptDriver.java" />
-        <option value="$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java" />
         <option value="$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java" />
+        <option value="$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java" />
+        <option value="$PROJECT_DIR$/src/submit/Optimize.java" />
+        <option value="$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java" />
       </list>
     </option>
   </component>
@@ -247,17 +282,6 @@
             <path>
               <item name="exp2" type="b2602c69:ProjectViewProjectNode" />
               <item name="exp2" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="exp2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="exp2" type="462c0819:PsiDirectoryNode" />
-              <item name="res" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="exp2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="exp2" type="462c0819:PsiDirectoryNode" />
-              <item name="res" type="462c0819:PsiDirectoryNode" />
-              <item name="opt" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="exp2" type="b2602c69:ProjectViewProjectNode" />
@@ -523,12 +547,12 @@
       <workItem from="1541635604256" duration="7762000" />
       <workItem from="1541654540631" duration="6391000" />
       <workItem from="1541784315372" duration="4205000" />
-      <workItem from="1541948573524" duration="8119000" />
+      <workItem from="1541948573524" duration="8943000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="76482000" />
+    <option name="totallyTimeSpent" value="77306000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1519" height="977" extended-state="6" />
@@ -542,10 +566,10 @@
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.3297619" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.42857143" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.42857143" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" weight="0.19301848" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19301848" />
       <window_info anchor="right" id="Database" order="3" weight="0.32991102" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3297619" />
       <window_info anchor="right" id="SciView" order="3" weight="0.32991102" />
@@ -572,7 +596,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java</url>
-          <line>139</line>
+          <line>140</line>
           <properties />
           <option name="timeStamp" value="37" />
         </line-breakpoint>
@@ -604,16 +628,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/submit/FindRedundantNullChecks.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="701">
-          <caret line="49" column="22" lean-forward="true" selection-start-line="49" selection-start-column="22" selection-end-line="49" selection-end-column="22" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/run.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
@@ -797,60 +811,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="19" column="21" selection-start-line="19" selection-start-column="21" selection-end-line="19" selection-end-column="21" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#484#485#0" expanded="true" />
-            <element signature="e#512#513#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="338" column="12" selection-start-line="338" selection-start-column="12" selection-end-line="338" selection-end-column="12" />
-          <folding>
-            <element signature="e#1849#1850#0" expanded="true" />
-            <element signature="e#1918#1919#0" expanded="true" />
-            <element signature="e#1953#1954#0" expanded="true" />
-            <element signature="e#1987#1988#0" expanded="true" />
-            <element signature="e#2101#2102#0" expanded="true" />
-            <element signature="e#2135#2136#0" expanded="true" />
-            <element signature="e#2252#2253#0" expanded="true" />
-            <element signature="e#2287#2288#0" expanded="true" />
-            <element signature="e#3129#3130#0" expanded="true" />
-            <element signature="e#3163#3164#0" expanded="true" />
-            <element signature="e#4533#4541#0" expanded="true" />
-            <element signature="e#8624#8625#0" expanded="true" />
-            <element signature="e#8651#8652#0" expanded="true" />
-            <element signature="e#8859#8860#0" expanded="true" />
-            <element signature="e#8892#8893#0" expanded="true" />
-            <element signature="e#9097#9098#0" expanded="true" />
-            <element signature="e#9129#9130#0" expanded="true" />
-            <element signature="e#9519#9520#0" expanded="true" />
-            <element signature="e#9560#9561#0" expanded="true" />
-            <element signature="e#9621#9622#0" expanded="true" />
-            <element signature="e#9663#9664#0" expanded="true" />
-            <element signature="e#9710#9711#0" expanded="true" />
-            <element signature="e#9745#9746#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
-          <caret line="50" selection-start-line="50" selection-end-line="50" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/submit/OptDriver.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -1008,19 +968,67 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/res/opt/TestBinary.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="194" selection-start-line="194" selection-end-line="194" selection-end-column="45" />
+        <state relative-caret-position="-170">
+          <caret line="113" selection-start-line="113" selection-end-line="113" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="42" column="30" selection-start-line="42" selection-start-column="30" selection-end-line="42" selection-end-column="30" />
+        <state relative-caret-position="343">
+          <caret line="44" column="57" selection-start-line="44" selection-start-column="57" selection-end-line="44" selection-end-column="57" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#555#556#0" expanded="true" />
             <element signature="e#583#584#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="14" column="51" selection-start-line="14" selection-start-column="31" selection-end-line="14" selection-end-column="51" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#484#485#0" expanded="true" />
+            <element signature="e#512#513#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="257">
+          <caret line="37" column="64" selection-start-line="37" selection-start-column="64" selection-end-line="37" selection-end-column="64" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#248#249#0" expanded="true" />
+            <element signature="e#276#277#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="278">
+          <caret line="69" column="9" lean-forward="true" selection-start-line="69" selection-start-column="9" selection-end-line="69" selection-end-column="9" />
+          <folding>
+            <element signature="e#2744#2745#0" expanded="true" />
+            <element signature="e#2819#2820#0" expanded="true" />
+            <element signature="e#3181#3182#0" expanded="true" />
+            <element signature="e#3232#3233#0" expanded="true" />
+            <element signature="e#5288#5296#0" expanded="true" />
           </folding>
         </state>
       </provider>

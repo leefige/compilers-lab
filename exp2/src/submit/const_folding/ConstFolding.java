@@ -42,6 +42,7 @@ public class ConstFolding implements Modifier {
         // fold const
         System.out.println("\nFolding const in " + cfg.getMethod().toString());
         Helper.runPass(cfg, folder);
+        System.out.println("\nConst folding finished.\n");
     }
 
     public static class ConstReplacer extends QuadVisitor.EmptyVisitor {
