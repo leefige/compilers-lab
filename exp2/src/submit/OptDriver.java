@@ -25,10 +25,11 @@ public class OptDriver {
     public void run(jq_Class clazz) {
         // register the analysis with the solver.
         solver.registerAnalysis(analysis);
-        Helper.runPass(clazz, solver);
-
-        // get result of data flow analysis
-        modifier.getDataFlowResult(analysis);
-        Helper.runPass(clazz, modifier);
+        do {
+            Helper.runPass(clazz, solver);
+            // get result of data flow analysis
+            modifier.getDataFlowResult(analysis);
+            Helper.runPass(clazz, modifier);
+        } while (modifier.runAgain());
     }
 }

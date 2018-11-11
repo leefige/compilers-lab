@@ -16,6 +16,10 @@ public class NullCheckEliminate implements Modifier {
     private Map<jq_Method, Set<Integer>> flowResult;
     private boolean isForward;
 
+    public boolean runAgain() {
+        return false;
+    }
+
     public void getDataFlowResult(Flow.Analysis analysis) {
         flowResult = new HashMap<jq_Method, Set<Integer>>(((NonNull)analysis).allResult);
         isForward = analysis.isForward();

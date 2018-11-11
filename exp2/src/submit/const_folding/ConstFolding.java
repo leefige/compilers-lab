@@ -8,30 +8,40 @@ import joeq.Main.Helper;
 import submit.Modifier;
 
 import java.util.HashMap;
+import java.util.ListIterator;
 import java.util.Map;
 
 public class ConstFolding implements Modifier {
-    public Map<jq_Method, Map<Integer, ConstantProp.ConstantPropTable>> allIn;
+    public Map<jq_Method, Map<Integer, ConstantProp.ConstantPropTable>> allOut;
     boolean isForward;
     private ConstReplacer replacer = new ConstReplacer();
+    private ConstFolder folder = new ConstFolder();
 
+    public boolean runAgain() {
+        return false;
+    }
 
     public void getDataFlowResult(Flow.Analysis analysis) {
-        allIn = new HashMap<jq_Method, Map<Integer, ConstantProp.ConstantPropTable>>(((ConstDetect)analysis).finalIn);
+        allOut = new HashMap<jq_Method, Map<Integer, ConstantProp.ConstantPropTable>>(((ConstDetect)analysis).finalOut);
         isForward = analysis.isForward();
     }
 
     public void visitCFG(ControlFlowGraph cfg) {
-        Map<Integer, ConstantProp.ConstantPropTable> in = allIn.get(cfg.getMethod());
+        Map<Integer, ConstantProp.ConstantPropTable> out = allOut.get(cfg.getMethod());
         QuadIterator qit = new QuadIterator(cfg, isForward);
 
         // replace const
+        System.out.println("\nReplacing const in " + cfg.getMethod().toString());
         while (qit.hasNext()) {
             Quad q = qit.next();
-            ConstantProp.ConstantPropTable table = in.get(q.getID());
+            ConstantProp.ConstantPropTable table = out.get(q.getID());
             replacer.registerIn(table);
             Helper.runPass(q, replacer);
         }
+
+        // fold const
+        System.out.println("\nFolding const in " + cfg.getMethod().toString());
+        Helper.runPass(cfg, folder);
     }
 
     public static class ConstReplacer extends QuadVisitor.EmptyVisitor {
@@ -87,15 +97,8 @@ public class ConstFolding implements Modifier {
                     String reg = regName(op);
                     Operator.Unary.setSrc(q, toConstOprand(val.get(reg).getConst()));
                     System.out.println("Set unary const: " + q.getID());
-
                 }
             }
-        }
-
-        private boolean isConst(Operand op) {
-            return (op instanceof Operand.IConstOperand) ||
-                    (op instanceof Operand.RegisterOperand &&
-                            val.get(((Operand.RegisterOperand) op).getRegister().toString()).isConst());
         }
 
         private String regName(Operand op) {
@@ -109,6 +112,45 @@ public class ConstFolding implements Modifier {
 
         private Operand toConstOprand(int val) {
             return new Operand.IConstOperand(val);
+        }
+    }
+
+    public class ConstFolder extends BasicBlockVisitor.EmptyVisitor {
+
+        @Override
+        public void visitBasicBlock(BasicBlock bb) {
+            ListIterator<Quad> qit = bb.iterator();
+            while (qit.hasNext()) {
+                Quad q = qit.next();
+                Operator opr = q.getOperator();
+
+                // since constprop only parses ADD
+                if (opr instanceof Operator.Binary && opr == Operator.Binary.ADD_I.INSTANCE) {
+                    Operand op1 = Operator.Binary.getSrc1(q);
+                    Operand op2 = Operator.Binary.getSrc2(q);
+                    Operand.RegisterOperand origin = Operator.Binary.getDest(q);
+                    Operand.RegisterOperand dst =
+                            new Operand.RegisterOperand(origin.getRegister(), origin.getType());
+
+                    if (isConst(op1) && isConst(op2)) {
+                        int val = getConst(op1) + getConst(op2);
+                        Operand ic = new Operand.IConstOperand(val);
+                        int qid = q.getID();
+                        qit.remove();
+                        Quad fold = Operator.Move.create(qid, Operator.Move.MOVE_I.INSTANCE, dst, ic);
+                        qit.add(fold);
+                        System.out.println("Fold const: " + q.getID());
+                    }
+                }
+            }
+        }
+
+        private boolean isConst(Operand op) {
+            return (op instanceof Operand.IConstOperand);
+        }
+
+        private int getConst(Operand op) {
+            return ((Operand.IConstOperand) op).getValue();
         }
     }
 }

@@ -621,4 +621,24 @@ public class NonNull implements Flow.Analysis {
                             ((AConstOperand) op).getType() == jq_Reference.jq_NullType.NULL_TYPE);
         }
     }
+
+    public class QuadBBVisitor extends BasicBlockVisitor.EmptyVisitor {
+        public Map<Integer, Integer> quadBBMap;
+
+        public QuadBBVisitor() {
+            quadBBMap = new TreeMap<Integer, Integer>();
+        }
+
+        @Override
+        public void visitBasicBlock(BasicBlock bb) {
+            int bbid = bb.getID();
+            ListIterator<Quad> qit = bb.iterator();
+            while (qit.hasNext()) {
+                Quad q = qit.next();
+                int qid = q.getID();
+                assert !quadBBMap.containsKey(qid);
+                quadBBMap.put(qid, bbid);
+            }
+        }
+    }
 }
