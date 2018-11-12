@@ -8,28 +8,36 @@ import java.util.TreeSet;
 
 public class TestBinary {
     int binary(int a) {
+        System.out.println("binary: a=" + a);
         Integer aa = new Integer(a);
         int b = 3 + 1;
         Integer bb = new Integer(b);
         bb += aa;
         aa += bb;
         Integer c = (aa + bb);
-        c.toString();
+        System.out.println(c.toString());
         return c;
     }
 
     int unary(int a) {
+        System.out.println("unary: a=" + a);
         new Integer(a).toString();
-        new Integer(-a);
+        System.out.println(new Integer(-a));
         return a;
     }
 
     void cmp() {
         Integer set = new Integer(0);
+        set = null;
         if (set != null) {
+            set += 1;
+            set.toString();
+        } else {
+            set = new Integer(0);
+            set = 1;
             set.toString();
         }
-        set.toString();
+        System.out.println("cmp: " + set.toString());
     }
 
     void cnstfld() {
@@ -40,12 +48,12 @@ public class TestBinary {
         int e = a + c;
         int f = a + d;
         int g = f + b;
-        System.out.println(new Integer(g).toString());
+        System.out.println("const fold: g=" + new Integer(g).toString());
     }
 
-    public void common(int b, int c) {
+    void common(int b, int c) {
         int a = b + c;
-        System.out.println(a);
+        System.out.println("common : a=" + a);
 
         if (a > 0) {
             int d = b + c;
@@ -64,11 +72,24 @@ public class TestBinary {
         }
     }
 
+    int faint(int a) {
+        System.out.println("faint: a=" + a);
+        int b = a + 1;
+        int c = b + 1;
+        int d = b + c;
+        int e = a + c;
+        b = a * 8;
+        System.out.println("b=" + b);
+        return a;
+    }
+
     public static void main() {
         TestBinary t = new TestBinary();
-//        int a = t.binary(t.unary(7));
-//        t.cmp();
-//        new Integer(a).toString();
+        int a = t.binary(t.unary(7));
+        t.cmp();
+        new Integer(a).toString();
+        t.cnstfld();
         t.common(3, 4);
+        System.out.println(t.faint(9));
     }
 }

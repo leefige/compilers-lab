@@ -9,6 +9,8 @@ import joeq.Main.Driver;
 import joeq.Main.Helper;
 import submit.const_folding.ConstDetect;
 import submit.const_folding.ConstFolding;
+import submit.faint.FaintDetect;
+import submit.faint.FaintEliminate;
 import submit.global_common.GlobCommDetect;
 import submit.global_common.GlobCommEliminate;
 import submit.null_check.NonNull;
@@ -33,9 +35,14 @@ class Optimize {
         Flow.Analysis nonNullAnalysis = new NonNull(NonNull.LEVEL_NORMAL);
         NullCheckEliminate nullCheck = new NullCheckEliminate();
 
-        Map<Flow.Analysis, Modifier> optMap = new HashMap<Flow.Analysis, Modifier>();
-        optMap.put(new ConstDetect(), new ConstFolding());
-        optMap.put(new GlobCommDetect(), new GlobCommEliminate());
+        List<Flow.Analysis> anaList = new ArrayList<Flow.Analysis>();
+        List<Modifier> modList = new ArrayList<Modifier>();
+
+        anaList.add(new ConstDetect());
+        modList.add(new ConstFolding());
+//        optMap.put(new GlobCommDetect(), new GlobCommEliminate());
+        anaList.add(new FaintDetect());
+        modList.add(new FaintEliminate());
 
         List<jq_Class> outputs = new ArrayList<jq_Class>();
         for (String className : optimizeClasses) {
@@ -48,9 +55,9 @@ class Optimize {
 
             if (!nullCheckOnly) {
                 // TODO: Run your extra optimizations. (Not required)
-                for (Flow.Analysis analysis : optMap.keySet()) {
-                    driver.registerAnalysis(analysis);
-                    driver.registerOptimizer(optMap.get(analysis));
+                for (int i = 0; i < anaList.size(); i++) {
+                    driver.registerAnalysis(anaList.get(i));
+                    driver.registerOptimizer(modList.get(i));
                     driver.run(clazz);
                 }
             }

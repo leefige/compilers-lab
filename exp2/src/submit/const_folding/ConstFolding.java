@@ -31,18 +31,19 @@ public class ConstFolding implements Modifier {
         QuadIterator qit = new QuadIterator(cfg, isForward);
 
         // replace const
-        System.out.println("\nReplacing const in " + cfg.getMethod().toString());
+        System.out.print("Replacing const in " + cfg.getMethod().toString() + ":");
         while (qit.hasNext()) {
             Quad q = qit.next();
             ConstantProp.ConstantPropTable table = out.get(q.getID());
             replacer.registerIn(table);
             Helper.runPass(q, replacer);
         }
+        System.out.println();
 
         // fold const
-        System.out.println("\nFolding const in " + cfg.getMethod().toString());
+        System.out.print("Folding const in " + cfg.getMethod().toString() + ":");
         Helper.runPass(cfg, folder);
-        System.out.println("\nConst folding finished.\n");
+        System.out.println();
     }
 
     public static class ConstReplacer extends QuadVisitor.EmptyVisitor {
@@ -58,7 +59,7 @@ public class ConstFolding implements Modifier {
             String key = Operator.Move.getDest(q).getRegister().toString();
             if (isRegConst(op)) {
                 String reg = regName(op);
-                System.out.println("Set move const: " + q.getID());
+                System.out.print(" MOVE_const:" + q.getID());
                 Operator.Move.setSrc(q, toConstOprand(val.get(reg).getConst()));
             }
         }
@@ -75,14 +76,13 @@ public class ConstFolding implements Modifier {
                 if (isRegConst(op1)) {
                     String reg = regName(op1);
                     Operator.Binary.setSrc1(q, toConstOprand(val.get(reg).getConst()));
-                    System.out.println("Set binary const: " + q.getID());
+                    System.out.print(" BINARY_const:" + q.getID());
 
                 }
                 if (isRegConst(op2)) {
                     String reg = regName(op2);
                     Operator.Binary.setSrc2(q, toConstOprand(val.get(reg).getConst()));
-                    System.out.println("Set binary const: " + q.getID());
-
+                    System.out.print(" BINARY_const:" + q.getID());
                 }
             }
         }
@@ -97,7 +97,7 @@ public class ConstFolding implements Modifier {
                 if (isRegConst(op)) {
                     String reg = regName(op);
                     Operator.Unary.setSrc(q, toConstOprand(val.get(reg).getConst()));
-                    System.out.println("Set unary const: " + q.getID());
+                    System.out.print(" UNARY_const: " + q.getID());
                 }
             }
         }
@@ -140,7 +140,7 @@ public class ConstFolding implements Modifier {
                         qit.remove();
                         Quad fold = Operator.Move.create(qid, Operator.Move.MOVE_I.INSTANCE, dst, ic);
                         qit.add(fold);
-                        System.out.println("Fold const: " + q.getID());
+                        System.out.print(" Fold:" + q.getID());
                     }
                 }
             }

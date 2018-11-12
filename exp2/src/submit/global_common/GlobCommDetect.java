@@ -3,6 +3,7 @@ package submit.global_common;
 // some useful things to import. add any additional imports you need.
 
 import flow.Flow;
+import joeq.Class.jq_Method;
 import joeq.Compiler.Quad.*;
 import joeq.Compiler.Quad.Operand.RegisterOperand;
 
@@ -161,6 +162,10 @@ public class GlobCommDetect implements Flow.Analysis {
             return set.toString();
         }
 
+        public Set<Exprsn> getSet() {
+            return set;
+        }
+
         public void useExp(Quad q) {
             if (q.getOperator() instanceof Operator.Binary) {
                 Exprsn exp = Exprsn.getExp(q);
@@ -193,7 +198,8 @@ public class GlobCommDetect implements Flow.Analysis {
      */
     private ExpSet[] in, out;
     private ExpSet entry, exit;
-    private TransferFunction transferfn = new TransferFunction();
+    private TransferFunction transferfn;
+    public Map<jq_Method, Map<Integer, ExpSet>> result;
 
     /**
      * This method initializes the datflow framework.
@@ -202,8 +208,11 @@ public class GlobCommDetect implements Flow.Analysis {
      */
     public void preprocess(ControlFlowGraph cfg) {
         // this line must come first.
+        universalSet.clear();
         System.out.println("Method: " + cfg.getMethod().getName().toString());
         usedregExpMap = new HashMap<String, Set<Exprsn>>();
+        transferfn = new TransferFunction();
+        result = new HashMap<jq_Method, Map<Integer, ExpSet>>();
 
         // get the amount of space we need to allocate for the in/out arrays.
         QuadIterator qit = new QuadIterator(cfg);
@@ -262,14 +271,21 @@ public class GlobCommDetect implements Flow.Analysis {
      * @param cfg Unused.
      */
     public void postprocess(ControlFlowGraph cfg) {
-        System.out.println("entry: " + entry.toString());
-        for (int i = 1; i < in.length; i++) {
-            if (in[i] != null) {
-                System.out.println(i + " in:  " + in[i].toString());
-                System.out.println(i + " out: " + out[i].toString());
-            }
+//        System.out.println("entry: " + entry.toString());
+//        for (int i = 1; i < in.length; i++) {
+//            if (in[i] != null) {
+//                System.out.println(i + " in:  " + in[i].toString());
+//                System.out.println(i + " out: " + out[i].toString());
+//            }
+//        }
+//        System.out.println("exit: " + exit.toString());
+        Map<Integer, ExpSet> curMap = new TreeMap<Integer, ExpSet>();
+        QuadIterator qit = new QuadIterator(cfg);
+        while (qit.hasNext()) {
+            int id = qit.next().getID();
+            curMap.put(id, in[id]);
         }
-        System.out.println("exit: " + exit.toString());
+        result.put(cfg.getMethod(), curMap);
     }
 
     /**
