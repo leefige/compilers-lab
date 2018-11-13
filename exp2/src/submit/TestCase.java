@@ -1,12 +1,6 @@
-package test;
+package submit;
 
-import com.sun.org.apache.xerces.internal.impl.xs.SchemaSymbols;
-import joeq.Compiler.Quad.Operator;
-
-import java.util.Set;
-import java.util.TreeSet;
-
-public class TestBinary {
+public class TestCase {
     int binary(int a) {
         System.out.println("binary: a=" + a);
         Integer aa = new Integer(a);
@@ -83,8 +77,8 @@ public class TestBinary {
         return a;
     }
 
-    public static void main() {
-        TestBinary t = new TestBinary();
+    public static void main(String[] args) {
+        TestCase t = new TestCase();
         int a = t.binary(t.unary(7));
         t.cmp();
         new Integer(a).toString();

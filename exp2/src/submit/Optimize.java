@@ -11,8 +11,6 @@ import submit.const_folding.ConstDetect;
 import submit.const_folding.ConstFolding;
 import submit.faint.FaintDetect;
 import submit.faint.FaintEliminate;
-import submit.global_common.GlobCommDetect;
-import submit.global_common.GlobCommEliminate;
 import submit.null_check.NonNull;
 import submit.null_check.NullCheckEliminate;
 
@@ -27,20 +25,23 @@ class Optimize {
         // get an instance of the solver class.
         Flow.Solver solver = new FlowSolver();
 
-        // generate driver
+        // optimization driver
         OptDriver driver = new OptDriver();
         driver.registerSolver(solver);
 
-        // a list of analysis classes.
+        // Redundant null check
         Flow.Analysis nonNullAnalysis = new NonNull(NonNull.LEVEL_NORMAL);
         NullCheckEliminate nullCheck = new NullCheckEliminate();
 
+        // a list of analysis classes.
         List<Flow.Analysis> anaList = new ArrayList<Flow.Analysis>();
         List<Modifier> modList = new ArrayList<Modifier>();
 
+        // Add extra analysis & modifiers
+        // constant folding
         anaList.add(new ConstDetect());
         modList.add(new ConstFolding());
-//        optMap.put(new GlobCommDetect(), new GlobCommEliminate());
+        // faintness elimination
         anaList.add(new FaintDetect());
         modList.add(new FaintEliminate());
 

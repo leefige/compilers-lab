@@ -13,6 +13,7 @@ import java.util.*;
  * Skeleton class for implementing a reaching definition analysis
  * using the Flow.Analysis interface.
  */
+@Deprecated
 public class GlobCommDetect implements Flow.Analysis {
 
     // expression object

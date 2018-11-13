@@ -18,7 +18,7 @@ public class FaintEliminate implements submit.Modifier {
     private FaintKiller killer = new FaintKiller();
 
     public boolean runAgain() {
-        return false;
+        return changed;
     }
 
     public void getDataFlowResult(Flow.Analysis analysis) {
@@ -47,11 +47,20 @@ public class FaintEliminate implements submit.Modifier {
             ListIterator<Quad> qit = bb.iterator();
             while (qit.hasNext()) {
                 Quad q = qit.next();
+                FaintDetect.VarSet faints = out.get(q.getID());
                 // T-1 is always fainted
                 if (!(q.getOperator() instanceof Operator.NullCheck)) {
-                    FaintDetect.VarSet faints = out.get(q.getID());
                     for (Operand.RegisterOperand def : q.getDefinedRegisters()) {
                         if (faints.isFaint(def.getRegister().toString())) {
+                            System.out.print(" " + q.getID());
+                            qit.remove();
+                            changed = true;
+                            break;
+                        }
+                    }
+                } else {
+                    for (Operand.RegisterOperand use : q.getUsedRegisters()) {
+                        if (faints.isFaint(use.getRegister().toString())) {
                             System.out.print(" " + q.getID());
                             qit.remove();
                             changed = true;

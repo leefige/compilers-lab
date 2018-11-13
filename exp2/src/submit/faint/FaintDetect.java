@@ -7,6 +7,18 @@ import joeq.Compiler.Quad.*;
 
 import java.util.*;
 
+
+/**
+ * This is just a similar class to Faintness
+ * I have to copy it since the VarSet::isFaint() is package private
+ * and thus I cannot know about the set of VarSet from package 'submit'
+ * However, a getter should be public
+ *
+ * By the way, I also modified the quad visiting method:
+ *      if the quad is NULL_CHECK, do not 'use' the reg being checked
+ *      (because it's actually not used)
+ * in order to perform more optimization
+ * */
 public class FaintDetect extends Faintness {
 
     /**
@@ -92,7 +104,6 @@ public class FaintDetect extends Faintness {
      */
     @Override
     public void postprocess(ControlFlowGraph cfg) {
-
         Map<Integer, VarSet> curOut = new TreeMap<Integer, VarSet>();
         QuadIterator qit = new QuadIterator(cfg);
         while (qit.hasNext()) {
@@ -173,6 +184,12 @@ public class FaintDetect extends Faintness {
                     val.setNotFaint(use.getRegister().toString());
                 }
             }
+        } else if (q.getOperator() instanceof Operator.NullCheck) {
+            // Get the defined register (we know there's exactly one: T-1)
+            for (Operand.RegisterOperand def : q.getDefinedRegisters()) {
+                val.setFaint(def.getRegister().toString());
+            }
+            // do nothing with used, because we know it will only be checked
         } else {
             // For all other quads behave similarly to liveness analysis
             for (Operand.RegisterOperand def : q.getDefinedRegisters()) {

@@ -2,14 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c4d79337-8445-4159-bf98-246af0e43bb5" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/src/submit/faint/FaintDetect.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/submit/faint/FaintEliminate.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/submit/Optimize.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/Optimize.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/submit/faint/FaintDetect.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/faint/FaintDetect.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/submit/faint/FaintEliminate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/faint/FaintEliminate.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/TestBinary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/TestBinary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/TestBinary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/submit/TestCase.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -38,7 +37,7 @@
       <file leaf-file-name="ConstFolding.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="133">
+            <state relative-caret-position="-1850">
               <caret line="33" column="80" selection-start-line="33" selection-start-column="80" selection-end-line="33" selection-end-column="80" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -49,77 +48,101 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestBinary.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/TestBinary.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1672">
-              <caret line="92" column="36" selection-start-line="92" selection-start-column="36" selection-end-line="92" selection-end-column="36" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Optimize.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="76">
-              <caret line="58" column="60" lean-forward="true" selection-start-line="58" selection-start-column="60" selection-end-line="58" selection-end-column="60" />
+            <state relative-caret-position="741">
+              <caret line="39" column="21" selection-start-line="39" selection-start-column="21" selection-end-line="39" selection-end-column="21" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1310#1325#0" expanded="true" />
-                <element signature="e#1375#1385#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestBinary.log" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/res/opt/TestBinary.log">
+      <file leaf-file-name="ConstDetect.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/submit/const_folding/ConstDetect.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-911">
-              <caret line="39" column="44" lean-forward="true" selection-start-line="39" selection-start-column="44" selection-end-line="39" selection-end-column="44" />
+            <state relative-caret-position="221">
+              <caret line="22" column="51" selection-start-line="22" selection-start-column="51" selection-end-line="22" selection-end-column="51" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FaintDetect.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="TestCase.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/submit/TestCase.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="143">
+              <caret line="79" column="41" selection-start-line="79" selection-start-column="41" selection-end-line="79" selection-end-column="41" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NullTest.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/NullTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="228">
+              <caret line="120" column="41" selection-start-line="120" selection-start-column="28" selection-end-line="120" selection-end-column="41" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FaintDetect.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/submit/faint/FaintDetect.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1482">
-              <caret line="81" selection-start-line="81" selection-end-line="81" />
+            <state relative-caret-position="285">
+              <caret line="18" column="27" selection-start-line="18" selection-start-column="27" selection-end-line="18" selection-end-column="27" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#685#718#0" expanded="true" />
-                <element signature="e#3304#3321#0" expanded="true" />
-                <element signature="e#8421#8422#0" expanded="true" />
-                <element signature="e#8455#8456#0" expanded="true" />
-                <element signature="e#8567#8568#0" expanded="true" />
-                <element signature="e#8613#8614#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FaintEliminate.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="FaintEliminate.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/submit/faint/FaintEliminate.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="202">
-              <caret line="20" column="20" selection-start-line="20" selection-start-column="20" selection-end-line="20" selection-end-column="20" />
+            <state relative-caret-position="143">
+              <caret line="62" column="46" selection-start-line="62" selection-start-column="46" selection-end-line="62" selection-end-column="46" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#403#404#0" expanded="true" />
-                <element signature="e#431#432#0" expanded="true" />
-                <element signature="e#1184#1185#0" expanded="true" />
-                <element signature="e#1215#1216#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PrintTestBinary.log" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/res/PrintTestBinary.log">
+      <file leaf-file-name="run.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/run.sh">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file leaf-file-name="GlobCommEliminate.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="275">
-              <caret line="190" column="30" selection-start-line="190" selection-start-column="28" selection-end-line="190" selection-end-column="30" />
+            <state relative-caret-position="209">
+              <caret line="11" selection-start-line="11" selection-end-line="12" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#850#882#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GlobCommDetect.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="209">
+              <caret line="16" selection-start-line="16" selection-end-line="16" />
+              <folding>
+                <element signature="class#Exprsn#0;class#GlobCommDetect#0" />
+                <element signature="method#getExp#0;class#Exprsn#0;class#GlobCommDetect#0" />
+                <element signature="e#4990#4991#0" expanded="true" />
+                <element signature="e#5024#5025#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -136,8 +159,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>CheckSet</find>
-      <find>mymap</find>
       <find>MyDataflowObject</find>
       <find>checkMap</find>
       <find>notNull</find>
@@ -165,6 +186,9 @@
       <find>T5</find>
       <find>NULL_CHECK</find>
       <find>R6</find>
+      <find>R7</find>
+      <find>T2</find>
+      <find>T4</find>
     </findStrings>
     <replaceStrings>
       <replace>CheckSet</replace>
@@ -206,13 +230,14 @@
         <option value="$PROJECT_DIR$/src/submit/Modifier.java" />
         <option value="$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java" />
         <option value="$PROJECT_DIR$/src/submit/OptDriver.java" />
-        <option value="$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java" />
-        <option value="$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java" />
-        <option value="$PROJECT_DIR$/src/test/TestBinary.java" />
-        <option value="$PROJECT_DIR$/src/submit/faint/FaintDetect.java" />
         <option value="$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java" />
+        <option value="$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java" />
+        <option value="$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java" />
         <option value="$PROJECT_DIR$/src/submit/Optimize.java" />
+        <option value="$PROJECT_DIR$/src/test/TestBinary.java" />
         <option value="$PROJECT_DIR$/src/submit/faint/FaintEliminate.java" />
+        <option value="$PROJECT_DIR$/src/submit/TestCase.java" />
+        <option value="$PROJECT_DIR$/src/submit/faint/FaintDetect.java" />
       </list>
     </option>
   </component>
@@ -297,25 +322,12 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="exp2" type="b2602c69:ProjectViewProjectNode" />
               <item name="exp2" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="exp2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="exp2" type="462c0819:PsiDirectoryNode" />
-              <item name="res" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="exp2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="exp2" type="462c0819:PsiDirectoryNode" />
-              <item name="res" type="462c0819:PsiDirectoryNode" />
-              <item name="opt" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="exp2" type="b2602c69:ProjectViewProjectNode" />
@@ -358,6 +370,8 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -382,7 +396,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Optimize NullTest">
+  <component name="RunManager" selected="Application.Find-e TestCase">
     <configuration name="Find NullTest" type="Application" factoryName="Application">
       <output_file path="$PROJECT_DIR$/res/NullTest.basic.log" is_save="true" />
       <option name="MAIN_CLASS_NAME" value="submit.FindRedundantNullChecks" />
@@ -404,11 +418,11 @@
       <option name="PROGRAM_PARAMETERS" value="test.SkipList" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
-    <configuration name="Find TestBinary" type="Application" factoryName="Application">
-      <output_file path="$PROJECT_DIR$/res/TestBinary.basic.log" is_save="true" />
+    <configuration name="Find TestCase" type="Application" factoryName="Application">
+      <output_file path="$PROJECT_DIR$/res/TestCase.basic.log" is_save="true" />
       <option name="MAIN_CLASS_NAME" value="submit.FindRedundantNullChecks" />
       <module name="exp2" />
-      <option name="PROGRAM_PARAMETERS" value="test.TestBinary" />
+      <option name="PROGRAM_PARAMETERS" value="submit.TestCase" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration name="Find-e NullTest" type="Application" factoryName="Application">
@@ -432,11 +446,11 @@
       <option name="PROGRAM_PARAMETERS" value="test.SkipList -e" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
-    <configuration name="Find-e TestBinary" type="Application" factoryName="Application">
-      <output_file path="$PROJECT_DIR$/res/TestBinary.extra.log" is_save="true" />
+    <configuration name="Find-e TestCase" type="Application" factoryName="Application">
+      <output_file path="$PROJECT_DIR$/res/TestCase.extra.log" is_save="true" />
       <option name="MAIN_CLASS_NAME" value="submit.FindRedundantNullChecks" />
       <module name="exp2" />
-      <option name="PROGRAM_PARAMETERS" value="test.TestBinary -e" />
+      <option name="PROGRAM_PARAMETERS" value="submit.TestCase -e" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration name="Optimize NullTest" type="Application" factoryName="Application">
@@ -460,11 +474,11 @@
       <option name="PROGRAM_PARAMETERS" value="test.SkipList -m test.SkipList -p 5 -e" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
-    <configuration name="Optimize TestBinary" type="Application" factoryName="Application">
-      <output_file path="$PROJECT_DIR$/res/opt/TestBinary.log" is_save="true" />
+    <configuration name="Optimize TestCase" type="Application" factoryName="Application">
+      <output_file path="$PROJECT_DIR$/res/opt/TestCase.log" is_save="true" />
       <option name="MAIN_CLASS_NAME" value="submit.Optimize" />
       <module name="exp2" />
-      <option name="PROGRAM_PARAMETERS" value="test.TestBinary -m test.TestBinary -p 10 -e" />
+      <option name="PROGRAM_PARAMETERS" value="submit.TestCase -m submit.TestCase -e" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration name="PrintQuads NullTest" type="Application" factoryName="Application">
@@ -488,15 +502,31 @@
       <option name="PROGRAM_PARAMETERS" value="test.SkipList" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
-    <configuration name="PrintQuads TestBinary" type="Application" factoryName="Application">
-      <output_file path="$PROJECT_DIR$/res/PrintTestBinary.log" is_save="true" />
+    <configuration name="PrintQuads TestCase" type="Application" factoryName="Application">
+      <output_file path="$PROJECT_DIR$/res/PrintTestCase.log" is_save="true" />
       <option name="MAIN_CLASS_NAME" value="examples.PrintQuads" />
       <module name="exp2" />
-      <option name="PROGRAM_PARAMETERS" value="test.TestBinary" />
+      <option name="PROGRAM_PARAMETERS" value="submit.TestCase" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    </configuration>
+    <configuration name="opt NullTest" type="CompoundRunConfigurationType" factoryName="Compound Run Configuration">
+      <toRun type="Application" name="Optimize NullTest" />
+      <toRun type="Application" name="PrintQuads NullTest" />
+    </configuration>
+    <configuration name="opt QuickSort" type="CompoundRunConfigurationType" factoryName="Compound Run Configuration">
+      <toRun type="Application" name="Optimize QuickSort" />
+      <toRun type="Application" name="PrintQuads QuickSort" />
+    </configuration>
+    <configuration name="opt SkipList" type="CompoundRunConfigurationType" factoryName="Compound Run Configuration">
+      <toRun type="Application" name="Optimize SkipList" />
+      <toRun type="Application" name="PrintQuads SkipList" />
+    </configuration>
+    <configuration name="opt TestCase" type="CompoundRunConfigurationType" factoryName="Compound Run Configuration">
+      <toRun type="Application" name="Optimize TestCase" />
+      <toRun type="Application" name="PrintQuads TestCase" />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -537,22 +567,26 @@
       <listeners />
     </configuration>
     <list>
+      <item itemvalue="Application.PrintQuads TestCase" />
       <item itemvalue="Application.PrintQuads NullTest" />
-      <item itemvalue="Application.PrintQuads TestBinary" />
       <item itemvalue="Application.PrintQuads QuickSort" />
       <item itemvalue="Application.PrintQuads SkipList" />
+      <item itemvalue="Application.Find TestCase" />
       <item itemvalue="Application.Find NullTest" />
       <item itemvalue="Application.Find SkipList" />
       <item itemvalue="Application.Find QuickSort" />
-      <item itemvalue="Application.Find TestBinary" />
+      <item itemvalue="Application.Find-e TestCase" />
       <item itemvalue="Application.Find-e NullTest" />
       <item itemvalue="Application.Find-e QuickSort" />
       <item itemvalue="Application.Find-e SkipList" />
-      <item itemvalue="Application.Find-e TestBinary" />
       <item itemvalue="Application.Optimize NullTest" />
       <item itemvalue="Application.Optimize SkipList" />
       <item itemvalue="Application.Optimize QuickSort" />
-      <item itemvalue="Application.Optimize TestBinary" />
+      <item itemvalue="Application.Optimize TestCase" />
+      <item itemvalue="Compound.opt NullTest" />
+      <item itemvalue="Compound.opt TestCase" />
+      <item itemvalue="Compound.opt QuickSort" />
+      <item itemvalue="Compound.opt SkipList" />
     </list>
   </component>
   <component name="SvnConfiguration">
@@ -573,12 +607,13 @@
       <workItem from="1541654540631" duration="6391000" />
       <workItem from="1541784315372" duration="4205000" />
       <workItem from="1541948573524" duration="8943000" />
-      <workItem from="1542014954377" duration="13309000" />
+      <workItem from="1542014954377" duration="14293000" />
+      <workItem from="1542092265223" duration="4719000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="90615000" />
+    <option name="totallyTimeSpent" value="96318000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1519" height="977" extended-state="6" />
@@ -592,11 +627,12 @@
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.3297619" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.42857143" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.42857143" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19575633" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19849418" />
       <window_info anchor="right" id="Database" order="3" weight="0.32991102" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3297619" />
       <window_info anchor="right" id="SciView" order="3" weight="0.32991102" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.24982889" />
@@ -608,7 +644,6 @@
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3297619" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -620,12 +655,6 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java</url>
-          <line>140</line>
-          <properties />
-          <option name="timeStamp" value="37" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/BytecodeToQuad.java</url>
           <line>2040</line>
@@ -654,113 +683,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/test/QuickSort.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38">
-          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/design.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor />
-          <second_editor />
-        </state>
-      </provider>
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Develop/Java/jdk1.5.0_22/src.zip!/java/util/TreeMap.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19437">
-          <caret line="1092" selection-start-line="1092" selection-end-line="1092" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/flow/FlowSolver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1330">
-          <caret line="76" selection-start-line="76" selection-end-line="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/opt/QuickSort.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="15" column="47" selection-start-line="15" selection-start-column="47" selection-end-line="15" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/null_check/QuadBBVisitor.java" />
-    <entry file="jar://C:/Develop/Java/jdk1.5.0_22/src.zip!/java/util/ListIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1289">
-          <caret line="182" column="9" selection-start-line="182" selection-start-column="9" selection-end-line="182" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/joeq.jar!/joeq/Compiler/Quad/Quad.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-627">
-          <caret line="17" column="13" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/NullTest.basic.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="3" column="10" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/NullTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1001">
-          <caret line="114" column="33" selection-start-line="114" selection-start-column="33" selection-end-line="114" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/PrintQuickSort.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2470">
-          <caret line="130" column="54" selection-start-line="130" selection-start-column="48" selection-end-line="130" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/null_check/NonNull.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="334">
-          <caret line="468" selection-start-line="468" selection-end-line="468" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="class#SingleVar#0;class#NonNull#0" />
-            <element signature="class#CheckTable#0;class#NonNull#0" />
-            <element signature="method#getEntry#0;class#NonNull#0" />
-            <element signature="method#getExit#0;class#NonNull#0" />
-            <element signature="method#getIn#0;class#NonNull#0" />
-            <element signature="method#getOut#0;class#NonNull#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/PrintSkipList.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1995">
-          <caret line="105" column="19" selection-start-line="105" selection-end-line="105" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/opt/NullTest.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="265">
-          <caret line="21" column="42" selection-start-line="21" selection-start-column="42" selection-end-line="21" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/flow/ReachingDefs.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
@@ -779,9 +701,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="133">
           <caret line="7" column="30" selection-start-line="7" selection-start-column="30" selection-end-line="7" selection-end-column="30" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -789,9 +708,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
           <caret line="31" selection-start-line="31" selection-end-line="31" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -921,22 +837,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="434">
-          <caret line="164" column="37" selection-start-line="164" selection-start-column="37" selection-end-line="164" selection-end-column="37" />
-          <folding>
-            <element signature="class#Exprsn#0;class#GlobCommDetect#0" />
-            <element signature="method#getExp#0;class#Exprsn#0;class#GlobCommDetect#0" />
-            <element signature="e#2744#2745#0" expanded="true" />
-            <element signature="e#2832#2833#0" expanded="true" />
-            <element signature="e#5024#5025#0" expanded="true" />
-            <element signature="e#5529#5537#0" expanded="true" />
-            <element signature="e#8959#8976#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/submit/null_check/NullCheckEliminate.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
@@ -945,23 +845,6 @@
             <element signature="imports" expanded="true" />
             <element signature="e#484#485#0" expanded="true" />
             <element signature="e#512#513#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/PrintNullTest.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3705">
-          <caret line="33" lean-forward="true" selection-start-line="33" selection-end-line="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="36" column="11" lean-forward="true" selection-start-line="36" selection-start-column="11" selection-end-line="36" selection-end-column="11" />
-          <folding>
-            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -980,20 +863,66 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/const_folding/ConstDetect.java">
+    <entry file="file://$PROJECT_DIR$/res/PrintTestBinary.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="392">
-          <caret line="22" column="51" selection-start-line="22" selection-start-column="51" selection-end-line="22" selection-end-column="51" />
+        <state relative-caret-position="3610">
+          <caret line="190" column="30" selection-start-line="190" selection-start-column="28" selection-end-line="190" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/opt/TestBinary.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="741">
+          <caret line="39" column="44" selection-start-line="39" selection-start-column="44" selection-end-line="39" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/exp2.properties">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/exp2.iml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nullCheck.sh">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/optimize.sh">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run.sh">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommEliminate.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="11" selection-start-line="11" selection-end-line="12" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#850#882#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/global_common/GlobCommDetect.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
+          <folding>
+            <element signature="class#Exprsn#0;class#GlobCommDetect#0" />
+            <element signature="method#getExp#0;class#Exprsn#0;class#GlobCommDetect#0" />
+            <element signature="e#4990#4991#0" expanded="true" />
+            <element signature="e#5024#5025#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/flow/Faintness.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1064">
-          <caret line="17" column="7" lean-forward="true" selection-start-line="17" selection-start-column="7" selection-end-line="17" selection-end-column="7" />
+        <state relative-caret-position="361">
+          <caret line="107" column="55" lean-forward="true" selection-start-line="100" selection-start-column="8" selection-end-line="107" selection-end-column="55" />
           <folding>
             <element signature="e#8418#8419#0" expanded="true" />
             <element signature="e#8452#8453#0" expanded="true" />
@@ -1003,23 +932,108 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/res/PrintTestBinary.log">
+    <entry file="file://$PROJECT_DIR$/src/submit/faint/FaintEliminate.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="190" column="30" selection-start-line="190" selection-start-column="28" selection-end-line="190" selection-end-column="30" />
+        <state relative-caret-position="143">
+          <caret line="62" column="46" selection-start-line="62" selection-start-column="46" selection-end-line="62" selection-end-column="46" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/res/opt/TestBinary.log">
+    <entry file="file://$PROJECT_DIR$/res/opt/NullTest.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-911">
-          <caret line="39" column="44" lean-forward="true" selection-start-line="39" selection-start-column="44" selection-end-line="39" selection-end-column="44" />
+        <state relative-caret-position="-4067">
+          <caret line="42" column="16" lean-forward="true" selection-start-line="42" selection-start-column="16" selection-end-line="42" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/opt/TestCase.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="73" column="3" lean-forward="true" selection-start-line="73" selection-start-column="3" selection-end-line="73" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/NullTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="120" column="41" selection-start-line="120" selection-start-column="28" selection-end-line="120" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/TestCase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="79" column="41" selection-start-line="79" selection-start-column="41" selection-end-line="79" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/opt/QuickSort.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="194">
+          <caret line="28" column="27" selection-start-line="28" selection-start-column="27" selection-end-line="28" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/opt/SkipList.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-794" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/SkipList.basic.out">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="9" column="19" lean-forward="true" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/PrintNullTest.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="104">
+          <caret line="54" lean-forward="true" selection-start-line="54" selection-end-line="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/NullTest.basic.out">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/design.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor />
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="741">
+          <caret line="39" column="21" selection-start-line="39" selection-start-column="21" selection-end-line="39" selection-end-column="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/submit/const_folding/ConstDetect.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="22" column="51" selection-start-line="22" selection-start-column="51" selection-end-line="22" selection-end-column="51" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/submit/const_folding/ConstFolding.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
+        <state relative-caret-position="-1850">
           <caret line="33" column="80" selection-start-line="33" selection-start-column="80" selection-end-line="33" selection-end-column="80" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1029,51 +1043,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/TestBinary.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1672">
-          <caret line="92" column="36" selection-start-line="92" selection-start-column="36" selection-end-line="92" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/Optimize.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="58" column="60" lean-forward="true" selection-start-line="58" selection-start-column="60" selection-end-line="58" selection-end-column="60" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1310#1325#0" expanded="true" />
-            <element signature="e#1375#1385#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/submit/faint/FaintDetect.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1482">
-          <caret line="81" selection-start-line="81" selection-end-line="81" />
+        <state relative-caret-position="285">
+          <caret line="18" column="27" selection-start-line="18" selection-start-column="27" selection-end-line="18" selection-end-column="27" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#685#718#0" expanded="true" />
-            <element signature="e#3304#3321#0" expanded="true" />
-            <element signature="e#8421#8422#0" expanded="true" />
-            <element signature="e#8455#8456#0" expanded="true" />
-            <element signature="e#8567#8568#0" expanded="true" />
-            <element signature="e#8613#8614#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/submit/faint/FaintEliminate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="202">
-          <caret line="20" column="20" selection-start-line="20" selection-start-column="20" selection-end-line="20" selection-end-column="20" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#403#404#0" expanded="true" />
-            <element signature="e#431#432#0" expanded="true" />
-            <element signature="e#1184#1185#0" expanded="true" />
-            <element signature="e#1215#1216#0" expanded="true" />
           </folding>
         </state>
       </provider>
