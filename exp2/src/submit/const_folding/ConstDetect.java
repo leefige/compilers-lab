@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class ConstDetect extends ConstantProp {
-    public Map<jq_Method, Map<Integer, ConstantPropTable>> finalOut = new HashMap<jq_Method, Map<Integer, ConstantPropTable>>();
+    public Map<jq_Method, Map<Integer, ConstantPropTable>> finalRes = new HashMap<jq_Method, Map<Integer, ConstantPropTable>>();
 
     @Override
     public void postprocess(ControlFlowGraph cfg) {
@@ -20,8 +20,9 @@ public class ConstDetect extends ConstantProp {
         while (qit.hasNext()) {
             Quad q = qit.next();
             int qid = q.getID();
-            curOut.put(qid, (ConstantPropTable)getOut(q));
+            // we use the program point before the quad (in)
+            curOut.put(qid, (ConstantPropTable)getIn(q));
         }
-        finalOut.put(cfg.getMethod(), curOut);
+        finalRes.put(cfg.getMethod(), curOut);
     }
 }

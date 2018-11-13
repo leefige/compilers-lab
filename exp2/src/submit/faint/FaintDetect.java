@@ -10,28 +10,22 @@ import java.util.*;
 
 /**
  * This is just a similar class to Faintness
- * I have to copy it since the VarSet::isFaint() is package private
+ * I have to copy it since the Faintness::VarSet::isFaint() is package-private
  * and thus I cannot know about the set of VarSet from package 'submit'
  * However, a getter should be public
+ * What's more, the ctor of Faintness::VarSet is also package-private...
+ * I cannot even extend it, so I have to copy it
  *
  * By the way, I also modified the quad visiting method:
  *      if the quad is NULL_CHECK, do not 'use' the reg being checked
  *      (because it's actually not used)
  * in order to perform more optimization
  * */
-public class FaintDetect extends Faintness {
+public class FaintDetect implements Flow.Analysis {
 
-    /**
-     * Dataflow objects for the interior and entry/exit points
-     * of the CFG. in[ID] and out[ID] store the entry and exit
-     * state for the input and output of the quad with identifier ID.
-     * <p>
-     * You are free to modify these fields, just make sure to
-     * preserve the data printed by postprocess(), which relies on these.
-     */
+    public Map<jq_Method, Map<Integer, VarSet>> finalOut = new HashMap<jq_Method, Map<Integer, VarSet>>();
     private VarSet[] in, out;
     private VarSet entry, exit;
-    public Map<jq_Method, Map<Integer, VarSet>> finalOut = new HashMap<jq_Method, Map<Integer, VarSet>>();
 
     /**
      * This method initializes the datflow framework.
@@ -40,7 +34,6 @@ public class FaintDetect extends Faintness {
      */
     public void preprocess(ControlFlowGraph cfg) {
         // this line must come first.
-
         // get the amount of space we need to allocate for the in/out arrays.
         QuadIterator qit = new QuadIterator(cfg);
         int max = 0;
@@ -102,7 +95,6 @@ public class FaintDetect extends Faintness {
      *
      * @param cfg Unused.
      */
-    @Override
     public void postprocess(ControlFlowGraph cfg) {
         Map<Integer, VarSet> curOut = new TreeMap<Integer, VarSet>();
         QuadIterator qit = new QuadIterator(cfg);
@@ -112,6 +104,40 @@ public class FaintDetect extends Faintness {
             curOut.put(qid, (VarSet) getOut(q));
         }
         finalOut.put(cfg.getMethod(), curOut);
+    }
+
+    public void processQuad(Quad q) {
+        VarSet val = (VarSet) getOut(q);
+        // Move non-faintness over to used registers for move and binary operators
+        if (q.getOperator() instanceof Operator.Move || q.getOperator() instanceof Operator.Binary) {
+            // Get the defined register (we know there's exactly one)
+            Operand.RegisterOperand def = q.getDefinedRegisters().iterator().next();
+            boolean defWasFaint = val.isFaint(def.getRegister().toString());
+            // Make the defined register faint
+            val.setFaint(def.getRegister().toString());
+
+            // If the defined register was not faint, make the used registers not faint
+            if (!defWasFaint) {
+                for (Operand.RegisterOperand use : q.getUsedRegisters()) {
+                    val.setNotFaint(use.getRegister().toString());
+                }
+            }
+        } else if (q.getOperator() instanceof Operator.NullCheck) {
+            // Get the defined register (we know there's exactly one: T-1)
+            for (Operand.RegisterOperand def : q.getDefinedRegisters()) {
+                val.setFaint(def.getRegister().toString());
+            }
+            // do nothing with used, because we know it will only be checked
+        } else {
+            // For all other quads behave similarly to liveness analysis
+            for (Operand.RegisterOperand def : q.getDefinedRegisters()) {
+                val.setFaint(def.getRegister().toString());
+            }
+            for (Operand.RegisterOperand use : q.getUsedRegisters()) {
+                val.setNotFaint(use.getRegister().toString());
+            }
+        }
+        setIn(q, val);
     }
 
     /**
@@ -168,43 +194,9 @@ public class FaintDetect extends Faintness {
         return new VarSet();
     }
 
-    public void processQuad(Quad q) {
-        VarSet val = (VarSet) getOut(q);
-        // Move non-faintness over to used registers for move and binary operators
-        if (q.getOperator() instanceof Operator.Move || q.getOperator() instanceof Operator.Binary) {
-            // Get the defined register (we know there's exactly one)
-            Operand.RegisterOperand def = q.getDefinedRegisters().iterator().next();
-            boolean defWasFaint = val.isFaint(def.getRegister().toString());
-            // Make the defined register faint
-            val.setFaint(def.getRegister().toString());
-
-            // If the defined register was not faint, make the used registers not faint
-            if (!defWasFaint) {
-                for (Operand.RegisterOperand use : q.getUsedRegisters()) {
-                    val.setNotFaint(use.getRegister().toString());
-                }
-            }
-        } else if (q.getOperator() instanceof Operator.NullCheck) {
-            // Get the defined register (we know there's exactly one: T-1)
-            for (Operand.RegisterOperand def : q.getDefinedRegisters()) {
-                val.setFaint(def.getRegister().toString());
-            }
-            // do nothing with used, because we know it will only be checked
-        } else {
-            // For all other quads behave similarly to liveness analysis
-            for (Operand.RegisterOperand def : q.getDefinedRegisters()) {
-                val.setFaint(def.getRegister().toString());
-            }
-            for (Operand.RegisterOperand use : q.getUsedRegisters()) {
-                val.setNotFaint(use.getRegister().toString());
-            }
-        }
-        setIn(q, val);
-    }
-
     /**
-     * Class for the dataflow objects in the Faintness analysis.
-     * Based very closely on the class flow.Liveness.VarSet
+     * Almost a copy of Faintness.VarSet
+     * Just to avoid some non-public method problem
      */
     public static class VarSet implements Flow.DataflowObject {
         static Set<String> universalSet;
@@ -213,7 +205,7 @@ public class FaintDetect extends Faintness {
         /**
          * The default value has all registers faint
          */
-        VarSet() {
+        public VarSet() {
             set = new TreeSet<String>(universalSet);
         }
 

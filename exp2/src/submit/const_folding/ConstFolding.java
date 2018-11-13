@@ -12,7 +12,7 @@ import java.util.ListIterator;
 import java.util.Map;
 
 public class ConstFolding implements Modifier {
-    public Map<jq_Method, Map<Integer, ConstantProp.ConstantPropTable>> allOut;
+    public Map<jq_Method, Map<Integer, ConstantProp.ConstantPropTable>> allIn;
     boolean isForward;
     private ConstReplacer replacer = new ConstReplacer();
     private ConstFolder folder = new ConstFolder();
@@ -22,19 +22,19 @@ public class ConstFolding implements Modifier {
     }
 
     public void getDataFlowResult(Flow.Analysis analysis) {
-        allOut = new HashMap<jq_Method, Map<Integer, ConstantProp.ConstantPropTable>>(((ConstDetect)analysis).finalOut);
+        allIn = new HashMap<jq_Method, Map<Integer, ConstantProp.ConstantPropTable>>(((ConstDetect)analysis).finalRes);
         isForward = analysis.isForward();
     }
 
     public void visitCFG(ControlFlowGraph cfg) {
-        Map<Integer, ConstantProp.ConstantPropTable> out = allOut.get(cfg.getMethod());
+        Map<Integer, ConstantProp.ConstantPropTable> in = allIn.get(cfg.getMethod());
         QuadIterator qit = new QuadIterator(cfg, isForward);
 
         // replace const
         System.out.print("Replacing const in " + cfg.getMethod().toString() + ":");
         while (qit.hasNext()) {
             Quad q = qit.next();
-            ConstantProp.ConstantPropTable table = out.get(q.getID());
+            ConstantProp.ConstantPropTable table = in.get(q.getID());
             replacer.registerIn(table);
             Helper.runPass(q, replacer);
         }
