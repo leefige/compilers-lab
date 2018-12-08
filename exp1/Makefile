@@ -1,7 +1,7 @@
 
 # if java/javac are not in your ${PATH}, set this line to the directory
 # they are located in, with a trailing '/', e.g. 'JAVAPATH=/usr/bin/'
-JAVAPATH=/opt/jdk1.5.0_22/bin/
+JAVAPATH=
 
 compile: clean
 	chmod +x run.sh

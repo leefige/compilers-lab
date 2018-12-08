@@ -1,8 +1,8 @@
 #!/bin/sh
 
-echo "building..."
-rm -r build > /dev/null
-make > /dev/null
+#echo "building..."
+#rm -r build > /dev/null
+#make > /dev/null
 
 echo "testing..."
 tpe="flow.ConstantProp"
@@ -19,7 +19,7 @@ elif [ $2 = "tf" ] ; then
     file="$1"
 fi
 
-rm res/$file > /dev/null 2>&1
+rm res/$file #> /dev/null 2>&1
 ./run.sh flow.Flow submit.MySolver $tpe $tar > res/$file
 
 diff res/$file src/test/$file.out;

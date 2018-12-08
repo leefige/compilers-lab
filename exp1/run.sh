@@ -1,3 +1,2 @@
 #!/bin/sh
-here=`dirname $0`
-/opt/jdk1.5.0_22/bin/java -cp build/:${here}/lib/joeq.jar $@
+C:/Develop/Java/jdk1.5.0_22/bin/java.exe "-javaagent:C:/Develop/JetBrains/IntelliJ IDEA 2018.1.5/lib/idea_rt.jar=4439:C:/Develop/JetBrains/IntelliJ IDEA 2018.1.5/bin" -Dfile.encoding=UTF-8 -classpath C:/Develop/Java/jdk1.5.0_22/jre/lib/charsets.jar;C:/Develop/Java/jdk1.5.0_22/jre/lib/ext/dnsns.jar;C:/Develop/Java/jdk1.5.0_22/jre/lib/ext/localedata.jar;C:/Develop/Java/jdk1.5.0_22/jre/lib/ext/sunjce_provider.jar;C:/Develop/Java/jdk1.5.0_22/jre/lib/jce.jar;C:/Develop/Java/jdk1.5.0_22/jre/lib/jsse.jar;C:/Develop/Java/jdk1.5.0_22/jre/lib/rt.jar;C:/Users/Liyf/OneDrive/Desktop/compiler/lab/exp1/build/production/hw2;C:/Users/Liyf/OneDrive/Desktop/compiler/lab/exp1/lib/joeq.jar $@
