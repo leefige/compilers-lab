@@ -55,7 +55,9 @@ public:
   void visitFunction(Function &F) {}
   void visitBasicBlock(BasicBlock &B) {}
 
-  void visitAdd(BinaryOperator &I) {}
+  void visitAdd(BinaryOperator &I) {
+    printf("This is add.\n");
+  }
   void visitSub(BinaryOperator &I) {}
   void visitMul(BinaryOperator &I) {}
   void visitShl(BinaryOperator &I) {}
@@ -89,6 +91,7 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
+  printf("Now walking the module...\n");
   Z3Walker().visitModule(*module);
 
   return 0;
