@@ -1,4 +1,7 @@
-
+/**
+ * By Yifei Li
+ * */
+#define LOG
 #include <map>
 #include <string>
 
@@ -47,16 +50,23 @@ private:
   z3::solver solver;
 
 public:
-  Z3Walker() : ctx(), solver(ctx) {}
+  Z3Walker() : ctx(), solver(ctx) {
+    std::cout << "new z3walker" << std::endl;
+  }
 
   // Not using InstVisitor::visit due to their sequential order.
   // We want topological order on the Call Graph and CFG.
-  void visitModule(Module &M) {}
+  void visitModule(Module &M) {
+    std::cout << "Parsing module: " << M.getName().str() << std::endl;
+    // iterate functions
+    for(auto it = M.begin(); it != M.end(); it++) {
+      std::cout << (*it).getGC() << std::endl;
+    }
+  }
   void visitFunction(Function &F) {}
   void visitBasicBlock(BasicBlock &B) {}
 
   void visitAdd(BinaryOperator &I) {
-    printf("This is add.\n");
   }
   void visitSub(BinaryOperator &I) {}
   void visitMul(BinaryOperator &I) {}
@@ -72,7 +82,9 @@ public:
   void visitPHINode(PHINode &I) {}
 
   // Call checkAndReport here.
-  void visitGetElementPtrInst(GetElementPtrInst &I) {}
+  void visitGetElementPtrInst(GetElementPtrInst &I) {
+    checkAndReport(solver, I);
+  }
 };
 
 int main(int argc, char const *argv[]) {
