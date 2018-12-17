@@ -59,30 +59,67 @@ public:
   void visitModule(Module &M) {
     std::cout << "Parsing module: " << M.getName().str() << std::endl;
     // iterate functions
+    std::cout << "size is " << M.size() << std::endl;
     for(auto it = M.begin(); it != M.end(); it++) {
-      std::cout << (*it).getGC() << std::endl;
+//      std::cout << "inst cnt: " << (*it).getFunctionType() << std::endl;
+      this->visit(*it);
     }
   }
-  void visitFunction(Function &F) {}
-  void visitBasicBlock(BasicBlock &B) {}
+  void visitFunction(Function &F) {
+  
+    std::cout << "visit func" << std::endl;
+  }
+  void visitBasicBlock(BasicBlock &B) {
+  
+    std::cout << "visit bb" << std::endl;
+  }
 
   void visitAdd(BinaryOperator &I) {
+    std::cout << "visit add" << std::endl;
   }
-  void visitSub(BinaryOperator &I) {}
-  void visitMul(BinaryOperator &I) {}
-  void visitShl(BinaryOperator &I) {}
-  void visitLShr(BinaryOperator &I) {}
-  void visitAShr(BinaryOperator &I) {}
-  void visitAnd(BinaryOperator &I) {}
-  void visitOr(BinaryOperator &I) {}
-  void visitXor(BinaryOperator &I) {}
-  void visitICmp(ICmpInst &I) {}
+  void visitSub(BinaryOperator &I) {
+  
+    std::cout << "visit sub" << std::endl;
+  }
+  void visitMul(BinaryOperator &I) {
+  
+  }
+  void visitShl(BinaryOperator &I) {
+  
+  }
+  void visitLShr(BinaryOperator &I) {
+  
+  }
+  void visitAShr(BinaryOperator &I) {
+  
+  }
+  void visitAnd(BinaryOperator &I) {
+  
+  }
+  void visitOr(BinaryOperator &I) {
+  
+  }
+  void visitXor(BinaryOperator &I) {
+  
+  }
+  void visitICmp(ICmpInst &I) {
+  
+    std::cout << "visit icmp" << std::endl;
+  }
 
-  void visitBranchInst(BranchInst &I) {}
-  void visitPHINode(PHINode &I) {}
+  void visitBranchInst(BranchInst &I) {
+  
+    std::cout << "visit br" << std::endl;
+  }
+  void visitPHINode(PHINode &I) {
+  
+    std::cout << "visit phi" << std::endl;
+  }
 
   // Call checkAndReport here.
   void visitGetElementPtrInst(GetElementPtrInst &I) {
+    
+    std::cout << "visit gep" << std::endl;
     checkAndReport(solver, I);
   }
 };
