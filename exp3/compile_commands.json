@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/ubuntu/code/compilers-lab/exp3/build",
+  "command": "/usr/bin/c++   -I/usr/lib/llvm-6.0/include    -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -std=gnu++14 -o CMakeFiles/z3expr.dir/main.cpp.o -c /home/ubuntu/code/compilers-lab/exp3/main.cpp",
+  "file": "/home/ubuntu/code/compilers-lab/exp3/main.cpp"
+}
+]
