@@ -53,7 +53,7 @@ private:
   z3::solver solver;
 
   // gen 32-bit val
-  z3::expr genBVConst(std::string name) {
+  z3::expr genBVConst(const std::string& name) {
     return ctx.bv_const(name.c_str(), 32);  
   }
 
@@ -120,16 +120,14 @@ public:
 
   void visitAdd(BinaryOperator &I) {
     std::cout << "    visit add" << std::endl;
-    for (auto i = I.op_begin(); i != I.op_end(); i++) {
-      std::cout << "\top: " << *i;
-    }
-    std::cout << std::endl;
+//    for (auto i = I.op_begin(); i != I.op_end(); i++) {
+//      std::cout << "\top: " << *i;
+//    }
+//    std::cout << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
     z3::expr a = genBVConst(getName(*op1));
     z3::expr b = genBVConst(getName(*op2));
-    //solver.add(a == op1->va)
-//    solver.add()
     // the Instruction itself is the ret val
     z3::expr r = genBVConst(getName(I));
     solver.add(r == a + b);
