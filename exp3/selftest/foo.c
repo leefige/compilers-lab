@@ -1,9 +1,13 @@
 extern int a;
 int foo(int i) {
     if (i == 3) {
-        return a;
+      int a = 1; 
+      int b = 2;
+      int c = a + b;
+      return c;
     } else {
-        return i;
+      int d = i * a;
+      return d;
     }
 }
 

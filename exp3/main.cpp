@@ -8,6 +8,7 @@
 
 #include <llvm/IR/CFG.h>
 #include <llvm/IR/InstVisitor.h>
+#include <llvm/IR/Instruction.h>
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/raw_ostream.h>
@@ -66,10 +67,13 @@ public:
       this->visitFunction(*it);
     }
   }
+
   void visitFunction(Function &F) {
     std::cout << "<Func> " << getName(F) << std::endl;
-    std::stack<scc_iterator<Function*> > sccs;
+    solver.push();
+//    solver.add()
     // use stack to reverse post order
+    std::stack<scc_iterator<Function*> > sccs;
     for(scc_iterator<Function*> scci = scc_begin(&F), scce = scc_end(&F); scci != scce; ++scci) {
         sccs.push(scci);
     }
@@ -85,17 +89,30 @@ public:
           this->visitBasicBlock(*(*E));
       }
     }
+    solver.pop();
   }
+
   void visitBasicBlock(BasicBlock &B) {
-    std::cout << "\t<BB> " << getName(B) << std::endl;
+    std::cout << "  <BB> " << getName(B) << std::endl;
+    for (auto iit = B.begin(); iit != B.end(); iit++) {
+      this->visit(*iit);
+    }
   }
 
   void visitAdd(BinaryOperator &I) {
-    std::cout << "visit add" << std::endl;
+    std::cout << "    visit add" << std::endl;
+    for (auto i = I.op_begin(); i != I.op_end(); i++) {
+      std::cout << *i;
+    }
+    std::cout << std::endl;
+    auto op1 = I.llvm::User::getOperand(1);
+    auto op2 = I.llvm::User::getOperand(2);
+//    solver.add()
   }
+
   void visitSub(BinaryOperator &I) {
   
-    std::cout << "visit sub" << std::endl;
+    std::cout << "    visit sub" << std::endl;
   }
   void visitMul(BinaryOperator &I) {
   
@@ -118,24 +135,23 @@ public:
   void visitXor(BinaryOperator &I) {
   
   }
-  void visitICmp(ICmpInst &I) {
-  
-    std::cout << "visit icmp" << std::endl;
+  void visitICmp(ICmpInst &I) { 
+    std::cout << "    visit icmp" << std::endl;
+//    solver.add()
   }
 
   void visitBranchInst(BranchInst &I) {
   
-    std::cout << "visit br" << std::endl;
+    std::cout << "    visit br" << I << std::endl;
   }
   void visitPHINode(PHINode &I) {
   
-    std::cout << "visit phi" << std::endl;
+    std::cout << "    visit phi" << std::endl;
   }
 
   // Call checkAndReport here.
   void visitGetElementPtrInst(GetElementPtrInst &I) {
-    
-    std::cout << "visit gep" << std::endl;
+    std::cout << "    visit gep" << std::endl;
     checkAndReport(solver, I);
   }
 };
