@@ -1,0 +1,910 @@
+de-Morgan example
+(declare-fun y () Bool)
+(declare-fun x () Bool)
+(assert (not (= (not (and x y)) (or (not x) (not y)))))
+
+; 
+(set-info :status unknown)
+(declare-fun y () Bool)
+(declare-fun x () Bool)
+(assert
+ (not (= (not (and x y)) (or (not x) (not y)))))
+(check-sat)
+
+de-Morgan is valid
+
+find_model_example1
+sat
+(define-fun x () Int
+  1)
+(define-fun y () Int
+  3)
+x = 1
+y = 3
+x + y + 1 = 5
+
+prove_example1
+conjecture 1
+(=> (= x y) (= (g x) (g y)))
+proved
+conjecture 2
+(=> (= x y) (= (g (g x)) (g y)))
+failed to prove
+counterexample:
+(define-fun y () Int
+  0)
+(define-fun x () Int
+  0)
+(define-fun g ((x!0 Int)) Int
+  (ite (= x!0 1) 2
+    1))
+g(g(x)) = 2
+g(y)    = 1
+
+prove_example1
+conjecture 1:
+(let ((a!1 (distinct (g (- (g x) (g y))) (g z))))
+  (=> (and a!1 (<= (+ x z) y) (<= y x)) (< z 0)))
+proved
+conjecture 2:
+(let ((a!1 (distinct (g (- (g x) (g y))) (g z))))
+  (=> (and a!1 (<= (+ x z) y) (<= y x)) (< z (- 1))))
+failed to prove
+counterexample:
+(define-fun z () Int
+  (- 1))
+(define-fun y () Int
+  (- 3))
+(define-fun x () Int
+  (- 2))
+(define-fun g ((x!0 Int)) Int
+  (ite (= x!0 (- 2)) 11795
+  (ite (= x!0 (- 1)) 5
+    11797)))
+
+nonlinear example 1
+sat
+(define-fun x () Real
+  (/ 1.0 8.0))
+(define-fun y () Real
+  (root-obj (+ (* 64 (^ x 2)) (- 63)) 1))
+(define-fun z () Real
+  (/ 1.0 2.0))
+model in decimal notation
+(define-fun x () Real
+  0.125)
+(define-fun y () Real
+  (- 0.9921567416?))
+(define-fun z () Real
+  0.5)
+model using 50 decimal places
+(define-fun x () Real
+  0.125)
+(define-fun y () Real
+  (- 0.99215674164922147143810590761472265964134719365591?))
+(define-fun z () Real
+  0.5)
+
+bitvector example 1
+conjecture:
+(= (bvsle (bvsub x #x0000000a) #x00000000) (bvsle x #x0000000a))
+failed to prove
+counterexample:
+(define-fun x () (_ BitVec 32)
+  #x80000003)
+conjecture:
+(= (bvule (bvsub x #x0000000a) #x00000000) (bvule x #x0000000a))
+failed to prove
+counterexample:
+(define-fun x () (_ BitVec 32)
+  #x00000000)
+conjecture:
+(=> (= (concat x y) (concat y x)) (= x y))
+proved
+
+bitvector example 2
+(declare-fun y () (_ BitVec 32))
+(declare-fun x () (_ BitVec 32))
+(assert (= (bvsub (bvxor x y) #x00000067) (bvmul x y)))
+
+sat
+(define-fun y () (_ BitVec 32)
+  #xc3c3fb1c)
+(define-fun x () (_ BitVec 32)
+  #x3c281d77)
+
+capi example
+r: (bvsrem x y)
+
+eval example 1
+sat
+Model:
+(define-fun x () Int
+  3)
+(define-fun y () Int
+  4)
+x+y = 7
+
+two contexts example 1
+(+ x 1)
+
+error example
+failed: invalid argument
+failed: index out of bounds
+
+numeral example
+(/ 1.0 2.0) (/ 1.0 2.0) (/ 1.0 2.0)
+conjecture:
+(and (= (/ 1.0 2.0) (/ 1.0 2.0)) (= (/ 1.0 2.0) (/ 1.0 2.0)))
+proved
+(- (/ 1.0 3.0)) (- (/ 3333333333333333333333333333333333.0
+      10000000000000000000000000000000000.0))
+conjecture:
+(distinct (- (/ 1.0 3.0))
+          (- (/ 3333333333333333333333333333333333.0
+                10000000000000000000000000000000000.0)))
+proved
+
+if-then-else example
+term: (ite false 1 0)
+
+if-then-else example2
+(> (ite b x y) 0)
+
+quantifier example
+(declare-fun f (Int Int) Int)
+(declare-fun a () Int)
+(assert (forall ((x Int) (y Int)) (>= (f x y) 0)))
+(assert (< (f a a) a))
+
+sat
+(define-fun a () Int
+  1)
+(define-fun f ((x!0 Int) (x!1 Int)) Int
+  0)
+unsat
+
+unsat core example1
+unsat
+(ast-vector
+  p1
+  p2)
+size: 2
+p1
+p2
+sat
+
+unsat core example 2
+unsat
+(ast-vector
+  p1)
+size: 1
+p1
+F num. args (before simplify): 2
+F num. args (after simplify):  4
+Creating answer literal q0 for (not (<= x 10))
+Creating answer literal q1 for (not (<= y x))
+Creating answer literal q2 for (not (<= 5 y))
+Creating answer literal q3 for (not (<= y 0))
+unsat
+(ast-vector
+  q0
+  q1
+  q2)
+size: 3
+q0
+q1
+q2
+
+unsat core example 3
+unsat
+(ast-vector
+  p1
+  p3)
+
+tactic example 1
+(goal
+  (> x 0.0)
+  (> y 0.0)
+  (= x (+ y 2.0)))
+(goals
+(goal
+  (not (<= y (- 2.0)))
+  (not (<= y 0.0)))
+)
+
+tactic example 2
+subgoal 0
+(goal
+  (< x 0.0)
+  (= x (+ y 1.0))
+  (< y 0.0))
+subgoal 1
+(goal
+  (> x 0.0)
+  (= x (+ y 1.0))
+  (< y 0.0))
+
+tactic example 3
+(goals
+(goal
+  (= x 0.0)
+  (= y 0.0)
+  (= z 0.0)
+  (> (+ x y z) 2.0))
+(goal
+  (= x 0.0)
+  (= y 0.0)
+  (= z 1.0)
+  (> (+ x y z) 2.0))
+(goal
+  (= x 0.0)
+  (= y 1.0)
+  (= z 0.0)
+  (> (+ x y z) 2.0))
+(goal
+  (= x 0.0)
+  (= y 1.0)
+  (= z 1.0)
+  (> (+ x y z) 2.0))
+(goal
+  (= x 1.0)
+  (= y 0.0)
+  (= z 0.0)
+  (> (+ x y z) 2.0))
+(goal
+  (= x 1.0)
+  (= y 0.0)
+  (= z 1.0)
+  (> (+ x y z) 2.0))
+(goal
+  (= x 1.0)
+  (= y 1.0)
+  (= z 0.0)
+  (> (+ x y z) 2.0))
+(goal
+  (= x 1.0)
+  (= y 1.0)
+  (= z 1.0)
+  (> (+ x y z) 2.0))
+)
+(goals
+(goal
+  (= x 0.0)
+  (= y 0.0)
+  (or (= z 0.0) (= z 1.0))
+  (> (+ x y z) 2.0))
+(goal
+  (= x 0.0)
+  (= y 1.0)
+  (or (= z 0.0) (= z 1.0))
+  (> (+ x y z) 2.0))
+(goal
+  (= x 1.0)
+  (= y 0.0)
+  (or (= z 0.0) (= z 1.0))
+  (> (+ x y z) 2.0))
+(goal
+  (= x 1.0)
+  (= y 1.0)
+  (or (= z 0.0) (= z 1.0))
+  (> (+ x y z) 2.0))
+)
+(goals
+(goal)
+)
+
+tactic example 4
+sat
+(define-fun y () (_ BitVec 16)
+  #x200d)
+(define-fun x () (_ BitVec 16)
+  #x0700)
+x*32 + y = #x000d
+x & y    = #x0000
+
+tactic example 5
+sat
+(define-fun y () Int
+  (- 2))
+(define-fun x () Int
+  0)
+
+tactic example 6
+sat
+(define-fun z () Int
+  5)
+(define-fun y () Int
+  1)
+(define-fun x () Int
+  1)
+unknown
+
+tactic example 7
+(goals
+(goal
+  (not (<= k!0 (- 1)))
+  (not (<= z (+ 14 k!0))))
+)
+sat
+model for subgoal:
+(define-fun z () Int
+  15)
+model for original goal:
+(define-fun z () Int
+  15)
+(define-fun y () Int
+  14)
+(define-fun x () Int
+  11)
+
+tactic example 8
+num-consts: 3
+tactic failed...
+trying again...
+(goals
+(goal
+  (> (+ x y) 0))
+)
+
+tactic example 9
+(goals
+(goal
+  (<= (* (+ y (* (- 1) x)) (+ y x)) 0))
+)
+(goals
+(goal
+  (>= (+ (* 2 x) y z) 0)
+  (>= (+ (* x x) (* (- 1) y y)) 0))
+)
+
+tactic example using quantifier elimination
+(forall ((x Int)) (=> (<= x a) (< x b)))
+sat
+(define-fun b () Int
+  1)
+(define-fun a () Int
+  0)
+
+visit example
+application of x: x
+application of x: x
+application of *: (* x x)
+application of y: y
+application of y: y
+application of *: (* y y)
+application of -: (- (* x x) (* y y))
+application of Int: 0
+application of >=: (>= (- (* x x) (* y y)) 0)
+
+(/ 1.0 3.0) is 0.333333
+
+incremental example1
+sat
+unsat
+
+incremental example2
+sat
+unsat
+sat
+(declare-fun k!0 () Bool)
+(declare-fun x () Int)
+(declare-fun k!1 () Bool)
+(assert (> x 0))
+(model-del k!0)
+(model-add x () Int (ite k!0 0 (+ 0 1)))
+(model-del k!1)
+(model-add k!0 () Bool (not k!1))
+(pb2bv-model-converter)
+(model-add k!1 () Bool true)
+
+
+incremental example3
+sat
+unsat
+sat
+sat
+
+enumeration sort example
+1: (and (= x a) (= x b))
+2: false
+
+tuple example
+(declare-fun pair2 (Int pair) pair2)
+
+expr_vector example
+(declare-fun x_0 () Int)
+(declare-fun x_1 () Int)
+(declare-fun x_2 () Int)
+(declare-fun x_3 () Int)
+(declare-fun x_4 () Int)
+(declare-fun x_5 () Int)
+(declare-fun x_6 () Int)
+(declare-fun x_7 () Int)
+(declare-fun x_8 () Int)
+(declare-fun x_9 () Int)
+(assert (>= x_0 1))
+(assert (>= x_1 1))
+(assert (>= x_2 1))
+(assert (>= x_3 1))
+(assert (>= x_4 1))
+(assert (>= x_5 1))
+(assert (>= x_6 1))
+(assert (>= x_7 1))
+(assert (>= x_8 1))
+(assert (>= x_9 1))
+
+solving...
+sat
+solution
+(define-fun x_9 () Int
+  1)
+(define-fun x_8 () Int
+  1)
+(define-fun x_7 () Int
+  1)
+(define-fun x_6 () Int
+  1)
+(define-fun x_5 () Int
+  1)
+(define-fun x_4 () Int
+  1)
+(define-fun x_3 () Int
+  1)
+(define-fun x_2 () Int
+  1)
+(define-fun x_1 () Int
+  1)
+(define-fun x_0 () Int
+  1)
+exists expr_vector example
+(exists ((x_0 Int)
+         (x_1 Int)
+         (x_2 Int)
+         (x_3 Int)
+         (x_4 Int)
+         (x_5 Int)
+         (x_6 Int)
+         (x_7 Int)
+         (x_8 Int)
+         (x_9 Int))
+  (and true
+       (>= x_0 0)
+       (>= x_1 0)
+       (>= x_2 0)
+       (>= x_3 0)
+       (>= x_4 0)
+       (>= x_5 0)
+       (>= x_6 0)
+       (>= x_7 0)
+       (>= x_8 0)
+       (>= x_9 0)))
+
+substitute example
+(or (= x 2) (= x 1))
+(or (= x 3) (= x 1))
+
+x: 4 y: 7
+x: 5 y: 6
+x: 3 y: 8
+x: 1 y: 10
+x: 2 y: 9
+x: 6 y: 5
+x: 7 y: 4
+x: 9 y: 2
+x: 10 y: 1
+x: 8 y: 3
+
+extract example
+((_ extract 21 10) x) 21 10
+
+parameter description example
+(ite_extra_rules, flat, elim_and, local_ctx, local_ctx_limit, blast_distinct, blast_distinct_threshold, som, som_blowup, hoist_mul, hoist_cmul, algebraic_number_evaluator, mul_to_power, expand_power, expand_tan, max_degree, sort_sums, gcd_rounding, arith_lhs, arith_ineq_lhs, elim_to_real, push_to_real, eq2ineq, elim_rem, udiv2mul, split_concat_eq, bit2bool, blast_eq_value, elim_sign_ext, hi_div0, mul2concat, bvnot2arith, bv_sort_ac, bv_trailing, bv_extract_prop, bv_not_simpl, bv_ite2id, bv_le_extra, bv_urem_simpl, expand_select_store, expand_store_eq, sort_store, max_memory, max_steps, push_ite_arith, push_ite_bv, pull_cheap_ite, bv_ineq_consistency_test_max, cache_all, rewrite_patterns, ignore_patterns_on_ground_qbody)
+ite_extra_rules: extra ite simplifications, these additional simplifications may reduce size locally but increase globally kind: bool
+flat: create nary applications for and,or,+,*,bvadd,bvmul,bvand,bvor,bvxor kind: bool
+elim_and: conjunctions are rewritten using negation and disjunctions kind: bool
+local_ctx: perform local (i.e., cheap) context simplifications kind: bool
+local_ctx_limit: limit for applying local context simplifier kind: uint
+blast_distinct: expand a distinct predicate into a quadratic number of disequalities kind: bool
+blast_distinct_threshold: when blast_distinct is true, only distinct expressions with less than this number of arguments are blasted kind: uint
+som: put polynomials in som-of-monomials form kind: bool
+som_blowup: maximum number of monomials generated when putting a polynomial in sum-of-monomials normal form kind: uint
+hoist_mul: hoist multiplication over summation to minimize number of multiplications kind: bool
+hoist_cmul: hoist constant multiplication over summation to minimize number of multiplications kind: bool
+algebraic_number_evaluator: simplify/evaluate expressions containing (algebraic) irrational numbers. kind: bool
+mul_to_power: collpase (* t ... t) into (^ t k), it is ignored if expand_power is true. kind: bool
+expand_power: expand (^ t k) into (* t ... t) if  1 < k <= max_degree. kind: bool
+expand_tan: replace (tan x) with (/ (sin x) (cos x)). kind: bool
+max_degree: max degree of algebraic numbers (and power operators) processed by simplifier. kind: uint
+sort_sums: sort the arguments of + application. kind: bool
+gcd_rounding: use gcd rounding on integer arithmetic atoms. kind: bool
+arith_lhs: all monomials are moved to the left-hand-side, and the right-hand-side is just a constant. kind: bool
+arith_ineq_lhs: rewrite inequalities so that right-hand-side is a constant. kind: bool
+elim_to_real: eliminate to_real from arithmetic predicates that contain only integers. kind: bool
+push_to_real: distribute to_real over * and +. kind: bool
+eq2ineq: expand equalities into two inequalities kind: bool
+elim_rem: replace (rem x y) with (ite (>= y 0) (mod x y) (- (mod x y))). kind: bool
+udiv2mul: convert constant udiv to mul kind: bool
+split_concat_eq: split equalities of the form (= (concat t1 t2) t3) kind: bool
+bit2bool: try to convert bit-vector terms of size 1 into Boolean terms kind: bool
+blast_eq_value: blast (some) Bit-vector equalities into bits kind: bool
+elim_sign_ext: expand sign-ext operator using concat and extract kind: bool
+hi_div0: use the 'hardware interpretation' for division by zero (for bit-vector terms) kind: bool
+mul2concat: replace multiplication by a power of two into a concatenation kind: bool
+bvnot2arith: replace (bvnot x) with (bvsub -1 x) kind: bool
+bv_sort_ac: sort the arguments of all AC operators kind: bool
+bv_trailing: lean removal of trailing zeros kind: bool
+bv_extract_prop: attempt to partially propagate extraction inwards kind: bool
+bv_not_simpl: apply simplifications for bvnot kind: bool
+bv_ite2id: rewrite ite that can be simplified to identity kind: bool
+bv_le_extra: additional bu_(u/s)le simplifications kind: bool
+bv_urem_simpl: additional simplification for bvurem kind: bool
+expand_select_store: replace a (select (store ...) ...) term by an if-then-else term kind: bool
+expand_store_eq: reduce (store ...) = (store ...) with a common base into selects kind: bool
+sort_store: sort nested stores when the indices are known to be different kind: bool
+max_memory: maximum amount of memory in megabytes kind: uint
+max_steps: maximum number of steps kind: uint
+push_ite_arith: push if-then-else over arithmetic terms. kind: bool
+push_ite_bv: push if-then-else over bit-vector terms. kind: bool
+pull_cheap_ite: pull if-then-else terms when cheap. kind: bool
+bv_ineq_consistency_test_max: max size of conjunctions on which to perform consistency test based on inequalities on bitvectors. kind: uint
+cache_all: cache all intermediate results. kind: bool
+rewrite_patterns: rewrite patterns. kind: bool
+ignore_patterns_on_ground_qbody: ignores patterns on quantifiers that don't mention their bound variables. kind: bool
+
+sudoku example
+sat
+(declare-fun x_0_4 () Int)
+(declare-fun x_0_5 () Int)
+(declare-fun x_0_7 () Int)
+(declare-fun x_1_3 () Int)
+(declare-fun x_1_4 () Int)
+(declare-fun x_1_8 () Int)
+(declare-fun x_2_1 () Int)
+(declare-fun x_2_2 () Int)
+(declare-fun x_2_7 () Int)
+(declare-fun x_3_6 () Int)
+(declare-fun x_3_8 () Int)
+(declare-fun x_4_1 () Int)
+(declare-fun x_4_3 () Int)
+(declare-fun x_4_5 () Int)
+(declare-fun x_4_7 () Int)
+(declare-fun x_5_0 () Int)
+(declare-fun x_5_2 () Int)
+(declare-fun x_6_1 () Int)
+(declare-fun x_6_6 () Int)
+(declare-fun x_6_7 () Int)
+(declare-fun x_7_0 () Int)
+(declare-fun x_7_4 () Int)
+(declare-fun x_7_5 () Int)
+(declare-fun x_8_1 () Int)
+(declare-fun x_8_3 () Int)
+(declare-fun x_8_4 () Int)
+(declare-fun x_0_0 () Int)
+(declare-fun x_0_1 () Int)
+(declare-fun x_0_2 () Int)
+(declare-fun x_0_3 () Int)
+(declare-fun x_0_6 () Int)
+(declare-fun x_0_8 () Int)
+(declare-fun x_1_0 () Int)
+(declare-fun x_1_1 () Int)
+(declare-fun x_1_2 () Int)
+(declare-fun x_1_5 () Int)
+(declare-fun x_1_6 () Int)
+(declare-fun x_1_7 () Int)
+(declare-fun x_2_0 () Int)
+(declare-fun x_2_3 () Int)
+(declare-fun x_2_4 () Int)
+(declare-fun x_2_5 () Int)
+(declare-fun x_2_6 () Int)
+(declare-fun x_2_8 () Int)
+(declare-fun x_3_0 () Int)
+(declare-fun x_3_1 () Int)
+(declare-fun x_3_2 () Int)
+(declare-fun x_3_3 () Int)
+(declare-fun x_3_4 () Int)
+(declare-fun x_3_5 () Int)
+(declare-fun x_3_7 () Int)
+(declare-fun x_4_0 () Int)
+(declare-fun x_4_2 () Int)
+(declare-fun x_4_4 () Int)
+(declare-fun x_4_6 () Int)
+(declare-fun x_4_8 () Int)
+(declare-fun x_5_1 () Int)
+(declare-fun x_5_3 () Int)
+(declare-fun x_5_4 () Int)
+(declare-fun x_5_5 () Int)
+(declare-fun x_5_6 () Int)
+(declare-fun x_5_7 () Int)
+(declare-fun x_5_8 () Int)
+(declare-fun x_6_0 () Int)
+(declare-fun x_6_2 () Int)
+(declare-fun x_6_3 () Int)
+(declare-fun x_6_4 () Int)
+(declare-fun x_6_5 () Int)
+(declare-fun x_6_8 () Int)
+(declare-fun x_7_1 () Int)
+(declare-fun x_7_2 () Int)
+(declare-fun x_7_3 () Int)
+(declare-fun x_7_6 () Int)
+(declare-fun x_7_7 () Int)
+(declare-fun x_7_8 () Int)
+(declare-fun x_8_0 () Int)
+(declare-fun x_8_2 () Int)
+(declare-fun x_8_5 () Int)
+(declare-fun x_8_6 () Int)
+(declare-fun x_8_7 () Int)
+(declare-fun x_8_8 () Int)
+(assert (and (>= x_0_0 1) (<= x_0_0 9)))
+(assert (and (>= x_0_1 1) (<= x_0_1 9)))
+(assert (and (>= x_0_2 1) (<= x_0_2 9)))
+(assert (and (>= x_0_3 1) (<= x_0_3 9)))
+(assert (and (>= x_0_4 1) (<= x_0_4 9)))
+(assert (and (>= x_0_5 1) (<= x_0_5 9)))
+(assert (and (>= x_0_6 1) (<= x_0_6 9)))
+(assert (and (>= x_0_7 1) (<= x_0_7 9)))
+(assert (and (>= x_0_8 1) (<= x_0_8 9)))
+(assert (and (>= x_1_0 1) (<= x_1_0 9)))
+(assert (and (>= x_1_1 1) (<= x_1_1 9)))
+(assert (and (>= x_1_2 1) (<= x_1_2 9)))
+(assert (and (>= x_1_3 1) (<= x_1_3 9)))
+(assert (and (>= x_1_4 1) (<= x_1_4 9)))
+(assert (and (>= x_1_5 1) (<= x_1_5 9)))
+(assert (and (>= x_1_6 1) (<= x_1_6 9)))
+(assert (and (>= x_1_7 1) (<= x_1_7 9)))
+(assert (and (>= x_1_8 1) (<= x_1_8 9)))
+(assert (and (>= x_2_0 1) (<= x_2_0 9)))
+(assert (and (>= x_2_1 1) (<= x_2_1 9)))
+(assert (and (>= x_2_2 1) (<= x_2_2 9)))
+(assert (and (>= x_2_3 1) (<= x_2_3 9)))
+(assert (and (>= x_2_4 1) (<= x_2_4 9)))
+(assert (and (>= x_2_5 1) (<= x_2_5 9)))
+(assert (and (>= x_2_6 1) (<= x_2_6 9)))
+(assert (and (>= x_2_7 1) (<= x_2_7 9)))
+(assert (and (>= x_2_8 1) (<= x_2_8 9)))
+(assert (and (>= x_3_0 1) (<= x_3_0 9)))
+(assert (and (>= x_3_1 1) (<= x_3_1 9)))
+(assert (and (>= x_3_2 1) (<= x_3_2 9)))
+(assert (and (>= x_3_3 1) (<= x_3_3 9)))
+(assert (and (>= x_3_4 1) (<= x_3_4 9)))
+(assert (and (>= x_3_5 1) (<= x_3_5 9)))
+(assert (and (>= x_3_6 1) (<= x_3_6 9)))
+(assert (and (>= x_3_7 1) (<= x_3_7 9)))
+(assert (and (>= x_3_8 1) (<= x_3_8 9)))
+(assert (and (>= x_4_0 1) (<= x_4_0 9)))
+(assert (and (>= x_4_1 1) (<= x_4_1 9)))
+(assert (and (>= x_4_2 1) (<= x_4_2 9)))
+(assert (and (>= x_4_3 1) (<= x_4_3 9)))
+(assert (and (>= x_4_4 1) (<= x_4_4 9)))
+(assert (and (>= x_4_5 1) (<= x_4_5 9)))
+(assert (and (>= x_4_6 1) (<= x_4_6 9)))
+(assert (and (>= x_4_7 1) (<= x_4_7 9)))
+(assert (and (>= x_4_8 1) (<= x_4_8 9)))
+(assert (and (>= x_5_0 1) (<= x_5_0 9)))
+(assert (and (>= x_5_1 1) (<= x_5_1 9)))
+(assert (and (>= x_5_2 1) (<= x_5_2 9)))
+(assert (and (>= x_5_3 1) (<= x_5_3 9)))
+(assert (and (>= x_5_4 1) (<= x_5_4 9)))
+(assert (and (>= x_5_5 1) (<= x_5_5 9)))
+(assert (and (>= x_5_6 1) (<= x_5_6 9)))
+(assert (and (>= x_5_7 1) (<= x_5_7 9)))
+(assert (and (>= x_5_8 1) (<= x_5_8 9)))
+(assert (and (>= x_6_0 1) (<= x_6_0 9)))
+(assert (and (>= x_6_1 1) (<= x_6_1 9)))
+(assert (and (>= x_6_2 1) (<= x_6_2 9)))
+(assert (and (>= x_6_3 1) (<= x_6_3 9)))
+(assert (and (>= x_6_4 1) (<= x_6_4 9)))
+(assert (and (>= x_6_5 1) (<= x_6_5 9)))
+(assert (and (>= x_6_6 1) (<= x_6_6 9)))
+(assert (and (>= x_6_7 1) (<= x_6_7 9)))
+(assert (and (>= x_6_8 1) (<= x_6_8 9)))
+(assert (and (>= x_7_0 1) (<= x_7_0 9)))
+(assert (and (>= x_7_1 1) (<= x_7_1 9)))
+(assert (and (>= x_7_2 1) (<= x_7_2 9)))
+(assert (and (>= x_7_3 1) (<= x_7_3 9)))
+(assert (and (>= x_7_4 1) (<= x_7_4 9)))
+(assert (and (>= x_7_5 1) (<= x_7_5 9)))
+(assert (and (>= x_7_6 1) (<= x_7_6 9)))
+(assert (and (>= x_7_7 1) (<= x_7_7 9)))
+(assert (and (>= x_7_8 1) (<= x_7_8 9)))
+(assert (and (>= x_8_0 1) (<= x_8_0 9)))
+(assert (and (>= x_8_1 1) (<= x_8_1 9)))
+(assert (and (>= x_8_2 1) (<= x_8_2 9)))
+(assert (and (>= x_8_3 1) (<= x_8_3 9)))
+(assert (and (>= x_8_4 1) (<= x_8_4 9)))
+(assert (and (>= x_8_5 1) (<= x_8_5 9)))
+(assert (and (>= x_8_6 1) (<= x_8_6 9)))
+(assert (and (>= x_8_7 1) (<= x_8_7 9)))
+(assert (and (>= x_8_8 1) (<= x_8_8 9)))
+(assert (distinct x_0_0 x_0_1 x_0_2 x_0_3 x_0_4 x_0_5 x_0_6 x_0_7 x_0_8))
+(assert (distinct x_1_0 x_1_1 x_1_2 x_1_3 x_1_4 x_1_5 x_1_6 x_1_7 x_1_8))
+(assert (distinct x_2_0 x_2_1 x_2_2 x_2_3 x_2_4 x_2_5 x_2_6 x_2_7 x_2_8))
+(assert (distinct x_3_0 x_3_1 x_3_2 x_3_3 x_3_4 x_3_5 x_3_6 x_3_7 x_3_8))
+(assert (distinct x_4_0 x_4_1 x_4_2 x_4_3 x_4_4 x_4_5 x_4_6 x_4_7 x_4_8))
+(assert (distinct x_5_0 x_5_1 x_5_2 x_5_3 x_5_4 x_5_5 x_5_6 x_5_7 x_5_8))
+(assert (distinct x_6_0 x_6_1 x_6_2 x_6_3 x_6_4 x_6_5 x_6_6 x_6_7 x_6_8))
+(assert (distinct x_7_0 x_7_1 x_7_2 x_7_3 x_7_4 x_7_5 x_7_6 x_7_7 x_7_8))
+(assert (distinct x_8_0 x_8_1 x_8_2 x_8_3 x_8_4 x_8_5 x_8_6 x_8_7 x_8_8))
+(assert (distinct x_0_0 x_1_0 x_2_0 x_3_0 x_4_0 x_5_0 x_6_0 x_7_0 x_8_0))
+(assert (distinct x_0_1 x_1_1 x_2_1 x_3_1 x_4_1 x_5_1 x_6_1 x_7_1 x_8_1))
+(assert (distinct x_0_2 x_1_2 x_2_2 x_3_2 x_4_2 x_5_2 x_6_2 x_7_2 x_8_2))
+(assert (distinct x_0_3 x_1_3 x_2_3 x_3_3 x_4_3 x_5_3 x_6_3 x_7_3 x_8_3))
+(assert (distinct x_0_4 x_1_4 x_2_4 x_3_4 x_4_4 x_5_4 x_6_4 x_7_4 x_8_4))
+(assert (distinct x_0_5 x_1_5 x_2_5 x_3_5 x_4_5 x_5_5 x_6_5 x_7_5 x_8_5))
+(assert (distinct x_0_6 x_1_6 x_2_6 x_3_6 x_4_6 x_5_6 x_6_6 x_7_6 x_8_6))
+(assert (distinct x_0_7 x_1_7 x_2_7 x_3_7 x_4_7 x_5_7 x_6_7 x_7_7 x_8_7))
+(assert (distinct x_0_8 x_1_8 x_2_8 x_3_8 x_4_8 x_5_8 x_6_8 x_7_8 x_8_8))
+(assert (distinct x_0_0 x_0_1 x_0_2 x_1_0 x_1_1 x_1_2 x_2_0 x_2_1 x_2_2))
+(assert (distinct x_0_3 x_0_4 x_0_5 x_1_3 x_1_4 x_1_5 x_2_3 x_2_4 x_2_5))
+(assert (distinct x_0_6 x_0_7 x_0_8 x_1_6 x_1_7 x_1_8 x_2_6 x_2_7 x_2_8))
+(assert (distinct x_3_0 x_3_1 x_3_2 x_4_0 x_4_1 x_4_2 x_5_0 x_5_1 x_5_2))
+(assert (distinct x_3_3 x_3_4 x_3_5 x_4_3 x_4_4 x_4_5 x_5_3 x_5_4 x_5_5))
+(assert (distinct x_3_6 x_3_7 x_3_8 x_4_6 x_4_7 x_4_8 x_5_6 x_5_7 x_5_8))
+(assert (distinct x_6_0 x_6_1 x_6_2 x_7_0 x_7_1 x_7_2 x_8_0 x_8_1 x_8_2))
+(assert (distinct x_6_3 x_6_4 x_6_5 x_7_3 x_7_4 x_7_5 x_8_3 x_8_4 x_8_5))
+(assert (distinct x_6_6 x_6_7 x_6_8 x_7_6 x_7_7 x_7_8 x_8_6 x_8_7 x_8_8))
+(assert (= x_0_4 9))
+(assert (= x_0_5 4))
+(assert (= x_0_7 3))
+(assert (= x_1_3 5))
+(assert (= x_1_4 1))
+(assert (= x_1_8 7))
+(assert (= x_2_1 8))
+(assert (= x_2_2 9))
+(assert (= x_2_7 4))
+(assert (= x_3_6 2))
+(assert (= x_3_8 8))
+(assert (= x_4_1 6))
+(assert (= x_4_3 2))
+(assert (= x_4_5 1))
+(assert (= x_4_7 5))
+(assert (= x_5_0 1))
+(assert (= x_5_2 2))
+(assert (= x_6_1 7))
+(assert (= x_6_6 5))
+(assert (= x_6_7 2))
+(assert (= x_7_0 9))
+(assert (= x_7_4 6))
+(assert (= x_7_5 5))
+(assert (= x_8_1 4))
+(assert (= x_8_3 9))
+(assert (= x_8_4 7))
+(model-add x_0_4 () Int 9)
+(model-add x_0_5 () Int 4)
+(model-add x_0_7 () Int 3)
+(model-add x_1_3 () Int 5)
+(model-add x_1_4 () Int 1)
+(model-add x_1_8 () Int 7)
+(model-add x_2_1 () Int 8)
+(model-add x_2_2 () Int 9)
+(model-add x_2_7 () Int 4)
+(model-add x_3_6 () Int 2)
+(model-add x_3_8 () Int 8)
+(model-add x_4_1 () Int 6)
+(model-add x_4_3 () Int 2)
+(model-add x_4_5 () Int 1)
+(model-add x_4_7 () Int 5)
+(model-add x_5_0 () Int 1)
+(model-add x_5_2 () Int 2)
+(model-add x_6_1 () Int 7)
+(model-add x_6_6 () Int 5)
+(model-add x_6_7 () Int 2)
+(model-add x_7_0 () Int 9)
+(model-add x_7_4 () Int 6)
+(model-add x_7_5 () Int 5)
+(model-add x_8_1 () Int 4)
+(model-add x_8_3 () Int 9)
+(model-add x_8_4 () Int 7)
+(rmodel->model-converter-wrapper
+x_7_2 -> 8
+x_1_1 -> 3
+x_3_1 -> 9
+x_6_0 -> 3
+x_1_5 -> 6
+x_8_7 -> 8
+x_0_8 -> 2
+x_5_8 -> 3
+x_5_5 -> 9
+x_2_0 -> 6
+x_0_6 -> 6
+x_1_2 -> 4
+x_6_3 -> 1
+x_3_5 -> 7
+x_6_4 -> 4
+x_2_6 -> 1
+x_8_6 -> 3
+x_6_5 -> 8
+x_8_2 -> 1
+x_1_6 -> 8
+x_0_0 -> 7
+x_4_4 -> 3
+x_2_5 -> 3
+x_5_3 -> 4
+x_5_4 -> 8
+x_0_1 -> 1
+x_5_6 -> 7
+x_8_0 -> 5
+x_7_1 -> 2
+x_2_8 -> 5
+x_4_6 -> 9
+x_0_2 -> 5
+x_2_3 -> 7
+x_3_3 -> 6
+x_0_3 -> 8
+x_3_4 -> 5
+x_7_3 -> 3
+x_4_8 -> 4
+x_1_0 -> 2
+x_3_2 -> 3
+x_6_8 -> 9
+x_3_0 -> 4
+x_4_0 -> 8
+x_8_8 -> 6
+x_4_2 -> 7
+x_3_7 -> 1
+x_5_7 -> 6
+x_7_8 -> 1
+x_5_1 -> 5
+x_7_6 -> 4
+x_2_4 -> 2
+x_8_5 -> 2
+x_6_2 -> 6
+x_7_7 -> 7
+x_1_7 -> 9
+x_8_4 -> 7
+x_8_3 -> 9
+x_8_1 -> 4
+x_7_5 -> 5
+x_7_4 -> 6
+x_7_0 -> 9
+x_6_7 -> 2
+x_6_6 -> 5
+x_6_1 -> 7
+x_5_2 -> 2
+x_5_0 -> 1
+x_4_7 -> 5
+x_4_5 -> 1
+x_4_3 -> 2
+x_4_1 -> 6
+x_3_8 -> 8
+x_3_6 -> 2
+x_2_7 -> 4
+x_2_2 -> 9
+x_2_1 -> 8
+x_1_8 -> 7
+x_1_4 -> 1
+x_1_3 -> 5
+x_0_7 -> 3
+x_0_5 -> 4
+x_0_4 -> 9
+)
+
+715894632
+234516897
+689723145
+493657218
+867231954
+152489763
+376148529
+928365471
+541972386
+
+consequence example
+sat
+(ast-vector
+  (=> (not c) (not c))
+  (=> (not c) (not b))
+  (=> (not c) (not a)))
+
+parse example
+(ast-vector
+  a)
+
+true
+
+recfun example
+conjecture:
+(> (f x false) x)
+proved
+
+done

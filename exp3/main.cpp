@@ -52,6 +52,10 @@ private:
   z3::context ctx;
   z3::solver solver;
 
+  z3::expr genBVConst(std::string name) {
+    return ctx.bv_const(name.c_str(), 32);  
+  }
+
 public:
   Z3Walker() : ctx(), solver(ctx) {
     std::cout << "new z3walker" << std::endl;
@@ -69,13 +73,26 @@ public:
   }
 
   void visitFunction(Function &F) {
-    std::cout << "<Func> " << getName(F) << std::endl;
+    std::cout << "<Func> " << getName(F) << ": ";
     solver.push();
-//    solver.add()
+
+//    std::cout << "ret type: ";
+//    F.getReturnType()->print(std::cout);
+    // parse args
+    for (auto ait = F.arg_begin(); ait != F.arg_end(); ait++) {
+      Argument* arg = &(*ait);
+      auto argname = getName(*arg);
+      std::cout << "; arg " << argname;
+      z3::expr arg_ = ctx.bv_const(argname.c_str(), 32);
+      // intra-proc, no need of arg val, because u dont know it at all
+      //solver.add(argname == arg->va)
+    }
+    std::cout << std::endl;
+
     // use stack to reverse post order
     std::stack<scc_iterator<Function*> > sccs;
     for(scc_iterator<Function*> scci = scc_begin(&F), scce = scc_end(&F); scci != scce; ++scci) {
-        sccs.push(scci);
+      sccs.push(scci);
     }
     
     // topological order iteration on BB
@@ -85,10 +102,11 @@ public:
       const std::vector<BasicBlock*> & nextSCC = *SCCI;
       // iterate bbs
       std::vector<BasicBlock*>::const_iterator I = nextSCC.begin(), E = nextSCC.end();
-      for(--I, --E; E != I; --E){
-          this->visitBasicBlock(*(*E));
+      for(--E,--I; E != I; --E) {
+        this->visitBasicBlock(**E);
       }
     }
+    std::cout << "<Solver> " << solver << std::endl;
     solver.pop();
   }
 
@@ -102,29 +120,68 @@ public:
   void visitAdd(BinaryOperator &I) {
     std::cout << "    visit add" << std::endl;
     for (auto i = I.op_begin(); i != I.op_end(); i++) {
-      std::cout << *i;
+      std::cout << "\top: " << *i;
     }
     std::cout << std::endl;
-    auto op1 = I.llvm::User::getOperand(1);
-    auto op2 = I.llvm::User::getOperand(2);
+    auto op1 = I.llvm::User::getOperand(0);
+    auto op2 = I.llvm::User::getOperand(1);
+    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
+    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
+    //solver.add(a == op1->va)
 //    solver.add()
+    // the Instruction itself is the ret val
+    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    solver.add(r == a + b);
   }
 
   void visitSub(BinaryOperator &I) {
-  
     std::cout << "    visit sub" << std::endl;
+    auto op1 = I.llvm::User::getOperand(0);
+    auto op2 = I.llvm::User::getOperand(1);
+    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
+    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
+    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    solver.add(r == a - b);
   }
+  
   void visitMul(BinaryOperator &I) {
-  
+    std::cout << "    visit mul" << std::endl;
+    auto op1 = I.llvm::User::getOperand(0);
+    auto op2 = I.llvm::User::getOperand(1);
+    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
+    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
+    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    solver.add(r == a * b);
   }
+
   void visitShl(BinaryOperator &I) {
-  
+    std::cout << "    visit shl" << std::endl;
+    auto op1 = I.llvm::User::getOperand(0);
+    auto op2 = I.llvm::User::getOperand(1);
+    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
+    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
+    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    solver.add(r == z3::shl(a, b));
   }
+
   void visitLShr(BinaryOperator &I) {
-  
+    std::cout << "    visit lshr" << std::endl;
+    auto op1 = I.llvm::User::getOperand(0);
+    auto op2 = I.llvm::User::getOperand(1);
+    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
+    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
+    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    solver.add(r == z3::lshr(a, b));
   }
+
   void visitAShr(BinaryOperator &I) {
-  
+    std::cout << "    visit ashr" << std::endl;
+    auto op1 = I.llvm::User::getOperand(0);
+    auto op2 = I.llvm::User::getOperand(1);
+    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
+    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
+    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    solver.add(r == z3::ashr(a, b));
   }
   void visitAnd(BinaryOperator &I) {
   
@@ -142,7 +199,7 @@ public:
 
   void visitBranchInst(BranchInst &I) {
   
-    std::cout << "    visit br" << I << std::endl;
+    std::cout << "    visit br"<< std::endl;
   }
   void visitPHINode(PHINode &I) {
   
