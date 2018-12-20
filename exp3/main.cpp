@@ -52,8 +52,17 @@ private:
   z3::context ctx;
   z3::solver solver;
 
+  // gen 32-bit val
   z3::expr genBVConst(std::string name) {
     return ctx.bv_const(name.c_str(), 32);  
+  }
+
+  void parseBinary(const BinaryOperator &I, z3::expr& a, z3::expr& b, z3::expr& r) {
+    auto op1 = I.llvm::User::getOperand(0);
+    auto op2 = I.llvm::User::getOperand(1);
+    a = genBVConst(getName(*op1)genBVConst);
+    b = genBVConst(getName(*op2)genBVConst);
+    r = genBVConst(getName(I)genBVConst);
   }
 
 public:
@@ -83,7 +92,7 @@ public:
       Argument* arg = &(*ait);
       auto argname = getName(*arg);
       std::cout << "; arg " << argname;
-      z3::expr arg_ = ctx.bv_const(argname.c_str(), 32);
+      z3::expr arg_ = genBVConst(argname);
       // intra-proc, no need of arg val, because u dont know it at all
       //solver.add(argname == arg->va)
     }
@@ -125,22 +134,19 @@ public:
     std::cout << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
-    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
+    z3::expr a = genBVConst(getName(*op1), 32);
+    z3::expr b = genBVConst(getName(*op2), 32);
     //solver.add(a == op1->va)
 //    solver.add()
     // the Instruction itself is the ret val
-    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    z3::expr r = genBVConst(getName(I)genBVConst);
     solver.add(r == a + b);
   }
 
   void visitSub(BinaryOperator &I) {
     std::cout << "    visit sub" << std::endl;
-    auto op1 = I.llvm::User::getOperand(0);
-    auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
-    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
-    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    z3::expr a, b, r;
+    parseBinary(I, a, b, r);
     solver.add(r == a - b);
   }
   
@@ -148,9 +154,9 @@ public:
     std::cout << "    visit mul" << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
-    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
-    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    z3::expr a = genBVConst(getName(*op1)genBVConst);
+    z3::expr b = genBVConst(getName(*op2)genBVConst);
+    z3::expr r = genBVConst(getName(I)genBVConst);
     solver.add(r == a * b);
   }
 
@@ -158,9 +164,9 @@ public:
     std::cout << "    visit shl" << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
-    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
-    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    z3::expr a = genBVConst(getName(*op1)genBVConst);
+    z3::expr b = genBVConst(getName(*op2)genBVConst);
+    z3::expr r = genBVConst(getName(I)genBVConst);
     solver.add(r == z3::shl(a, b));
   }
 
@@ -168,9 +174,9 @@ public:
     std::cout << "    visit lshr" << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
-    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
-    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    z3::expr a = genBVConst(getName(*op1)genBVConst);
+    z3::expr b = genBVConst(getName(*op2)genBVConst);
+    z3::expr r = genBVConst(getName(I)genBVConst);
     solver.add(r == z3::lshr(a, b));
   }
 
@@ -178,9 +184,9 @@ public:
     std::cout << "    visit ashr" << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = ctx.bv_const(getName(*op1).c_str(), 32);
-    z3::expr b = ctx.bv_const(getName(*op2).c_str(), 32);
-    z3::expr r = ctx.bv_const(getName(I).c_str(), 32);
+    z3::expr a = genBVConst(getName(*op1)genBVConst);
+    z3::expr b = genBVConst(getName(*op2)genBVConst);
+    z3::expr r = genBVConst(getName(I)genBVConst);
     solver.add(r == z3::ashr(a, b));
   }
   void visitAnd(BinaryOperator &I) {
