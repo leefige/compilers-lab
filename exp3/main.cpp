@@ -4,12 +4,14 @@
 #define LOG
 #include <map>
 #include <string>
+#include <stack>
 
 #include <llvm/IR/CFG.h>
 #include <llvm/IR/InstVisitor.h>
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/ADT/SCCIterator.h>
 #include <z3++.h>
 
 using namespace llvm;
@@ -57,21 +59,35 @@ public:
   // Not using InstVisitor::visit due to their sequential order.
   // We want topological order on the Call Graph and CFG.
   void visitModule(Module &M) {
-    std::cout << "Parsing module: " << M.getName().str() << std::endl;
+    std::cout << "<Module> " << M.getName().str();
     // iterate functions
-    std::cout << "size is " << M.size() << std::endl;
+    std::cout << ", size is " << M.size() << std::endl;
     for(auto it = M.begin(); it != M.end(); it++) {
-//      std::cout << "inst cnt: " << (*it).getFunctionType() << std::endl;
-      this->visit(*it);
+      this->visitFunction(*it);
     }
   }
   void visitFunction(Function &F) {
-  
-    std::cout << "visit func" << std::endl;
+    std::cout << "<Func> " << getName(F) << std::endl;
+    std::stack<scc_iterator<Function*> > sccs;
+    // use stack to reverse post order
+    for(scc_iterator<Function*> scci = scc_begin(&F), scce = scc_end(&F); scci != scce; ++scci) {
+        sccs.push(scci);
+    }
+    
+    // topological order iteration on BB
+    while(!sccs.empty()){
+      scc_iterator<Function*> SCCI = sccs.top();
+      sccs.pop();
+      const std::vector<BasicBlock*> & nextSCC = *SCCI;
+      // iterate bbs
+      std::vector<BasicBlock*>::const_iterator I = nextSCC.begin(), E = nextSCC.end();
+      for(--I, --E; E != I; --E){
+          this->visitBasicBlock(*(*E));
+      }
+    }
   }
   void visitBasicBlock(BasicBlock &B) {
-  
-    std::cout << "visit bb" << std::endl;
+    std::cout << "\t<BB> " << getName(B) << std::endl;
   }
 
   void visitAdd(BinaryOperator &I) {
