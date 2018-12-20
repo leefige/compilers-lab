@@ -134,8 +134,8 @@ public:
     std::cout << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1), 32);
-    z3::expr b = genBVConst(getName(*op2), 32);
+    z3::expr a = genBVConst(getName(*op1));
+    z3::expr b = genBVConst(getName(*op2));
     //solver.add(a == op1->va)
 //    solver.add()
     // the Instruction itself is the ret val
