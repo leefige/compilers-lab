@@ -60,9 +60,9 @@ private:
   void parseBinary(const BinaryOperator &I, z3::expr& a, z3::expr& b, z3::expr& r) {
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    a = genBVConst(getName(*op1);
-    b = genBVConst(getName(*op2);
-    r = genBVConst(getName(I);
+    a = genBVConst(getName(*op1));
+    b = genBVConst(getName(*op2));
+    r = genBVConst(getName(I));
   }
 
 public:
@@ -139,7 +139,7 @@ public:
     //solver.add(a == op1->va)
 //    solver.add()
     // the Instruction itself is the ret val
-    z3::expr r = genBVConst(getName(I);
+    z3::expr r = genBVConst(getName(I));
     solver.add(r == a + b);
   }
 
@@ -147,9 +147,9 @@ public:
     std::cout << "    visit sub" << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1);
-    z3::expr b = genBVConst(getName(*op2);
-    z3::expr r = genBVConst(getName(I);
+    z3::expr a = genBVConst(getName(*op1));
+    z3::expr b = genBVConst(getName(*op2));
+    z3::expr r = genBVConst(getName(I));
     solver.add(r == a - b);
   }
   
@@ -157,9 +157,9 @@ public:
     std::cout << "    visit mul" << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1);
-    z3::expr b = genBVConst(getName(*op2);
-    z3::expr r = genBVConst(getName(I);
+    z3::expr a = genBVConst(getName(*op1));
+    z3::expr b = genBVConst(getName(*op2));
+    z3::expr r = genBVConst(getName(I));
     solver.add(r == a * b);
   }
 
@@ -167,9 +167,9 @@ public:
     std::cout << "    visit shl" << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1);
-    z3::expr b = genBVConst(getName(*op2);
-    z3::expr r = genBVConst(getName(I);
+    z3::expr a = genBVConst(getName(*op1));
+    z3::expr b = genBVConst(getName(*op2));
+    z3::expr r = genBVConst(getName(I));
     solver.add(r == z3::shl(a, b));
   }
 
@@ -177,9 +177,9 @@ public:
     std::cout << "    visit lshr" << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1);
-    z3::expr b = genBVConst(getName(*op2);
-    z3::expr r = genBVConst(getName(I);
+    z3::expr a = genBVConst(getName(*op1));
+    z3::expr b = genBVConst(getName(*op2));
+    z3::expr r = genBVConst(getName(I));
     solver.add(r == z3::lshr(a, b));
   }
 
@@ -187,9 +187,9 @@ public:
     std::cout << "    visit ashr" << std::endl;
     auto op1 = I.llvm::User::getOperand(0);
     auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1);
-    z3::expr b = genBVConst(getName(*op2);
-    z3::expr r = genBVConst(getName(I);
+    z3::expr a = genBVConst(getName(*op1));
+    z3::expr b = genBVConst(getName(*op2));
+    z3::expr r = genBVConst(getName(I));
     solver.add(r == z3::ashr(a, b));
   }
   void visitAnd(BinaryOperator &I) {
