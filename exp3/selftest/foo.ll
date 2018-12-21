@@ -1,4 +1,5 @@
 @a = external global i32, align 4
+@arr = external global [128 x i32], align 16
 
 ; Function Attrs: noinline nounwind optnone uwtable
 define i32 @foo(i32) #0 {
@@ -55,6 +56,25 @@ define i32 @foo(i32) #0 {
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
+define i32 @foo1(i32) #0 {
+  %2 = alloca i32, align 4
+  %3 = alloca [64 x i32], align 16
+  store i32 %0, i32* %2, align 4
+  %4 = load i32, i32* getelementptr inbounds ([128 x i32], [128 x i32]* @arr, i64 0, i64 31), align 4
+  %5 = load i32, i32* %2, align 4
+  %6 = sext i32 %5 to i64
+  %7 = getelementptr inbounds [64 x i32], [64 x i32]* %3, i64 0, i64 %6
+  %8 = load i32, i32* %7, align 4
+  %9 = add nsw i32 %8, %4
+  store i32 %9, i32* %7, align 4
+  %10 = load i32, i32* %2, align 4
+  %11 = sext i32 %10 to i64
+  %12 = getelementptr inbounds [64 x i32], [64 x i32]* %3, i64 0, i64 %11
+  %13 = load i32, i32* %12, align 4
+  ret i32 %13
+}
+
+; Function Attrs: noinline nounwind optnone uwtable
 define void @bar(i32*) #0 {
   %2 = alloca i32*, align 8
   %3 = alloca i32, align 4
@@ -90,7 +110,13 @@ define i32 @foobar() #0 {
   %2 = load i32, i32* @a, align 4
   %3 = call i32 @foo(i32 %2)
   store i32 %3, i32* %1, align 4
-  call void @bar(i32* %1)
   %4 = load i32, i32* %1, align 4
-  ret i32 %4
+  %5 = and i32 %4, 32
+  %6 = call i32 @foo1(i32 %5)
+  %7 = load i32, i32* %1, align 4
+  %8 = xor i32 %7, %6
+  store i32 %8, i32* %1, align 4
+  call void @bar(i32* %1)
+  %9 = load i32, i32* %1, align 4
+  ret i32 %9
 }

@@ -13,7 +13,6 @@ new z3walker
 ------------
 <Solver>
 (declare-fun i () (_ BitVec 32))
-(declare-fun |1024| () (_ BitVec 32))
 (declare-fun cmp () (_ BitVec 1))
-(assert (= cmp (ite (bvule |1024| i) #b0 #b1)))
+(assert (= cmp (ite (bvult i #x00000400) #b1 #b0)))
 ============

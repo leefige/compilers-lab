@@ -312,6 +312,14 @@ public:
     
   }
 
+  void visitSExtInst(SExtInst & I) {
+    std::cout << "    visit sext" << std::endl;
+    auto srcv = I.getOperand(0);
+    z3::expr src = gen_i32(srcv);
+    z3::expr dst = gen_i64(&I);
+    solver.add(dst == z3::sext(src, 32));
+  }
+
   // Call checkAndReport here.
   void visitGetElementPtrInst(GetElementPtrInst &I) {
     std::cout << "    visit gep" << std::endl;
@@ -323,12 +331,12 @@ public:
           std::cout << "===check pushed===" << std::endl;
           std::cout << solver << std::endl;
           auto size = type->getArrayNumElements(); 
-          auto ptrOp = I.getPointerOperand();
-          z3::expr ptr = gen_i32(ptrOp);
+          auto ptrOp = I.getOperand(2);
+          z3::expr ptr = gen_i64(ptrOp);
           z3::expr lb = ctx.bv_val(0, 64);
           z3::expr ub = ctx.bv_val(size, 64);
           
-          z3::expr inbounds = ((z3::sext(ptr, 32)) >= lb && (z3::sext(ptr, 32) < ub));
+          z3::expr inbounds = (ptr >= lb && ptr < ub);
           solver.add(!inbounds); 
           std::cout << "bound added" << std::endl << solver << std::endl;
           checkAndReport(solver, I);
