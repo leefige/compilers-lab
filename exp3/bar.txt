@@ -1,0 +1,19 @@
+Now walking the module...
+new z3walker
+<Module> test/bar.ll, size is 1
+<Func> foo: ; arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> if.then
+    visit gep
+    visit br
+  <BB> return
+    visit phi
+------------
+<Solver>
+(declare-fun i () (_ BitVec 32))
+(declare-fun |1024| () (_ BitVec 32))
+(declare-fun cmp () (_ BitVec 1))
+(assert (= cmp (ite (bvule |1024| i) #b0 #b1)))
+============

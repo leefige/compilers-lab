@@ -1,6 +1,6 @@
 Now walking the module...
 new z3walker
-<Module> selftest/foo-opt.ll, size is 1
+<Module> selftest/foo-opt.ll, size is 3
 <Func> foo: ; arg %0
   <BB> %1
     visit icmp
@@ -12,13 +12,16 @@ new z3walker
     visit br
   <BB> %3
     visit add
-	op: 0x56416cd7e0c0	op: 0x56416cd7e0f0
     visit sub
     visit br
   <BB> %12
     visit phi
-<Solver> (declare-fun %7 () (_ BitVec 32))
+------------
+<Solver>
+(declare-fun |3| () (_ BitVec 32))
 (declare-fun %0 () (_ BitVec 32))
+(declare-fun %2 () (_ BitVec 1))
+(declare-fun %7 () (_ BitVec 32))
 (declare-fun %8 () (_ BitVec 32))
 (declare-fun |2| () (_ BitVec 32))
 (declare-fun %10 () (_ BitVec 32))
@@ -27,9 +30,38 @@ new z3walker
 (declare-fun |1| () (_ BitVec 32))
 (declare-fun %4 () (_ BitVec 32))
 (declare-fun %5 () (_ BitVec 32))
+(assert (= %2 (ite (= %0 |3|) #b1 #b0)))
 (assert (= %8 (bvmul %0 %7)))
 (assert (= %10 (bvshl |2| %0)))
 (assert (= %11 (bvashr |16| %0)))
 (assert (= %4 (bvadd |1| |2|)))
-(assert (= %5 (bvsub %4 %0)))
-
+(assert (= %5 (bvadd %4 (bvmul #xffffffff %0))))
+============
+<Func> bar: ; arg %0
+  <BB> %1
+    visit shl
+    visit and
+    visit or
+    visit xor
+------------
+<Solver>
+(declare-fun |4| () (_ BitVec 32))
+(declare-fun %2 () (_ BitVec 32))
+(declare-fun %3 () (_ BitVec 32))
+(declare-fun %4 () (_ BitVec 32))
+(declare-fun |32| () (_ BitVec 32))
+(declare-fun %5 () (_ BitVec 32))
+(declare-fun |8| () (_ BitVec 32))
+(declare-fun %6 () (_ BitVec 32))
+(declare-fun %7 () (_ BitVec 32))
+(declare-fun %8 () (_ BitVec 32))
+(assert (= %3 (bvshl %2 |4|)))
+(assert (= %5 (bvnot (bvor (bvnot |32|) (bvnot %4)))))
+(assert (= %6 (bvor |8| %3)))
+(assert (= %8 (bvxor %7 %6)))
+============
+<Func> foobar: 
+  <BB> %0
+------------
+<Solver>
+============

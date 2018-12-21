@@ -53,3 +53,44 @@ define i32 @foo(i32) #0 {
   %33 = load i32, i32* %2, align 4
   ret i32 %33
 }
+
+; Function Attrs: noinline nounwind optnone uwtable
+define void @bar(i32*) #0 {
+  %2 = alloca i32*, align 8
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  store i32* %0, i32** %2, align 8
+  %5 = load i32*, i32** %2, align 8
+  %6 = load i32, i32* %5, align 4
+  %7 = shl i32 %6, 4
+  store i32 %7, i32* %3, align 4
+  store i32 32, i32* %4, align 4
+  %8 = load i32, i32* %4, align 4
+  %9 = load i32*, i32** %2, align 8
+  %10 = load i32, i32* %9, align 4
+  %11 = and i32 %8, %10
+  store i32 %11, i32* %4, align 4
+  %12 = load i32, i32* %3, align 4
+  %13 = or i32 8, %12
+  store i32 %13, i32* %4, align 4
+  %14 = load i32*, i32** %2, align 8
+  %15 = load i32, i32* %14, align 4
+  %16 = load i32, i32* %4, align 4
+  %17 = xor i32 %15, %16
+  store i32 %17, i32* %3, align 4
+  %18 = load i32, i32* %3, align 4
+  %19 = load i32*, i32** %2, align 8
+  store i32 %18, i32* %19, align 4
+  ret void
+}
+
+; Function Attrs: noinline nounwind optnone uwtable
+define i32 @foobar() #0 {
+  %1 = alloca i32, align 4
+  %2 = load i32, i32* @a, align 4
+  %3 = call i32 @foo(i32 %2)
+  store i32 %3, i32* %1, align 4
+  call void @bar(i32* %1)
+  %4 = load i32, i32* %1, align 4
+  ret i32 %4
+}

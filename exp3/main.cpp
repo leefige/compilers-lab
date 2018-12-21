@@ -52,9 +52,48 @@ private:
   z3::context ctx;
   z3::solver solver;
 
-  // gen 32-bit val
-  z3::expr genBVConst(const std::string& name) {
-    return ctx.bv_const(name.c_str(), 32);  
+  // gen 32-bit const
+  z3::expr gen_i32(Value* var) {
+    //return ctx.bv_const(name.c_str(), 32);  
+    if (ConstantInt* CI = dyn_cast<ConstantInt>(var)) {
+      // var indeed is a ConstantInt, we can use CI here
+      return ctx.bv_val(CI->getSExtValue(), 32);
+    }
+    else {
+      // var was not actually a ConstantInt
+      return ctx.bv_const(getName(*var).c_str(), 32);
+    }
+  }
+
+  // gen 1-bit const
+  z3::expr gen_i1(Value* var) {
+    if (ConstantInt* CI = dyn_cast<ConstantInt>(var)) {
+      // var indeed is a ConstantInt, we can use CI here
+      return ctx.bv_val(CI->getSExtValue(), 1);
+    }
+    else {
+      // var was not actually a ConstantInt
+      return ctx.bv_const(getName(*var).c_str(), 1);
+    }
+  }
+
+  z3::expr gen_i64(Value* var) {
+    if (ConstantInt* CI = dyn_cast<ConstantInt>(var)) {
+      // var indeed is a ConstantInt, we can use CI here
+      return ctx.bv_val(CI->getSExtValue(), 64);
+    }
+    else {
+      // var was not actually a ConstantInt
+      return ctx.bv_const(getName(*var).c_str(), 64);
+    }
+  }
+
+  // gen true/false
+  z3::expr i1_true() {
+    return ctx.bv_val(1, 1);
+  }
+  z3::expr i1_false() {
+    return ctx.bv_val(0, 1);
   }
 
 public:
@@ -84,9 +123,7 @@ public:
       Argument* arg = &(*ait);
       auto argname = getName(*arg);
       std::cout << "; arg " << argname;
-      z3::expr arg_ = genBVConst(argname);
-      // intra-proc, no need of arg val, because u dont know it at all
-      //solver.add(argname == arg->va)
+      z3::expr arg_ = gen_i32(arg);
     }
     std::cout << std::endl;
 
@@ -107,7 +144,8 @@ public:
         this->visitBasicBlock(**E);
       }
     }
-    std::cout << "<Solver> " << solver << std::endl;
+    std::cout << "------------" << std::endl << "<Solver>" << std::endl 
+      << solver << "============" << std::endl;
     solver.pop();
   }
 
@@ -124,113 +162,181 @@ public:
 //      std::cout << "\top: " << *i;
 //    }
 //    std::cout << std::endl;
-    auto op1 = I.llvm::User::getOperand(0);
-    auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1));
-    z3::expr b = genBVConst(getName(*op2));
+    auto op1 = I.getOperand(0);
+    auto op2 = I.getOperand(1);
+    z3::expr a = gen_i32(op1);
+    z3::expr b = gen_i32(op2);
     // the Instruction itself is the ret val
-    z3::expr r = genBVConst(getName(I));
-    solver.add(r == a + b);
+    z3::expr r = gen_i32(&I);
+    solver.add((r == a + b)/*simp*/);
   }
 
   void visitSub(BinaryOperator &I) {
     std::cout << "    visit sub" << std::endl;
-    auto op1 = I.llvm::User::getOperand(0);
-    auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1));
-    z3::expr b = genBVConst(getName(*op2));
-    z3::expr r = genBVConst(getName(I));
-    solver.add(r == a - b);
+    auto op1 = I.getOperand(0);
+    auto op2 = I.getOperand(1);
+    z3::expr a = gen_i32(op1);
+    z3::expr b = gen_i32(op2);
+    z3::expr r = gen_i32(&I);
+    solver.add((r == a - b)/*simp*/);
   }
   
   void visitMul(BinaryOperator &I) {
     std::cout << "    visit mul" << std::endl;
-    auto op1 = I.llvm::User::getOperand(0);
-    auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1));
-    z3::expr b = genBVConst(getName(*op2));
-    z3::expr r = genBVConst(getName(I));
-    solver.add(r == a * b);
+    auto op1 = I.getOperand(0);
+    auto op2 = I.getOperand(1);
+    z3::expr a = gen_i32(op1);
+    z3::expr b = gen_i32(op2);
+    z3::expr r = gen_i32(&I);
+    solver.add((r == a * b)/*simp*/);
   }
 
   void visitShl(BinaryOperator &I) {
     std::cout << "    visit shl" << std::endl;
-    auto op1 = I.llvm::User::getOperand(0);
-    auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1));
-    z3::expr b = genBVConst(getName(*op2));
-    z3::expr r = genBVConst(getName(I));
-    solver.add(r == z3::shl(a, b));
+    auto op1 = I.getOperand(0);
+    auto op2 = I.getOperand(1);
+    z3::expr a = gen_i32(op1);
+    z3::expr b = gen_i32(op2);
+    z3::expr r = gen_i32(&I);
+    solver.add((r == z3::shl(a, b))/*simp*/);
   }
 
   void visitLShr(BinaryOperator &I) {
     std::cout << "    visit lshr" << std::endl;
-    auto op1 = I.llvm::User::getOperand(0);
-    auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1));
-    z3::expr b = genBVConst(getName(*op2));
-    z3::expr r = genBVConst(getName(I));
-    solver.add(r == z3::lshr(a, b));
+    auto op1 = I.getOperand(0);
+    auto op2 = I.getOperand(1);
+    z3::expr a = gen_i32(op1);
+    z3::expr b = gen_i32(op2);
+    z3::expr r = gen_i32(&I);
+    solver.add((r == z3::lshr(a, b))/*simp*/);
   }
 
   void visitAShr(BinaryOperator &I) {
     std::cout << "    visit ashr" << std::endl;
-    auto op1 = I.llvm::User::getOperand(0);
-    auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1));
-    z3::expr b = genBVConst(getName(*op2));
-    z3::expr r = genBVConst(getName(I));
-    solver.add(r == z3::ashr(a, b));
+    auto op1 = I.getOperand(0);
+    auto op2 = I.getOperand(1);
+    z3::expr a = gen_i32(op1);
+    z3::expr b = gen_i32(op2);
+    z3::expr r = gen_i32(&I);
+    solver.add((r == z3::ashr(a, b))/*simp*/);
   }
 
   void visitAnd(BinaryOperator &I) {
     std::cout << "    visit and" << std::endl;
-    auto op1 = I.llvm::User::getOperand(0);
-    auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1));
-    z3::expr b = genBVConst(getName(*op2));
-    z3::expr r = genBVConst(getName(I));
-    solver.add(r == (a && b));
+    auto op1 = I.getOperand(0);
+    auto op2 = I.getOperand(1);
+    z3::expr a = gen_i32(op1);
+    z3::expr b = gen_i32(op2);
+    z3::expr r = gen_i32(&I);
+//    solver.add((
+//        r == z3::ite(
+//          ((a == i1_true()) && (b == i1_true())),
+//          i1_true(), i1_false())
+//        );
+    solver.add((r == (a & b))/*simp*/);
   }
 
   void visitOr(BinaryOperator &I) {
     std::cout << "    visit or" << std::endl;
-    auto op1 = I.llvm::User::getOperand(0);
-    auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1));
-    z3::expr b = genBVConst(getName(*op2));
-    z3::expr r = genBVConst(getName(I));
-    solver.add(r == (a || b));
+    auto op1 = I.getOperand(0);
+    auto op2 = I.getOperand(1);
+    z3::expr a = gen_i32(op1);
+    z3::expr b = gen_i32(op2);
+    z3::expr r = gen_i32(&I);
+    solver.add((r == (a | b))/*simp*/);
   }
 
   void visitXor(BinaryOperator &I) {
     std::cout << "    visit xor" << std::endl;
-    auto op1 = I.llvm::User::getOperand(0);
-    auto op2 = I.llvm::User::getOperand(1);
-    z3::expr a = genBVConst(getName(*op1));
-    z3::expr b = genBVConst(getName(*op2));
-    z3::expr r = genBVConst(getName(I));
-    solver.add(r == (a ^ b));
+    auto op1 = I.getOperand(0);
+    auto op2 = I.getOperand(1);
+    z3::expr a = gen_i32(op1);
+    z3::expr b = gen_i32(op2);
+    z3::expr r = gen_i32(&I);
+    solver.add((r == (a ^ b))/*simp*/);
   }
 
   void visitICmp(ICmpInst &I) { 
     std::cout << "    visit icmp" << std::endl;
-//    solver.add()
+    auto op1 = I.getOperand(0);
+    auto op2 = I.getOperand(1);
+    z3::expr a = gen_i32(op1);
+    z3::expr b = gen_i32(op2);
+    // note: r here is bv_1
+    z3::expr r = gen_i1(&I);
+    
+    auto cond = I.getPredicate();
+    switch (cond) {
+      case CmpInst::ICMP_EQ :  ///< equal 
+        solver.add((r == z3::ite((a == b), i1_true(), i1_false()))/*simp*/);
+        break;
+      case CmpInst::ICMP_NE :  ///< not equal
+        solver.add((r == z3::ite((a != b), i1_true(), i1_false()))/*simp*/);
+        break;
+      case CmpInst::ICMP_UGT:  ///< unsigned greater than
+        solver.add((r == z3::ite(z3::ugt(a, b), i1_true(), i1_false()))/*simp*/);
+        break;
+      case CmpInst::ICMP_UGE:  ///< unsigned greater or equal
+        solver.add((r == z3::ite(z3::uge(a, b), i1_true(), i1_false()))/*simp*/);
+        break;
+      case CmpInst::ICMP_ULT:  ///< unsigned less than
+        solver.add((r == z3::ite(z3::ult(a, b), i1_true(), i1_false()))/*simp*/);
+        break;
+      case CmpInst::ICMP_ULE:  ///< unsigned less or equal
+        solver.add((r == z3::ite(z3::ule(a, b), i1_true(), i1_false()))/*simp*/);
+        break;
+      case CmpInst::ICMP_SGT:  ///< signed greater than
+        solver.add((r == z3::ite((a > b), i1_true(), i1_false()))/*simp*/);
+        break;
+      case CmpInst::ICMP_SGE:  ///< signed greater or equal
+        solver.add((r == z3::ite((a >= b), i1_true(), i1_false()))/*simp*/);
+        break;
+      case CmpInst::ICMP_SLT:  ///< signed less than
+        solver.add((r == z3::ite((a < b), i1_true(), i1_false()))/*simp*/);
+        break;
+      case CmpInst::ICMP_SLE:  ///< signed less or equal
+        solver.add(((r == z3::ite((a <= b), i1_true(), i1_false()))/*simp*/));
+        break;
+      default:
+        errs() << "Unsupported ICMP_OP: " << cond << "\n";
+        break;
+    }
   }
 
   void visitBranchInst(BranchInst &I) {
   
     std::cout << "    visit br"<< std::endl;
   }
-  void visitPHINode(PHINode &I) {
-  
+  void visitPHINode(PHINode &I) { 
     std::cout << "    visit phi" << std::endl;
+    
   }
 
   // Call checkAndReport here.
   void visitGetElementPtrInst(GetElementPtrInst &I) {
     std::cout << "    visit gep" << std::endl;
-    checkAndReport(solver, I);
+    if (I.isInBounds()) {
+      if (I.getSourceElementType()->isArrayTy()) {
+        ArrayType* type = (ArrayType*) I.getSourceElementType();
+        if (type->getArrayElementType()->isIntegerTy()) {
+          solver.push();
+          std::cout << "===check pushed===" << std::endl;
+          std::cout << solver << std::endl;
+          auto size = type->getArrayNumElements(); 
+          auto ptrOp = I.getPointerOperand();
+          z3::expr ptr = gen_i32(ptrOp);
+          z3::expr lb = ctx.bv_val(0, 64);
+          z3::expr ub = ctx.bv_val(size, 64);
+          
+          z3::expr inbounds = ((z3::sext(ptr, 32)) >= lb && (z3::sext(ptr, 32) < ub));
+          solver.add(!inbounds); 
+          std::cout << "bound added" << std::endl << solver << std::endl;
+          checkAndReport(solver, I);
+          solver.pop();
+          std::cout << "===check popped===" << std::endl;
+        }
+      }
+    }
   }
 };
 
@@ -255,3 +361,4 @@ int main(int argc, char const *argv[]) {
 
   return 0;
 }
+

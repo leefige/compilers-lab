@@ -15,3 +15,18 @@ int foo(int i) {
     }
 }
 
+void bar(int* b) {
+  int tmp = *b << 4;
+  int aa = 32;
+  aa = aa & *b;
+  aa = 8 | tmp;
+  tmp = *b ^ aa;
+  *b = tmp;
+}
+
+int foobar() {
+  int k = foo(a);
+  bar(&k);
+  return k;
+}
+
