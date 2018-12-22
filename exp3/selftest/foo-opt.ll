@@ -34,10 +34,11 @@ define i32 @foo1(i32) {
   %6 = load i32, i32* %5, align 4
   %7 = add nsw i32 %6, %3
   store i32 %7, i32* %5, align 4
-  %8 = sext i32 %0 to i64
-  %9 = getelementptr inbounds [64 x i32], [64 x i32]* %2, i64 0, i64 %8
-  %10 = load i32, i32* %9, align 4
-  ret i32 %10
+  %8 = and i32 16, %0
+  %9 = sext i32 %8 to i64
+  %10 = getelementptr inbounds [64 x i32], [64 x i32]* %2, i64 0, i64 %9
+  %11 = load i32, i32* %10, align 4
+  ret i32 %11
 }
 
 define void @bar(i32*) {

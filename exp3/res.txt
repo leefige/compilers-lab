@@ -59,7 +59,12 @@ Model causing out of bound:
 (define-fun %0 () (_ BitVec 32)
   #x20000000)
 ===check popped===
+(declare-fun %0 () (_ BitVec 32))
+(declare-fun %4 () (_ BitVec 64))
+(assert (= %4 ((_ sign_extend 32) %0)))
+
     visit add
+    visit and
     visit sext
     visit gep
 ===check pushed===
@@ -68,10 +73,12 @@ Model causing out of bound:
 (declare-fun %3 () (_ BitVec 32))
 (declare-fun %6 () (_ BitVec 32))
 (declare-fun %7 () (_ BitVec 32))
-(declare-fun %8 () (_ BitVec 64))
+(declare-fun %8 () (_ BitVec 32))
+(declare-fun %9 () (_ BitVec 64))
 (assert (= %4 ((_ sign_extend 32) %0)))
 (assert (= %7 (bvadd %6 %3)))
-(assert (= %8 ((_ sign_extend 32) %0)))
+(assert (= %8 (bvand #x00000010 %0)))
+(assert (= %9 ((_ sign_extend 32) %8)))
 
 bound added
 (declare-fun %0 () (_ BitVec 32))
@@ -79,33 +86,35 @@ bound added
 (declare-fun %3 () (_ BitVec 32))
 (declare-fun %6 () (_ BitVec 32))
 (declare-fun %7 () (_ BitVec 32))
-(declare-fun %8 () (_ BitVec 64))
+(declare-fun %8 () (_ BitVec 32))
+(declare-fun %9 () (_ BitVec 64))
 (assert (= %4 ((_ sign_extend 32) %0)))
 (assert (= %7 (bvadd %6 %3)))
-(assert (= %8 ((_ sign_extend 32) %0)))
-(assert (not (and (bvsge %8 #x0000000000000000) (bvslt %8 #x0000000000000040))))
+(assert (= %8 (bvand #x00000010 %0)))
+(assert (= %9 ((_ sign_extend 32) %8)))
+(assert (not (and (bvsge %9 #x0000000000000000) (bvslt %9 #x0000000000000040))))
 
 Checking with assertions:
 (ast-vector
   (= %4 ((_ sign_extend 32) %0))
   (= %7 (bvadd %6 %3))
-  (= %8 ((_ sign_extend 32) %0))
-  (not (and (bvsge %8 #x0000000000000000) (bvslt %8 #x0000000000000040))))
-GEP %9 is potentially out of bound.
-Model causing out of bound:
-(define-fun %4 () (_ BitVec 64)
-  #x0000000020000000)
-(define-fun %0 () (_ BitVec 32)
-  #x20000000)
-(define-fun %7 () (_ BitVec 32)
-  #x00000800)
-(define-fun %6 () (_ BitVec 32)
-  #x00000000)
-(define-fun %3 () (_ BitVec 32)
-  #x00000800)
-(define-fun %8 () (_ BitVec 64)
-  #x0000000020000000)
+  (= %8 (bvand #x00000010 %0))
+  (= %9 ((_ sign_extend 32) %8))
+  (not (and (bvsge %9 #x0000000000000000) (bvslt %9 #x0000000000000040))))
+GEP %10 is safe.
 ===check popped===
+(declare-fun %0 () (_ BitVec 32))
+(declare-fun %4 () (_ BitVec 64))
+(declare-fun %3 () (_ BitVec 32))
+(declare-fun %6 () (_ BitVec 32))
+(declare-fun %7 () (_ BitVec 32))
+(declare-fun %8 () (_ BitVec 32))
+(declare-fun %9 () (_ BitVec 64))
+(assert (= %4 ((_ sign_extend 32) %0)))
+(assert (= %7 (bvadd %6 %3)))
+(assert (= %8 (bvand #x00000010 %0)))
+(assert (= %9 ((_ sign_extend 32) %8)))
+
 ------------
 <Solver>
 (declare-fun %0 () (_ BitVec 32))
@@ -113,10 +122,12 @@ Model causing out of bound:
 (declare-fun %3 () (_ BitVec 32))
 (declare-fun %6 () (_ BitVec 32))
 (declare-fun %7 () (_ BitVec 32))
-(declare-fun %8 () (_ BitVec 64))
+(declare-fun %8 () (_ BitVec 32))
+(declare-fun %9 () (_ BitVec 64))
 (assert (= %4 ((_ sign_extend 32) %0)))
 (assert (= %7 (bvadd %6 %3)))
-(assert (= %8 ((_ sign_extend 32) %0)))
+(assert (= %8 (bvand #x00000010 %0)))
+(assert (= %9 ((_ sign_extend 32) %8)))
 ============
 <Func> bar: ; arg %0
   <BB> %1

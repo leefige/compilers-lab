@@ -300,11 +300,10 @@ public:
       default:
         errs() << "Unsupported ICMP_OP: " << cond << "\n";
         break;
-    }
+    }  
   }
 
-  void visitBranchInst(BranchInst &I) {
-  
+  void visitBranchInst(BranchInst &I) { 
     std::cout << "    visit br"<< std::endl;
   }
   void visitPHINode(PHINode &I) { 
@@ -328,8 +327,8 @@ public:
         ArrayType* type = (ArrayType*) I.getSourceElementType();
         if (type->getArrayElementType()->isIntegerTy()) {
           solver.push();
-          std::cout << "===check pushed===" << std::endl;
-          std::cout << solver << std::endl;
+//          std::cout << "===check pushed===" << std::endl;
+//          std::cout << solver << std::endl;
           auto size = type->getArrayNumElements(); 
           auto ptrOp = I.getOperand(2);
           z3::expr ptr = gen_i64(ptrOp);
@@ -338,10 +337,11 @@ public:
           
           z3::expr inbounds = (ptr >= lb && ptr < ub);
           solver.add(!inbounds); 
-          std::cout << "bound added" << std::endl << solver << std::endl;
+//          std::cout << "bound added" << std::endl << solver << std::endl;
           checkAndReport(solver, I);
           solver.pop();
-          std::cout << "===check popped===" << std::endl;
+//          std::cout << "===check popped===" << std::endl;
+//          std::cout << solver << std::endl;
         }
       }
     }
