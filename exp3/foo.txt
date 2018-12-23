@@ -16,37 +16,31 @@ new z3walker
 <Solver>
 (declare-fun i () (_ BitVec 32))
 (declare-fun cmp () (_ BitVec 1))
+(declare-fun if.then () (_ BitVec 1))
+(declare-fun if.else () (_ BitVec 1))
+(declare-fun if.end () (_ BitVec 1))
 (declare-fun sub () (_ BitVec 32))
+(declare-fun a.0 () (_ BitVec 32))
 (assert (= cmp (ite (bvslt i #x00000000) #b1 #b0)))
+(assert (= if.then cmp))
+(assert (= if.else (ite (= cmp #b1) #b0 #b1)))
+(assert (= if.end #b1))
 (assert (= sub (bvsub #x00000000 i)))
+(assert (= if.end #b1))
+(assert (=> (= if.then #b1) (= a.0 sub)))
+(assert (=> (= if.else #b1) (= a.0 i)))
 ============
 <Func> foo1: ; arg i
   <BB> entry
     visit and
     visit sext
     visit gep
-===check pushed===
-(declare-fun i () (_ BitVec 32))
-(declare-fun and () (_ BitVec 32))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= and (bvand i #x000003ff)))
-(assert (= idxprom ((_ sign_extend 32) and)))
-
-bound added
-(declare-fun i () (_ BitVec 32))
-(declare-fun and () (_ BitVec 32))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= and (bvand i #x000003ff)))
-(assert (= idxprom ((_ sign_extend 32) and)))
-(assert (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
-
 Checking with assertions:
 (ast-vector
   (= and (bvand i #x000003ff))
   (= idxprom ((_ sign_extend 32) and))
   (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
 GEP arrayidx is safe.
-===check popped===
 ------------
 <Solver>
 (declare-fun i () (_ BitVec 32))
@@ -67,42 +61,18 @@ GEP arrayidx is safe.
   <BB> if.then
     visit sext
     visit gep
-===check pushed===
-(declare-fun i () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun cmp1 () (_ BitVec 1))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
-(assert (= cmp1 (ite (bvslt i #x00000400) #b1 #b0)))
-(assert (= idxprom ((_ sign_extend 32) i)))
-
-bound added
-(declare-fun i () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun cmp1 () (_ BitVec 1))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
-(assert (= cmp1 (ite (bvslt i #x00000400) #b1 #b0)))
-(assert (= idxprom ((_ sign_extend 32) i)))
-(assert (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
-
 Checking with assertions:
 (ast-vector
   (= cmp (ite (bvsge i #x00000000) #b1 #b0))
+  (= land.lhs.true cmp)
+  (= if.else (ite (= cmp #b1) #b0 #b1))
   (= cmp1 (ite (bvslt i #x00000400) #b1 #b0))
+  (= if.then cmp1)
+  (= if.else (ite (= cmp1 #b1) #b0 #b1))
+  (= return #b1)
   (= idxprom ((_ sign_extend 32) i))
   (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
-GEP arrayidx is potentially out of bound.
-Model causing out of bound:
-(define-fun i () (_ BitVec 32)
-  #x80000000)
-(define-fun cmp () (_ BitVec 1)
-  #b0)
-(define-fun cmp1 () (_ BitVec 1)
-  #b1)
-(define-fun idxprom () (_ BitVec 64)
-  #xffffffff80000000)
-===check popped===
+GEP arrayidx is safe.
     visit br
   <BB> return
     visit phi
@@ -110,11 +80,25 @@ Model causing out of bound:
 <Solver>
 (declare-fun i () (_ BitVec 32))
 (declare-fun cmp () (_ BitVec 1))
+(declare-fun land.lhs.true () (_ BitVec 1))
+(declare-fun if.else () (_ BitVec 1))
 (declare-fun cmp1 () (_ BitVec 1))
+(declare-fun if.then () (_ BitVec 1))
+(declare-fun return () (_ BitVec 1))
 (declare-fun idxprom () (_ BitVec 64))
+(declare-fun %0 () (_ BitVec 32))
+(declare-fun retval.0 () (_ BitVec 32))
 (assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
+(assert (= land.lhs.true cmp))
+(assert (= if.else (ite (= cmp #b1) #b0 #b1)))
 (assert (= cmp1 (ite (bvslt i #x00000400) #b1 #b0)))
+(assert (= if.then cmp1))
+(assert (= if.else (ite (= cmp1 #b1) #b0 #b1)))
+(assert (= return #b1))
 (assert (= idxprom ((_ sign_extend 32) i)))
+(assert (= return #b1))
+(assert (=> (= if.then #b1) (= retval.0 %0)))
+(assert (=> (= if.else #b1) (= retval.0 #xffffffff)))
 ============
 <Func> foo3: ; arg i
   <BB> entry
@@ -131,55 +115,42 @@ Model causing out of bound:
     visit phi
     visit sext
     visit gep
-===check pushed===
-(declare-fun i () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun cmp1 () (_ BitVec 1))
-(declare-fun x.0 () (_ BitVec 32))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
-(assert (= cmp1 (ite (bvslt i #x00000400) #b1 #b0)))
-(assert (= idxprom ((_ sign_extend 32) x.0)))
-
-bound added
-(declare-fun i () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun cmp1 () (_ BitVec 1))
-(declare-fun x.0 () (_ BitVec 32))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
-(assert (= cmp1 (ite (bvslt i #x00000400) #b1 #b0)))
-(assert (= idxprom ((_ sign_extend 32) x.0)))
-(assert (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
-
 Checking with assertions:
 (ast-vector
   (= cmp (ite (bvsge i #x00000000) #b1 #b0))
+  (= land.lhs.true cmp)
+  (= if.else (ite (= cmp #b1) #b0 #b1))
   (= cmp1 (ite (bvslt i #x00000400) #b1 #b0))
+  (= if.then cmp1)
+  (= if.else (ite (= cmp1 #b1) #b0 #b1))
+  (= if.end #b1)
+  (= if.end #b1)
+  (=> (= if.then #b1) (= x.0 i))
+  (=> (= if.else #b1) (= x.0 #x00000000))
   (= idxprom ((_ sign_extend 32) x.0))
   (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
-GEP arrayidx is potentially out of bound.
-Model causing out of bound:
-(define-fun i () (_ BitVec 32)
-  #x80000000)
-(define-fun cmp () (_ BitVec 1)
-  #b0)
-(define-fun cmp1 () (_ BitVec 1)
-  #b1)
-(define-fun idxprom () (_ BitVec 64)
-  #xffffffff80000000)
-(define-fun x.0 () (_ BitVec 32)
-  #x80000000)
-===check popped===
+GEP arrayidx is safe.
 ------------
 <Solver>
 (declare-fun i () (_ BitVec 32))
 (declare-fun cmp () (_ BitVec 1))
+(declare-fun land.lhs.true () (_ BitVec 1))
+(declare-fun if.else () (_ BitVec 1))
 (declare-fun cmp1 () (_ BitVec 1))
+(declare-fun if.then () (_ BitVec 1))
+(declare-fun if.end () (_ BitVec 1))
 (declare-fun x.0 () (_ BitVec 32))
 (declare-fun idxprom () (_ BitVec 64))
 (assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
+(assert (= land.lhs.true cmp))
+(assert (= if.else (ite (= cmp #b1) #b0 #b1)))
 (assert (= cmp1 (ite (bvslt i #x00000400) #b1 #b0)))
+(assert (= if.then cmp1))
+(assert (= if.else (ite (= cmp1 #b1) #b0 #b1)))
+(assert (= if.end #b1))
+(assert (= if.end #b1))
+(assert (=> (= if.then #b1) (= x.0 i)))
+(assert (=> (= if.else #b1) (= x.0 #x00000000)))
 (assert (= idxprom ((_ sign_extend 32) x.0)))
 ============
 <Func> bar1: ; arg i
@@ -187,21 +158,6 @@ Model causing out of bound:
     visit and
     visit sext
     visit gep
-===check pushed===
-(declare-fun i () (_ BitVec 32))
-(declare-fun and () (_ BitVec 32))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= and (bvand i #x000007ff)))
-(assert (= idxprom ((_ sign_extend 32) and)))
-
-bound added
-(declare-fun i () (_ BitVec 32))
-(declare-fun and () (_ BitVec 32))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= and (bvand i #x000007ff)))
-(assert (= idxprom ((_ sign_extend 32) and)))
-(assert (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
-
 Checking with assertions:
 (ast-vector
   (= and (bvand i #x000007ff))
@@ -215,7 +171,6 @@ Model causing out of bound:
   #x00000400)
 (define-fun idxprom () (_ BitVec 64)
   #x0000000000000400)
-===check popped===
 ------------
 <Solver>
 (declare-fun i () (_ BitVec 32))
@@ -236,42 +191,35 @@ Model causing out of bound:
   <BB> if.then
     visit sext
     visit gep
-===check pushed===
-(declare-fun i () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun cmp1 () (_ BitVec 1))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
-(assert (= cmp1 (ite (bvsle i #x00000400) #b1 #b0)))
-(assert (= idxprom ((_ sign_extend 32) i)))
-
-bound added
-(declare-fun i () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun cmp1 () (_ BitVec 1))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
-(assert (= cmp1 (ite (bvsle i #x00000400) #b1 #b0)))
-(assert (= idxprom ((_ sign_extend 32) i)))
-(assert (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
-
 Checking with assertions:
 (ast-vector
   (= cmp (ite (bvsge i #x00000000) #b1 #b0))
+  (= land.lhs.true cmp)
+  (= if.else (ite (= cmp #b1) #b0 #b1))
   (= cmp1 (ite (bvsle i #x00000400) #b1 #b0))
+  (= if.then cmp1)
+  (= if.else (ite (= cmp1 #b1) #b0 #b1))
+  (= return #b1)
   (= idxprom ((_ sign_extend 32) i))
   (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
 GEP arrayidx is potentially out of bound.
 Model causing out of bound:
 (define-fun i () (_ BitVec 32)
-  #x80000000)
+  #x00000400)
 (define-fun cmp () (_ BitVec 1)
+  #b1)
+(define-fun land.lhs.true () (_ BitVec 1)
+  #b1)
+(define-fun if.else () (_ BitVec 1)
   #b0)
+(define-fun idxprom () (_ BitVec 64)
+  #x0000000000000400)
 (define-fun cmp1 () (_ BitVec 1)
   #b1)
-(define-fun idxprom () (_ BitVec 64)
-  #xffffffff80000000)
-===check popped===
+(define-fun if.then () (_ BitVec 1)
+  #b1)
+(define-fun return () (_ BitVec 1)
+  #b1)
     visit br
   <BB> return
     visit phi
@@ -279,11 +227,25 @@ Model causing out of bound:
 <Solver>
 (declare-fun i () (_ BitVec 32))
 (declare-fun cmp () (_ BitVec 1))
+(declare-fun land.lhs.true () (_ BitVec 1))
+(declare-fun if.else () (_ BitVec 1))
 (declare-fun cmp1 () (_ BitVec 1))
+(declare-fun if.then () (_ BitVec 1))
+(declare-fun return () (_ BitVec 1))
 (declare-fun idxprom () (_ BitVec 64))
+(declare-fun %0 () (_ BitVec 32))
+(declare-fun retval.0 () (_ BitVec 32))
 (assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
+(assert (= land.lhs.true cmp))
+(assert (= if.else (ite (= cmp #b1) #b0 #b1)))
 (assert (= cmp1 (ite (bvsle i #x00000400) #b1 #b0)))
+(assert (= if.then cmp1))
+(assert (= if.else (ite (= cmp1 #b1) #b0 #b1)))
+(assert (= return #b1))
 (assert (= idxprom ((_ sign_extend 32) i)))
+(assert (= return #b1))
+(assert (=> (= if.then #b1) (= retval.0 %0)))
+(assert (=> (= if.else #b1) (= retval.0 #xffffffff)))
 ============
 <Func> bar3: ; arg i
   <BB> entry
@@ -300,55 +262,61 @@ Model causing out of bound:
     visit phi
     visit sext
     visit gep
-===check pushed===
-(declare-fun i () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun cmp1 () (_ BitVec 1))
-(declare-fun x.0 () (_ BitVec 32))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
-(assert (= cmp1 (ite (bvsle i #x00000400) #b1 #b0)))
-(assert (= idxprom ((_ sign_extend 32) x.0)))
-
-bound added
-(declare-fun i () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun cmp1 () (_ BitVec 1))
-(declare-fun x.0 () (_ BitVec 32))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
-(assert (= cmp1 (ite (bvsle i #x00000400) #b1 #b0)))
-(assert (= idxprom ((_ sign_extend 32) x.0)))
-(assert (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
-
 Checking with assertions:
 (ast-vector
   (= cmp (ite (bvsge i #x00000000) #b1 #b0))
+  (= land.lhs.true cmp)
+  (= if.else (ite (= cmp #b1) #b0 #b1))
   (= cmp1 (ite (bvsle i #x00000400) #b1 #b0))
+  (= if.then cmp1)
+  (= if.else (ite (= cmp1 #b1) #b0 #b1))
+  (= if.end #b1)
+  (= if.end #b1)
+  (=> (= if.then #b1) (= x.0 i))
+  (=> (= if.else #b1) (= x.0 #x00000000))
   (= idxprom ((_ sign_extend 32) x.0))
   (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
 GEP arrayidx is potentially out of bound.
 Model causing out of bound:
 (define-fun i () (_ BitVec 32)
-  #x80000401)
+  #x00000400)
 (define-fun cmp () (_ BitVec 1)
+  #b1)
+(define-fun land.lhs.true () (_ BitVec 1)
+  #b1)
+(define-fun if.else () (_ BitVec 1)
   #b0)
-(define-fun cmp1 () (_ BitVec 1)
+(define-fun if.end () (_ BitVec 1)
   #b1)
 (define-fun idxprom () (_ BitVec 64)
-  #xffffffff80000000)
+  #x0000000000000400)
+(define-fun cmp1 () (_ BitVec 1)
+  #b1)
+(define-fun if.then () (_ BitVec 1)
+  #b1)
 (define-fun x.0 () (_ BitVec 32)
-  #x80000000)
-===check popped===
+  #x00000400)
 ------------
 <Solver>
 (declare-fun i () (_ BitVec 32))
 (declare-fun cmp () (_ BitVec 1))
+(declare-fun land.lhs.true () (_ BitVec 1))
+(declare-fun if.else () (_ BitVec 1))
 (declare-fun cmp1 () (_ BitVec 1))
+(declare-fun if.then () (_ BitVec 1))
+(declare-fun if.end () (_ BitVec 1))
 (declare-fun x.0 () (_ BitVec 32))
 (declare-fun idxprom () (_ BitVec 64))
 (assert (= cmp (ite (bvsge i #x00000000) #b1 #b0)))
+(assert (= land.lhs.true cmp))
+(assert (= if.else (ite (= cmp #b1) #b0 #b1)))
 (assert (= cmp1 (ite (bvsle i #x00000400) #b1 #b0)))
+(assert (= if.then cmp1))
+(assert (= if.else (ite (= cmp1 #b1) #b0 #b1)))
+(assert (= if.end #b1))
+(assert (= if.end #b1))
+(assert (=> (= if.then #b1) (= x.0 i)))
+(assert (=> (= if.else #b1) (= x.0 #x00000000)))
 (assert (= idxprom ((_ sign_extend 32) x.0)))
 ============
 <Func> interproc: ; arg i
@@ -360,35 +328,28 @@ Model causing out of bound:
   <BB> if.then
     visit sext
     visit gep
-===check pushed===
-(declare-fun call () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= cmp (ite (bvslt call #x00000400) #b1 #b0)))
-(assert (= idxprom ((_ sign_extend 32) call)))
-
-bound added
-(declare-fun call () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun idxprom () (_ BitVec 64))
-(assert (= cmp (ite (bvslt call #x00000400) #b1 #b0)))
-(assert (= idxprom ((_ sign_extend 32) call)))
-(assert (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
-
 Checking with assertions:
 (ast-vector
   (= cmp (ite (bvslt call #x00000400) #b1 #b0))
+  (= if.then cmp)
+  (= if.else (ite (= cmp #b1) #b0 #b1))
+  (= return #b1)
   (= idxprom ((_ sign_extend 32) call))
   (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
 GEP arrayidx is potentially out of bound.
 Model causing out of bound:
+(define-fun if.else () (_ BitVec 1)
+  #b1)
 (define-fun cmp () (_ BitVec 1)
+  #b0)
+(define-fun if.then () (_ BitVec 1)
   #b0)
 (define-fun call () (_ BitVec 32)
   #x40000000)
+(define-fun return () (_ BitVec 1)
+  #b1)
 (define-fun idxprom () (_ BitVec 64)
   #x0000000040000000)
-===check popped===
     visit br
   <BB> return
     visit phi
@@ -396,7 +357,18 @@ Model causing out of bound:
 <Solver>
 (declare-fun call () (_ BitVec 32))
 (declare-fun cmp () (_ BitVec 1))
+(declare-fun if.then () (_ BitVec 1))
+(declare-fun if.else () (_ BitVec 1))
+(declare-fun return () (_ BitVec 1))
 (declare-fun idxprom () (_ BitVec 64))
+(declare-fun %0 () (_ BitVec 32))
+(declare-fun retval.0 () (_ BitVec 32))
 (assert (= cmp (ite (bvslt call #x00000400) #b1 #b0)))
+(assert (= if.then cmp))
+(assert (= if.else (ite (= cmp #b1) #b0 #b1)))
+(assert (= return #b1))
 (assert (= idxprom ((_ sign_extend 32) call)))
+(assert (= return #b1))
+(assert (=> (= if.then #b1) (= retval.0 %0)))
+(assert (=> (= if.else #b1) (= retval.0 #xffffffff)))
 ============

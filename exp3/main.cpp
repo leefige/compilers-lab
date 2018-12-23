@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <stack>
+#include <assert.h>
 
 #include <llvm/IR/CFG.h>
 #include <llvm/IR/InstVisitor.h>
@@ -51,6 +52,31 @@ private:
   std::map<std::string, std::vector<z3::expr>> predicate_map;
   z3::context ctx;
   z3::solver solver;
+
+  std::string ast_name;
+
+  void astInit(const std::string& name) {
+    ast_name = name;
+    predicate_map.insert(
+        std::pair<std::string, std::vector<z3::expr> >(name, std::vector<z3::expr>())
+    );
+  }
+
+  void astAdd(const z3::expr& exp) {
+    auto vec = predicate_map.at(ast_name); 
+    vec.push_back(exp);
+  }
+
+  z3::expr getAst(const std::string& name) {
+    auto vec = predicate_map.at(name);
+    assert(!vec.empty());
+    auto ast = *vec.begin();
+    for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
+      ast = ast && *eit;
+    }
+    ast = ast.simplify();
+    return ast;
+  }
 
   // gen 32-bit const
   z3::expr gen_i32(Value* var) {
@@ -305,10 +331,38 @@ public:
 
   void visitBranchInst(BranchInst &I) { 
     std::cout << "    visit br"<< std::endl;
+    // only consider conditional jump
+    if (I.isConditional()) {
+      auto cond = I.getCondition();
+      auto tar_fls = I.getOperand(1); // BB
+      auto tar_tr = I.getOperand(2);
+      z3::expr cd = gen_i1(cond);
+      z3::expr tr = gen_i1(tar_tr);
+      z3::expr fls = gen_i1(tar_fls);
+      solver.add(tr == cd);
+      solver.add(fls == z3::ite(
+              (cd == i1_true()), i1_false(), i1_true()
+            ));
+    } else {
+      auto tar = I.getOperand(0);     // true
+      z3::expr tr = gen_i1(tar);
+      solver.add(tr == i1_true());
+    }
   }
+
   void visitPHINode(PHINode &I) { 
     std::cout << "    visit phi" << std::endl;
-    
+    unsigned cnt = I.getNumIncomingValues();
+    for (unsigned i = 0; i != cnt; i++) {
+      auto val = I.getIncomingValue(i);
+      auto bb = I.getIncomingBlock(i);
+      z3::expr v = gen_i32(val);
+      z3::expr b = gen_i1(bb);
+      z3::expr dst = gen_i32(&I);
+      solver.add(z3::implies(
+              (b == i1_true()), (dst == v)
+            ));
+    }
   }
 
   void visitSExtInst(SExtInst & I) {

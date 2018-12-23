@@ -20,34 +20,33 @@ new z3walker
 <Solver>
 (declare-fun %0 () (_ BitVec 32))
 (declare-fun %2 () (_ BitVec 1))
+(declare-fun %3 () (_ BitVec 1))
+(declare-fun %6 () (_ BitVec 1))
 (declare-fun %7 () (_ BitVec 32))
 (declare-fun %8 () (_ BitVec 32))
 (declare-fun %10 () (_ BitVec 32))
 (declare-fun %11 () (_ BitVec 32))
+(declare-fun %12 () (_ BitVec 1))
 (declare-fun %4 () (_ BitVec 32))
 (declare-fun %5 () (_ BitVec 32))
+(declare-fun .0 () (_ BitVec 32))
 (assert (= %2 (ite (= %0 #x00000003) #b1 #b0)))
+(assert (= %3 %2))
+(assert (= %6 (ite (= %2 #b1) #b0 #b1)))
 (assert (= %8 (bvmul %0 %7)))
 (assert (= %10 (bvshl #x00000002 %0)))
 (assert (= %11 (bvashr #x00000010 %0)))
+(assert (= %12 #b1))
 (assert (= %4 (bvadd #x00000001 #x00000002)))
 (assert (= %5 (bvsub %4 %0)))
+(assert (= %12 #b1))
+(assert (=> (= %3 #b1) (= .0 %5)))
+(assert (=> (= %6 #b1) (= .0 %8)))
 ============
 <Func> foo1: ; arg %0
   <BB> %1
     visit sext
     visit gep
-===check pushed===
-(declare-fun %0 () (_ BitVec 32))
-(declare-fun %4 () (_ BitVec 64))
-(assert (= %4 ((_ sign_extend 32) %0)))
-
-bound added
-(declare-fun %0 () (_ BitVec 32))
-(declare-fun %4 () (_ BitVec 64))
-(assert (= %4 ((_ sign_extend 32) %0)))
-(assert (not (and (bvsge %4 #x0000000000000000) (bvslt %4 #x0000000000000040))))
-
 Checking with assertions:
 (ast-vector
   (= %4 ((_ sign_extend 32) %0))
@@ -58,42 +57,10 @@ Model causing out of bound:
   #x0000000020000000)
 (define-fun %0 () (_ BitVec 32)
   #x20000000)
-===check popped===
-(declare-fun %0 () (_ BitVec 32))
-(declare-fun %4 () (_ BitVec 64))
-(assert (= %4 ((_ sign_extend 32) %0)))
-
     visit add
     visit and
     visit sext
     visit gep
-===check pushed===
-(declare-fun %0 () (_ BitVec 32))
-(declare-fun %4 () (_ BitVec 64))
-(declare-fun %3 () (_ BitVec 32))
-(declare-fun %6 () (_ BitVec 32))
-(declare-fun %7 () (_ BitVec 32))
-(declare-fun %8 () (_ BitVec 32))
-(declare-fun %9 () (_ BitVec 64))
-(assert (= %4 ((_ sign_extend 32) %0)))
-(assert (= %7 (bvadd %6 %3)))
-(assert (= %8 (bvand #x00000010 %0)))
-(assert (= %9 ((_ sign_extend 32) %8)))
-
-bound added
-(declare-fun %0 () (_ BitVec 32))
-(declare-fun %4 () (_ BitVec 64))
-(declare-fun %3 () (_ BitVec 32))
-(declare-fun %6 () (_ BitVec 32))
-(declare-fun %7 () (_ BitVec 32))
-(declare-fun %8 () (_ BitVec 32))
-(declare-fun %9 () (_ BitVec 64))
-(assert (= %4 ((_ sign_extend 32) %0)))
-(assert (= %7 (bvadd %6 %3)))
-(assert (= %8 (bvand #x00000010 %0)))
-(assert (= %9 ((_ sign_extend 32) %8)))
-(assert (not (and (bvsge %9 #x0000000000000000) (bvslt %9 #x0000000000000040))))
-
 Checking with assertions:
 (ast-vector
   (= %4 ((_ sign_extend 32) %0))
@@ -102,19 +69,6 @@ Checking with assertions:
   (= %9 ((_ sign_extend 32) %8))
   (not (and (bvsge %9 #x0000000000000000) (bvslt %9 #x0000000000000040))))
 GEP %10 is safe.
-===check popped===
-(declare-fun %0 () (_ BitVec 32))
-(declare-fun %4 () (_ BitVec 64))
-(declare-fun %3 () (_ BitVec 32))
-(declare-fun %6 () (_ BitVec 32))
-(declare-fun %7 () (_ BitVec 32))
-(declare-fun %8 () (_ BitVec 32))
-(declare-fun %9 () (_ BitVec 64))
-(assert (= %4 ((_ sign_extend 32) %0)))
-(assert (= %7 (bvadd %6 %3)))
-(assert (= %8 (bvand #x00000010 %0)))
-(assert (= %9 ((_ sign_extend 32) %8)))
-
 ------------
 <Solver>
 (declare-fun %0 () (_ BitVec 32))
