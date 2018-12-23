@@ -1,28 +1,3 @@
-Now walking the module...
-new z3walker
 <Module> test/bar.ll, size is 1
-<Func> foo: ; arg i
-  <BB> entry
-    visit icmp
-    visit br
-  <BB> if.then
-    visit gep
-    visit br
-  <BB> return
-    visit phi
-------------
-<Solver>
-(declare-fun i () (_ BitVec 32))
-(declare-fun cmp () (_ BitVec 1))
-(declare-fun if.then () (_ BitVec 1))
-(declare-fun return () (_ BitVec 1))
-(declare-fun ai () (_ BitVec 32))
-(declare-fun ret () (_ BitVec 32))
-(declare-fun entry () (_ BitVec 1))
-(assert (= cmp (ite (bvult i #x00000400) #b1 #b0)))
-(assert (= if.then cmp))
-(assert (= return (ite (= cmp #b1) #b0 #b1)))
-(assert (= return #b1))
-(assert (=> (= if.then #b1) (= ret ai)))
-(assert (=> (= entry #b1) (= ret #xffffffff)))
-============
+---------
+<Func> foo: arg i

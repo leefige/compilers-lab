@@ -63,8 +63,9 @@ private:
   }
 
   void astAdd(const z3::expr& exp) {
-    auto vec = predicate_map.at(ast_name); 
+    auto vec = predicate_map[ast_name];
     vec.push_back(exp);
+    predicate_map[ast_name] = vec;
   }
 
   z3::expr getAst(const std::string& name) {
@@ -74,7 +75,7 @@ private:
     for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
       ast = ast && *eit;
     }
-    ast = ast.simplify();
+    ast = ast;//.simplify();
     return ast;
   }
 
@@ -124,7 +125,7 @@ private:
 
 public:
   Z3Walker() : ctx(), solver(ctx) {
-    std::cout << "new z3walker" << std::endl;
+//    std::cout << "new z3walker" << std::endl;
   }
 
   // Not using InstVisitor::visit due to their sequential order.
@@ -139,16 +140,16 @@ public:
   }
 
   void visitFunction(Function &F) {
-    std::cout << "<Func> " << getName(F) << ": ";
-    solver.push();
-
+    std::cout << "---------" << std::endl << "<Func> " << getName(F) << ":";
+//    solver.push();
+    astInit(getName(F));
 //    std::cout << "ret type: ";
 //    F.getReturnType()->print(std::cout);
     // parse args
     for (auto ait = F.arg_begin(); ait != F.arg_end(); ait++) {
       Argument* arg = &(*ait);
       auto argname = getName(*arg);
-      std::cout << "; arg " << argname;
+      std::cout << " arg " << argname;
       z3::expr arg_ = gen_i32(arg);
     }
     std::cout << std::endl;
@@ -170,20 +171,20 @@ public:
         this->visitBasicBlock(**E);
       }
     }
-    std::cout << "------------" << std::endl << "<Solver>" << std::endl 
-      << solver << "============" << std::endl;
-    solver.pop();
+//    std::cout << "------------" << std::endl << "<Solver>" << std::endl 
+//      << solver << "============" << std::endl;
+//    solver.pop();
   }
 
   void visitBasicBlock(BasicBlock &B) {
-    std::cout << "  <BB> " << getName(B) << std::endl;
+//    std::cout << "  <BB> " << getName(B) << std::endl;
     for (auto iit = B.begin(); iit != B.end(); iit++) {
       this->visit(*iit);
     }
   }
 
   void visitAdd(BinaryOperator &I) {
-    std::cout << "    visit add" << std::endl;
+//    std::cout << "    visit add" << std::endl;
 //    for (auto i = I.op_begin(); i != I.op_end(); i++) {
 //      std::cout << "\top: " << *i;
 //    }
@@ -194,96 +195,96 @@ public:
     z3::expr b = gen_i32(op2);
     // the Instruction itself is the ret val
     z3::expr r = gen_i32(&I);
-    solver.add((r == a + b)/*simp*/);
+    astAdd((r == a + b)/*simp*/);
   }
 
   void visitSub(BinaryOperator &I) {
-    std::cout << "    visit sub" << std::endl;
+//    std::cout << "    visit sub" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    solver.add((r == a - b)/*simp*/);
+    astAdd((r == a - b)/*simp*/);
   }
   
   void visitMul(BinaryOperator &I) {
-    std::cout << "    visit mul" << std::endl;
+//    std::cout << "    visit mul" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    solver.add((r == a * b)/*simp*/);
+    astAdd((r == a * b)/*simp*/);
   }
 
   void visitShl(BinaryOperator &I) {
-    std::cout << "    visit shl" << std::endl;
+//    std::cout << "    visit shl" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    solver.add((r == z3::shl(a, b))/*simp*/);
+    astAdd((r == z3::shl(a, b))/*simp*/);
   }
 
   void visitLShr(BinaryOperator &I) {
-    std::cout << "    visit lshr" << std::endl;
+//    std::cout << "    visit lshr" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    solver.add((r == z3::lshr(a, b))/*simp*/);
+    astAdd((r == z3::lshr(a, b))/*simp*/);
   }
 
   void visitAShr(BinaryOperator &I) {
-    std::cout << "    visit ashr" << std::endl;
+//    std::cout << "    visit ashr" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    solver.add((r == z3::ashr(a, b))/*simp*/);
+    astAdd((r == z3::ashr(a, b))/*simp*/);
   }
 
   void visitAnd(BinaryOperator &I) {
-    std::cout << "    visit and" << std::endl;
+//    std::cout << "    visit and" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-//    solver.add((
+//    astAdd((
 //        r == z3::ite(
 //          ((a == i1_true()) && (b == i1_true())),
 //          i1_true(), i1_false())
 //        );
-    solver.add((r == (a & b))/*simp*/);
+    astAdd((r == (a & b))/*simp*/);
   }
 
   void visitOr(BinaryOperator &I) {
-    std::cout << "    visit or" << std::endl;
+//    std::cout << "    visit or" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    solver.add((r == (a | b))/*simp*/);
+    astAdd((r == (a | b))/*simp*/);
   }
 
   void visitXor(BinaryOperator &I) {
-    std::cout << "    visit xor" << std::endl;
+//    std::cout << "    visit xor" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    solver.add((r == (a ^ b))/*simp*/);
+    astAdd((r == (a ^ b))/*simp*/);
   }
 
   void visitICmp(ICmpInst &I) { 
-    std::cout << "    visit icmp" << std::endl;
+//    std::cout << "    visit icmp" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -294,34 +295,34 @@ public:
     auto cond = I.getPredicate();
     switch (cond) {
       case CmpInst::ICMP_EQ :  ///< equal 
-        solver.add((r == z3::ite((a == b), i1_true(), i1_false()))/*simp*/);
+        astAdd((r == z3::ite((a == b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_NE :  ///< not equal
-        solver.add((r == z3::ite((a != b), i1_true(), i1_false()))/*simp*/);
+        astAdd((r == z3::ite((a != b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_UGT:  ///< unsigned greater than
-        solver.add((r == z3::ite(z3::ugt(a, b), i1_true(), i1_false()))/*simp*/);
+        astAdd((r == z3::ite(z3::ugt(a, b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_UGE:  ///< unsigned greater or equal
-        solver.add((r == z3::ite(z3::uge(a, b), i1_true(), i1_false()))/*simp*/);
+        astAdd((r == z3::ite(z3::uge(a, b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_ULT:  ///< unsigned less than
-        solver.add((r == z3::ite(z3::ult(a, b), i1_true(), i1_false()))/*simp*/);
+        astAdd((r == z3::ite(z3::ult(a, b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_ULE:  ///< unsigned less or equal
-        solver.add((r == z3::ite(z3::ule(a, b), i1_true(), i1_false()))/*simp*/);
+        astAdd((r == z3::ite(z3::ule(a, b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_SGT:  ///< signed greater than
-        solver.add((r == z3::ite((a > b), i1_true(), i1_false()))/*simp*/);
+        astAdd((r == z3::ite((a > b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_SGE:  ///< signed greater or equal
-        solver.add((r == z3::ite((a >= b), i1_true(), i1_false()))/*simp*/);
+        astAdd((r == z3::ite((a >= b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_SLT:  ///< signed less than
-        solver.add((r == z3::ite((a < b), i1_true(), i1_false()))/*simp*/);
+        astAdd((r == z3::ite((a < b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_SLE:  ///< signed less or equal
-        solver.add(((r == z3::ite((a <= b), i1_true(), i1_false()))/*simp*/));
+        astAdd(((r == z3::ite((a <= b), i1_true(), i1_false()))/*simp*/));
         break;
       default:
         errs() << "Unsupported ICMP_OP: " << cond << "\n";
@@ -330,7 +331,7 @@ public:
   }
 
   void visitBranchInst(BranchInst &I) { 
-    std::cout << "    visit br"<< std::endl;
+//    std::cout << "    visit br"<< std::endl;
     // only consider conditional jump
     if (I.isConditional()) {
       auto cond = I.getCondition();
@@ -339,19 +340,19 @@ public:
       z3::expr cd = gen_i1(cond);
       z3::expr tr = gen_i1(tar_tr);
       z3::expr fls = gen_i1(tar_fls);
-      solver.add(tr == cd);
-      solver.add(fls == z3::ite(
+      astAdd(tr == cd);
+      astAdd(fls == z3::ite(
               (cd == i1_true()), i1_false(), i1_true()
             ));
     } else {
       auto tar = I.getOperand(0);     // true
       z3::expr tr = gen_i1(tar);
-      solver.add(tr == i1_true());
+      astAdd(tr == i1_true());
     }
   }
 
   void visitPHINode(PHINode &I) { 
-    std::cout << "    visit phi" << std::endl;
+//    std::cout << "    visit phi" << std::endl;
     unsigned cnt = I.getNumIncomingValues();
     for (unsigned i = 0; i != cnt; i++) {
       auto val = I.getIncomingValue(i);
@@ -359,37 +360,46 @@ public:
       z3::expr v = gen_i32(val);
       z3::expr b = gen_i1(bb);
       z3::expr dst = gen_i32(&I);
-      solver.add(z3::implies(
+      astAdd(z3::implies(
               (b == i1_true()), (dst == v)
             ));
     }
   }
 
   void visitSExtInst(SExtInst & I) {
-    std::cout << "    visit sext" << std::endl;
+//    std::cout << "    visit sext" << std::endl;
     auto srcv = I.getOperand(0);
     z3::expr src = gen_i32(srcv);
     z3::expr dst = gen_i64(&I);
-    solver.add(dst == z3::sext(src, 32));
+    astAdd(dst == z3::sext(src, 32));
+  }
+  
+  void visitZExtInst(ZExtInst & I) {
+//    std::cout << "    visit zext" << std::endl;
+    auto srcv = I.getOperand(0);
+    z3::expr src = gen_i32(srcv);
+    z3::expr dst = gen_i64(&I);
+    astAdd(dst == z3::zext(src, 32));
   }
 
   // Call checkAndReport here.
   void visitGetElementPtrInst(GetElementPtrInst &I) {
-    std::cout << "    visit gep" << std::endl;
+//    std::cout << "    visit gep" << std::endl;
     if (I.isInBounds()) {
       if (I.getSourceElementType()->isArrayTy()) {
         ArrayType* type = (ArrayType*) I.getSourceElementType();
         if (type->getArrayElementType()->isIntegerTy()) {
-          solver.push();
 //          std::cout << "===check pushed===" << std::endl;
 //          std::cout << solver << std::endl;
           auto size = type->getArrayNumElements(); 
           auto ptrOp = I.getOperand(2);
           z3::expr ptr = gen_i64(ptrOp);
           z3::expr lb = ctx.bv_val(0, 64);
-          z3::expr ub = ctx.bv_val(size, 64);
-          
+          z3::expr ub = ctx.bv_val(size, 64); 
           z3::expr inbounds = (ptr >= lb && ptr < ub);
+
+          solver.push();
+          solver.add(getAst(ast_name));
           solver.add(!inbounds); 
 //          std::cout << "bound added" << std::endl << solver << std::endl;
           checkAndReport(solver, I);
@@ -418,7 +428,7 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
-  printf("Now walking the module...\n");
+//  printf("Now walking the module...\n");
   Z3Walker().visitModule(*module);
 
   return 0;
