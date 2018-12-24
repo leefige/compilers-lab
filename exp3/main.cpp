@@ -86,17 +86,17 @@ private:
     predicate_map[ast_name] = vec;
   }
 
-//  z3::expr getAst(Function* func) {
-//    std::string name = getName(*func);
-//    auto vec = predicate_map[name];
-//    assert(!vec.empty());
-//    auto ast = *vec.begin();
-//    for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
-//      ast = ast && *eit;
-//    }
-//    //ast = ast.simplify();
-//    return ast;
-//  }
+  z3::expr getAst(Function* func) {
+    std::string name = getName(*func);
+    auto vec = predicate_map[name];
+    assert(!vec.empty());
+    auto ast = *vec.begin();
+    for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
+      ast = ast && *eit;
+    }
+    //ast = ast.simplify();
+    return ast;
+  }
 
   z3::func_decl gen_func(Value* var, unsigned n) {
     return z3::function(getName(*var), arg_svec, ctx.bv_sort(n));
@@ -110,7 +110,7 @@ private:
     else {
       // var was not actually a ConstantInt
       z3::func_decl r = gen_func(var, n);
-      return z3::ezpr(r(arg_evec));
+      return z3::expr(r(arg_evec));
     }
   }
 
@@ -439,12 +439,15 @@ public:
           z3::expr inbounds = z3::forall(arg_evec, ptr >= lb && ptr < ub);
 
           solver.push();
-          z3::expr check = (getAst(I.getFunction()) && !inbounds)
-#ifdef NDEBUG
-            .simplify()
-#endif
-          ;
-          solver.add(check); 
+//          z3::expr check = (getAst(I.getFunction()) && !inbounds)
+//#ifdef NDEBUG
+//            .simplify()
+//#endif
+//          ;
+          for (z3::expr e: predicate_map[getName(*current_fun)]) {
+            solver.add(e);
+          }
+          solver.add(!inbounds); 
 //          std::cout << "bound added" << std::endl << solver << std::endl;
           checkAndReport(solver, I);
           solver.pop();
