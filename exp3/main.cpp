@@ -64,29 +64,33 @@ private:
   z3::context ctx;
   z3::solver solver;
 
-  std::string ast_name;
+  //std::string ast_name;
+  Function* current_fun;
 
-  void astInit(const std::string& name) {
-    ast_name = name;
+  void astInit(Function* func) {
+    current_fun = func;
+    std::string ast_name = getName(*current_fun);
     predicate_map.insert(
-        std::pair<std::string, std::vector<z3::expr> >(name, std::vector<z3::expr>())
+        std::pair<std::string, std::vector<z3::expr> >(ast_name, std::vector<z3::expr>())
     );
   }
 
   void astAdd(const z3::expr& exp) {
+    std::string ast_name = getName(*current_fun);
     auto vec = predicate_map[ast_name];
     vec.push_back(exp);
     predicate_map[ast_name] = vec;
   }
 
-  z3::expr getAst(const std::string& name) {
-    auto vec = predicate_map.at(name);
+  z3::expr getAst(Function* func) {
+    std::string name = getName(*func);
+    auto vec = predicate_map[name];
     assert(!vec.empty());
     auto ast = *vec.begin();
     for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
       ast = ast && *eit;
     }
-    ast = ast;//.simplify();
+    //ast = ast.simplify();
     return ast;
   }
 
@@ -137,6 +141,7 @@ private:
 public:
   Z3Walker() : ctx(), solver(ctx) {
     debug << "new z3walker" << std::endl;
+    current_fun = NULL;
   }
 
   // Not using InstVisitor::visit due to their sequential order.
@@ -153,7 +158,7 @@ public:
   void visitFunction(Function &F) {
     std::cout << "---------" << std::endl << "<Func> " << getName(F) << ":";
 //    solver.push();
-    astInit(getName(F));
+    astInit(&F);
     // parse args
     for (auto ait = F.arg_begin(); ait != F.arg_end(); ait++) {
       Argument* arg = &(*ait);
@@ -408,7 +413,7 @@ public:
           z3::expr inbounds = (ptr >= lb && ptr < ub);
 
           solver.push();
-          z3::expr check = (getAst(ast_name) && !inbounds)
+          z3::expr check = (getAst(I.getFunction()) && !inbounds)
 #ifdef NDEBUG
             .simplify()
 #endif
