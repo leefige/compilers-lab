@@ -10,11 +10,14 @@
 #include <llvm/IR/CFG.h>
 #include <llvm/IR/InstVisitor.h>
 #include <llvm/IR/Instruction.h>
+#include <llvm/IR/DerivedTypes.h>
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/ADT/SCCIterator.h>
 #include <z3++.h>
+
+//#define NDEBUG
 
 using namespace llvm;
 
@@ -49,8 +52,6 @@ void checkAndReport(z3::solver &solver, const GetElementPtrInst &gep) {
 // ONLY MODIFY THIS CLASS FOR PART 1 & 2!
 /* for debug */
 namespace {
-//#define NDEBUG
-
 #ifdef NDEBUG
 #define debug 0 && std::cout
 #else
@@ -60,74 +61,67 @@ namespace {
 
 class Z3Walker : public InstVisitor<Z3Walker> {
 private:
-  std::map<std::string, std::vector<z3::expr>> predicate_map;
+  std::map<std::string, std::vector<z3::ast>> predicate_map;
   z3::context ctx;
   z3::solver solver;
 
   //std::string ast_name;
   Function* current_fun;
+  z3::expr_vector arg_evec;
+  z3::sort_vector arg_svec;
 
   void astInit(Function* func) {
     current_fun = func;
     std::string ast_name = getName(*current_fun);
     predicate_map.insert(
-        std::pair<std::string, std::vector<z3::expr> >(ast_name, std::vector<z3::expr>())
+        std::pair<std::string, std::vector<z3::func_decl> >(ast_name, std::vector<z3::func_decl>())
     );
+    this->getArgVectors(func);
   }
 
-  void astAdd(const z3::expr& exp) {
+  void astAdd(const z3::func_decl& exp) {
     std::string ast_name = getName(*current_fun);
     auto vec = predicate_map[ast_name];
     vec.push_back(exp);
     predicate_map[ast_name] = vec;
   }
 
-  z3::expr getAst(Function* func) {
-    std::string name = getName(*func);
-    auto vec = predicate_map[name];
-    assert(!vec.empty());
-    auto ast = *vec.begin();
-    for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
-      ast = ast && *eit;
+//  z3::func_decl getAst(Function* func) {
+//    std::string name = getName(*func);
+//    auto vec = predicate_map[name];
+//    assert(!vec.empty());
+//    auto ast = *vec.begin();
+//    for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
+//      ast = ast && *eit;
+//    }
+//    //ast = ast.simplify();
+//    return ast;
+//  }
+
+  z3::ast gen_i(Value* var, unsigned n) {
+    if (ConstantInt* CI = dyn_cast<ConstantInt>(var)) {
+      // var indeed is a ConstantInt, we can use CI here
+      return ctx.bv_val(CI->getSExtValue(), n);
     }
-    //ast = ast.simplify();
-    return ast;
+    else {
+      // var was not actually a ConstantInt
+      return z3::function(getName(*var), arg_svec, ctx.bv_sort(n));
+    }
   }
 
   // gen 32-bit const
-  z3::expr gen_i32(Value* var) {
-    //return ctx.bv_const(name.c_str(), 32);  
-    if (ConstantInt* CI = dyn_cast<ConstantInt>(var)) {
-      // var indeed is a ConstantInt, we can use CI here
-      return ctx.bv_val(CI->getSExtValue(), 32);
-    }
-    else {
-      // var was not actually a ConstantInt
-      return ctx.bv_const(getName(*var).c_str(), 32);
-    }
+  z3::ast gen_i32(Value* var) {
+    return gen_i(var, 32);
   }
 
   // gen 1-bit const
-  z3::expr gen_i1(Value* var) {
-    if (ConstantInt* CI = dyn_cast<ConstantInt>(var)) {
-      // var indeed is a ConstantInt, we can use CI here
-      return ctx.bv_val(CI->getSExtValue(), 1);
-    }
-    else {
-      // var was not actually a ConstantInt
-      return ctx.bv_const(getName(*var).c_str(), 1);
-    }
+  z3::ast gen_i1(Value* var) {
+    return gen_i(var, 1);
   }
 
-  z3::expr gen_i64(Value* var) {
-    if (ConstantInt* CI = dyn_cast<ConstantInt>(var)) {
-      // var indeed is a ConstantInt, we can use CI here
-      return ctx.bv_val(CI->getSExtValue(), 64);
-    }
-    else {
-      // var was not actually a ConstantInt
-      return ctx.bv_const(getName(*var).c_str(), 64);
-    }
+  // gen 64-bit const
+  z3::ast gen_i64(Value* var) {
+    return gen_i(var, 64);
   }
 
   // gen true/false
@@ -138,8 +132,37 @@ private:
     return ctx.bv_val(0, 1);
   }
 
+  // get sort
+  z3::sort getSort(Value* var) {
+    Type* type = var->getType();
+    if (type->isIntegerTy()) {
+      IntegerType* ty = (IntegerType*)type;
+      unsigned width = ty->getBitWidth();
+      return ctx.bv_sort(width);
+    } else {
+      return ctx.bv_sort(32);   // potentially harmful
+    }
+  }
+
+  void getArgVectors(Function* F) {
+    while (!arg_evec.empty()) {
+      arg_evec.pop_back();
+    }
+    while (!arg_svec.empty()) {
+      arg_svec.pop_back();
+    }
+
+    for (auto ait = F->arg_begin(); ait != F->arg_end(); ait++) {
+      Argument* arg = &(*ait);
+      z3::sort st = getSort(arg);
+      arg_svec.push_back(st);
+      unsigned size = st.bv_size();
+      arg_evec.push_back(ctx.bv_const(getName(*arg).c_str(), size));
+    }
+  }
+
 public:
-  Z3Walker() : ctx(), solver(ctx) {
+  Z3Walker() : ctx(), solver(ctx), arg_evec(ctx), arg_svec(ctx) {
     debug << "new z3walker" << std::endl;
     current_fun = NULL;
   }
@@ -159,12 +182,13 @@ public:
     std::cout << "---------" << std::endl << "<Func> " << getName(F) << ":";
 //    solver.push();
     astInit(&F);
+    
     // parse args
+    unsigned arg_cnt = F.arg_size();
     for (auto ait = F.arg_begin(); ait != F.arg_end(); ait++) {
       Argument* arg = &(*ait);
       auto argname = getName(*arg);
       std::cout << " arg " << argname;
-      z3::expr arg_ = gen_i32(arg);
     }
     std::cout << std::endl;
 
@@ -205,10 +229,10 @@ public:
     debug << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
-    z3::expr a = gen_i32(op1);
-    z3::expr b = gen_i32(op2);
+    z3::func_decl a = gen_i32(op1);
+    z3::func_decl b = gen_i32(op2);
     // the Instruction itself is the ret val
-    z3::expr r = gen_i32(&I);
+    z3::func_decl r = gen_i32(&I);
     astAdd((r == a + b)/*simp*/);
   }
 
@@ -216,9 +240,9 @@ public:
     debug << "    visit sub" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
-    z3::expr a = gen_i32(op1);
-    z3::expr b = gen_i32(op2);
-    z3::expr r = gen_i32(&I);
+    z3::func_decl a = gen_i32(op1);
+    z3::func_decl b = gen_i32(op2);
+    z3::func_decl r = gen_i32(&I);
     astAdd((r == a - b)/*simp*/);
   }
   
@@ -226,9 +250,9 @@ public:
     debug << "    visit mul" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
-    z3::expr a = gen_i32(op1);
-    z3::expr b = gen_i32(op2);
-    z3::expr r = gen_i32(&I);
+    z3::func_decl a = gen_i32(op1);
+    z3::func_decl b = gen_i32(op2);
+    z3::func_decl r = gen_i32(&I);
     astAdd((r == a * b)/*simp*/);
   }
 
@@ -236,9 +260,9 @@ public:
     debug << "    visit shl" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
-    z3::expr a = gen_i32(op1);
-    z3::expr b = gen_i32(op2);
-    z3::expr r = gen_i32(&I);
+    z3::func_decl a = gen_i32(op1);
+    z3::func_decl b = gen_i32(op2);
+    z3::func_decl r = gen_i32(&I);
     astAdd((r == z3::shl(a, b))/*simp*/);
   }
 
@@ -246,9 +270,9 @@ public:
     debug << "    visit lshr" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
-    z3::expr a = gen_i32(op1);
-    z3::expr b = gen_i32(op2);
-    z3::expr r = gen_i32(&I);
+    z3::func_decl a = gen_i32(op1);
+    z3::func_decl b = gen_i32(op2);
+    z3::func_decl r = gen_i32(&I);
     astAdd((r == z3::lshr(a, b))/*simp*/);
   }
 
@@ -256,9 +280,9 @@ public:
     debug << "    visit ashr" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
-    z3::expr a = gen_i32(op1);
-    z3::expr b = gen_i32(op2);
-    z3::expr r = gen_i32(&I);
+    z3::func_decl a = gen_i32(op1);
+    z3::func_decl b = gen_i32(op2);
+    z3::func_decl r = gen_i32(&I);
     astAdd((r == z3::ashr(a, b))/*simp*/);
   }
 
@@ -266,9 +290,9 @@ public:
     debug << "    visit and" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
-    z3::expr a = gen_i32(op1);
-    z3::expr b = gen_i32(op2);
-    z3::expr r = gen_i32(&I);
+    z3::func_decl a = gen_i32(op1);
+    z3::func_decl b = gen_i32(op2);
+    z3::func_decl r = gen_i32(&I);
 //    astAdd((
 //        r == z3::ite(
 //          ((a == i1_true()) && (b == i1_true())),
@@ -281,9 +305,9 @@ public:
     debug << "    visit or" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
-    z3::expr a = gen_i32(op1);
-    z3::expr b = gen_i32(op2);
-    z3::expr r = gen_i32(&I);
+    z3::func_decl a = gen_i32(op1);
+    z3::func_decl b = gen_i32(op2);
+    z3::func_decl r = gen_i32(&I);
     astAdd((r == (a | b))/*simp*/);
   }
 
@@ -291,9 +315,9 @@ public:
     debug << "    visit xor" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
-    z3::expr a = gen_i32(op1);
-    z3::expr b = gen_i32(op2);
-    z3::expr r = gen_i32(&I);
+    z3::func_decl a = gen_i32(op1);
+    z3::func_decl b = gen_i32(op2);
+    z3::func_decl r = gen_i32(&I);
     astAdd((r == (a ^ b))/*simp*/);
   }
 
@@ -301,10 +325,10 @@ public:
     debug << "    visit icmp" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
-    z3::expr a = gen_i32(op1);
-    z3::expr b = gen_i32(op2);
+    z3::func_decl a = gen_i32(op1);
+    z3::func_decl b = gen_i32(op2);
     // note: r here is bv_1
-    z3::expr r = gen_i1(&I);
+    z3::func_decl r = gen_i1(&I);
     
     auto cond = I.getPredicate();
     switch (cond) {
@@ -351,16 +375,16 @@ public:
       auto cond = I.getCondition();
       auto tar_fls = I.getOperand(1); // BB
       auto tar_tr = I.getOperand(2);
-      z3::expr cd = gen_i1(cond);
-      z3::expr tr = gen_i1(tar_tr);
-      z3::expr fls = gen_i1(tar_fls);
+      z3::func_decl cd = gen_i1(cond);
+      z3::func_decl tr = gen_i1(tar_tr);
+      z3::func_decl fls = gen_i1(tar_fls);
       astAdd(tr == cd);
       astAdd(fls == z3::ite(
               (cd == i1_true()), i1_false(), i1_true()
             ));
     } else {
       auto tar = I.getOperand(0);     // true
-      z3::expr tr = gen_i1(tar);
+      z3::func_decl tr = gen_i1(tar);
       astAdd(tr == i1_true());
     }
   }
@@ -371,9 +395,9 @@ public:
     for (unsigned i = 0; i != cnt; i++) {
       auto val = I.getIncomingValue(i);
       auto bb = I.getIncomingBlock(i);
-      z3::expr v = gen_i32(val);
-      z3::expr b = gen_i1(bb);
-      z3::expr dst = gen_i32(&I);
+      z3::func_decl v = gen_i32(val);
+      z3::func_decl b = gen_i1(bb);
+      z3::func_decl dst = gen_i32(&I);
       astAdd(z3::implies(
               (b == i1_true()), (dst == v)
             ));
@@ -383,16 +407,16 @@ public:
   void visitSExtInst(SExtInst & I) {
     debug << "    visit sext" << std::endl;
     auto srcv = I.getOperand(0);
-    z3::expr src = gen_i32(srcv);
-    z3::expr dst = gen_i64(&I);
+    z3::func_decl src = gen_i32(srcv);
+    z3::func_decl dst = gen_i64(&I);
     astAdd(dst == z3::sext(src, 32));
   }
   
   void visitZExtInst(ZExtInst & I) {
     debug << "    visit zext" << std::endl;
     auto srcv = I.getOperand(0);
-    z3::expr src = gen_i32(srcv);
-    z3::expr dst = gen_i64(&I);
+    z3::func_decl src = gen_i32(srcv);
+    z3::func_decl dst = gen_i64(&I);
     astAdd(dst == z3::zext(src, 32));
   }
 
@@ -407,13 +431,13 @@ public:
 //          std::cout << solver << std::endl;
           auto size = type->getArrayNumElements(); 
           auto ptrOp = I.getOperand(2);
-          z3::expr ptr = gen_i64(ptrOp);
-          z3::expr lb = ctx.bv_val(0, 64);
-          z3::expr ub = ctx.bv_val(size, 64); 
-          z3::expr inbounds = (ptr >= lb && ptr < ub);
+          z3::func_decl ptr = gen_i64(ptrOp);
+          z3::func_decl lb = ctx.bv_val(0, 64);
+          z3::func_decl ub = ctx.bv_val(size, 64); 
+          z3::func_decl inbounds = (ptr >= lb && ptr < ub);
 
           solver.push();
-          z3::expr check = (getAst(I.getFunction()) && !inbounds)
+          z3::func_decl check = (getAst(I.getFunction()) && !inbounds)
 #ifdef NDEBUG
             .simplify()
 #endif
