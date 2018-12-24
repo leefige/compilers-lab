@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <stack>
+#include <set>
 #include <assert.h>
 
 #include <llvm/IR/CFG.h>
@@ -65,10 +66,11 @@ private:
   z3::context ctx;
   z3::solver solver;
 
-  //std::string ast_name;
   Function* current_fun;
+  // args
   z3::expr_vector arg_evec;
   z3::sort_vector arg_svec;
+  std::set<std::string> arg_names; 
 
   void astInit(Function* func) {
     current_fun = func;
@@ -76,14 +78,17 @@ private:
     predicate_map.insert(
         std::pair<std::string, std::vector<z3::expr> >(ast_name, std::vector<z3::expr>())
     );
-    this->getArgVectors(func);
+    this->getArgInfo(func);
   }
 
   void astAdd(const z3::expr& exp) {
+    debug << "in ast add\n";
     std::string ast_name = getName(*current_fun);
     auto vec = predicate_map[ast_name];
     vec.push_back(exp);
+    debug << "want to insert back to map\n";
     predicate_map[ast_name] = vec;
+    debug << "ast added: " << exp << std::endl;
   }
 
   z3::expr getAst(Function* func) {
@@ -109,8 +114,16 @@ private:
     }
     else {
       // var was not actually a ConstantInt
-      z3::func_decl r = gen_func(var, n);
-      return z3::expr(r(arg_evec));
+      std::string reg = getName(*var);
+      // if this is arg
+      if (arg_names.count(reg)) {
+        return ctx.bv_const(reg.c_str(), n);
+      } 
+      // or this is a func of arg
+      else {
+        z3::func_decl r = gen_func(var, n);
+        return z3::expr(r(arg_evec));
+      }
     }
   }
 
@@ -149,16 +162,18 @@ private:
     }
   }
 
-  void getArgVectors(Function* F) {
+  void getArgInfo(Function* F) {
     while (!arg_evec.empty()) {
       arg_evec.pop_back();
     }
     while (!arg_svec.empty()) {
       arg_svec.pop_back();
     }
+    arg_names.clear();
 
     for (auto ait = F->arg_begin(); ait != F->arg_end(); ait++) {
       Argument* arg = &(*ait);
+      arg_names.insert(getName(*ait));
       z3::sort st = getSort(arg);
       arg_svec.push_back(st);
       unsigned size = st.bv_size();
@@ -264,7 +279,12 @@ public:
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    astAdd(z3::forall(arg_evec, z3::shl(a, b)));
+    debug << "shl gen_ed" << std::endl;
+    z3::expr ex = (r == z3::shl(a, b));
+    debug << "2nd: " << ex << std::endl;
+    z3::expr all = z3::forall(arg_evec, ex);
+    debug << "all: " << all << std::endl;
+    astAdd(all);
   }
 
   void visitLShr(BinaryOperator &I) {
@@ -274,7 +294,7 @@ public:
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    astAdd(z3::forall(arg_evec, z3::lshr(a, b)));
+    astAdd(z3::forall(arg_evec, r == z3::lshr(a, b)));
   }
 
   void visitAShr(BinaryOperator &I) {
@@ -284,7 +304,7 @@ public:
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    astAdd(z3::forall(arg_evec, z3::ashr(a, b)));
+    astAdd(z3::forall(arg_evec, r == z3::ashr(a, b)));
   }
 
   void visitAnd(BinaryOperator &I) {
@@ -358,6 +378,7 @@ public:
         astAdd(z3::forall(arg_evec, r == z3::ite((a >= b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_SLT:  ///< signed less than
+        debug << "in slt" << std::endl;
         astAdd(z3::forall(arg_evec, r == z3::ite((a < b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_SLE:  ///< signed less or equal
@@ -379,10 +400,10 @@ public:
       z3::expr cd = gen_i1(cond);
       z3::expr tr = gen_i1(tar_tr);
       z3::expr fls = gen_i1(tar_fls);
-      astAdd(tr == cd);
-      astAdd(fls == z3::ite(
+      astAdd(z3::forall(arg_evec, tr == cd));
+      astAdd(z3::forall(arg_evec, fls == z3::ite(
               (cd == i1_true()), i1_false(), i1_true()
-            ));
+            )));
     } else {
       auto tar = I.getOperand(0);     // true
       z3::expr tr = gen_i1(tar);
