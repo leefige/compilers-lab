@@ -47,6 +47,17 @@ void checkAndReport(z3::solver &solver, const GetElementPtrInst &gep) {
 } // namespace
 
 // ONLY MODIFY THIS CLASS FOR PART 1 & 2!
+/* for debug */
+namespace {
+//#define NDEBUG
+
+#ifdef NDEBUG
+#define debug 0 && std::cout
+#else
+#define debug std::cout
+#endif
+}
+
 class Z3Walker : public InstVisitor<Z3Walker> {
 private:
   std::map<std::string, std::vector<z3::expr>> predicate_map;
@@ -125,7 +136,7 @@ private:
 
 public:
   Z3Walker() : ctx(), solver(ctx) {
-//    std::cout << "new z3walker" << std::endl;
+    debug << "new z3walker" << std::endl;
   }
 
   // Not using InstVisitor::visit due to their sequential order.
@@ -143,8 +154,6 @@ public:
     std::cout << "---------" << std::endl << "<Func> " << getName(F) << ":";
 //    solver.push();
     astInit(getName(F));
-//    std::cout << "ret type: ";
-//    F.getReturnType()->print(std::cout);
     // parse args
     for (auto ait = F.arg_begin(); ait != F.arg_end(); ait++) {
       Argument* arg = &(*ait);
@@ -171,24 +180,24 @@ public:
         this->visitBasicBlock(**E);
       }
     }
-//    std::cout << "------------" << std::endl << "<Solver>" << std::endl 
+//    debug << "------------" << std::endl << "<Solver>" << std::endl 
 //      << solver << "============" << std::endl;
 //    solver.pop();
   }
 
   void visitBasicBlock(BasicBlock &B) {
-//    std::cout << "  <BB> " << getName(B) << std::endl;
+    debug << "  <BB> " << getName(B) << std::endl;
     for (auto iit = B.begin(); iit != B.end(); iit++) {
       this->visit(*iit);
     }
   }
 
   void visitAdd(BinaryOperator &I) {
-//    std::cout << "    visit add" << std::endl;
+    debug << "    visit add" << std::endl;
 //    for (auto i = I.op_begin(); i != I.op_end(); i++) {
 //      std::cout << "\top: " << *i;
 //    }
-//    std::cout << std::endl;
+    debug << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -199,7 +208,7 @@ public:
   }
 
   void visitSub(BinaryOperator &I) {
-//    std::cout << "    visit sub" << std::endl;
+    debug << "    visit sub" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -209,7 +218,7 @@ public:
   }
   
   void visitMul(BinaryOperator &I) {
-//    std::cout << "    visit mul" << std::endl;
+    debug << "    visit mul" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -219,7 +228,7 @@ public:
   }
 
   void visitShl(BinaryOperator &I) {
-//    std::cout << "    visit shl" << std::endl;
+    debug << "    visit shl" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -229,7 +238,7 @@ public:
   }
 
   void visitLShr(BinaryOperator &I) {
-//    std::cout << "    visit lshr" << std::endl;
+    debug << "    visit lshr" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -239,7 +248,7 @@ public:
   }
 
   void visitAShr(BinaryOperator &I) {
-//    std::cout << "    visit ashr" << std::endl;
+    debug << "    visit ashr" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -249,7 +258,7 @@ public:
   }
 
   void visitAnd(BinaryOperator &I) {
-//    std::cout << "    visit and" << std::endl;
+    debug << "    visit and" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -264,7 +273,7 @@ public:
   }
 
   void visitOr(BinaryOperator &I) {
-//    std::cout << "    visit or" << std::endl;
+    debug << "    visit or" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -274,7 +283,7 @@ public:
   }
 
   void visitXor(BinaryOperator &I) {
-//    std::cout << "    visit xor" << std::endl;
+    debug << "    visit xor" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -284,7 +293,7 @@ public:
   }
 
   void visitICmp(ICmpInst &I) { 
-//    std::cout << "    visit icmp" << std::endl;
+    debug << "    visit icmp" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
     z3::expr a = gen_i32(op1);
@@ -331,7 +340,7 @@ public:
   }
 
   void visitBranchInst(BranchInst &I) { 
-//    std::cout << "    visit br"<< std::endl;
+    debug << "    visit br"<< std::endl;
     // only consider conditional jump
     if (I.isConditional()) {
       auto cond = I.getCondition();
@@ -352,7 +361,7 @@ public:
   }
 
   void visitPHINode(PHINode &I) { 
-//    std::cout << "    visit phi" << std::endl;
+    debug << "    visit phi" << std::endl;
     unsigned cnt = I.getNumIncomingValues();
     for (unsigned i = 0; i != cnt; i++) {
       auto val = I.getIncomingValue(i);
@@ -367,7 +376,7 @@ public:
   }
 
   void visitSExtInst(SExtInst & I) {
-//    std::cout << "    visit sext" << std::endl;
+    debug << "    visit sext" << std::endl;
     auto srcv = I.getOperand(0);
     z3::expr src = gen_i32(srcv);
     z3::expr dst = gen_i64(&I);
@@ -375,7 +384,7 @@ public:
   }
   
   void visitZExtInst(ZExtInst & I) {
-//    std::cout << "    visit zext" << std::endl;
+    debug << "    visit zext" << std::endl;
     auto srcv = I.getOperand(0);
     z3::expr src = gen_i32(srcv);
     z3::expr dst = gen_i64(&I);
@@ -384,7 +393,7 @@ public:
 
   // Call checkAndReport here.
   void visitGetElementPtrInst(GetElementPtrInst &I) {
-//    std::cout << "    visit gep" << std::endl;
+    debug << "    visit gep" << std::endl;
     if (I.isInBounds()) {
       if (I.getSourceElementType()->isArrayTy()) {
         ArrayType* type = (ArrayType*) I.getSourceElementType();
@@ -399,8 +408,12 @@ public:
           z3::expr inbounds = (ptr >= lb && ptr < ub);
 
           solver.push();
-          solver.add(getAst(ast_name));
-          solver.add(!inbounds); 
+#ifdef NDEBUG
+          z3::expr check = (getAst(ast_name) && !inbounds).simplify();
+#else
+          z3::expr check = (getAst(ast_name) && !inbounds);
+#endif
+          solver.add(check); 
 //          std::cout << "bound added" << std::endl << solver << std::endl;
           checkAndReport(solver, I);
           solver.pop();

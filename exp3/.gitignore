@@ -2,3 +2,5 @@
 build/
 tags
 .vscode/
+*.swp
+

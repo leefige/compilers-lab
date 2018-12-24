@@ -1,5 +1,24 @@
 extern int a;
 extern int arr[128];
+
+int foo__(int a, int b) {
+  if (a > 0) {
+    int ar[128];
+    b ^= b;
+    b = b + a;
+    b = (b << 1);
+    if (b < 64) {
+      int c = ar[b] + a;
+      b ^= c;
+    } else {
+      b |= a;
+    }
+  } else {
+    b &= a;
+  }
+  return b;
+}
+
 int foo(int i) {
     if (i == 3) {
       int a = 1; 

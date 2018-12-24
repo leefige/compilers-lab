@@ -1,15 +1,43 @@
+new z3walker
 <Module> test/foo.ll, size is 8
 ---------
 <Func> abs: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit sub
+    visit br
+  <BB> if.end
+    visit phi
 ---------
 <Func> foo1: arg i
+  <BB> entry
+    visit and
+    visit sext
+    visit gep
 Checking with assertions:
 (ast-vector
-  (and (= and (bvand i #x000003ff)) (= idxprom ((_ sign_extend 32) and)))
-  (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
+  (and (= and (bvand i #x000003ff))
+       (= idxprom ((_ sign_extend 32) and))
+       (not (and (bvsge idxprom #x0000000000000000)
+                 (bvslt idxprom #x0000000000000400)))))
 GEP arrayidx is safe.
 ---------
 <Func> foo2: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> land.lhs.true
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit sext
+    visit gep
 Checking with assertions:
 (ast-vector
   (and (= cmp (ite (bvsge i #x00000000) #b1 #b0))
@@ -19,11 +47,29 @@ Checking with assertions:
        (= if.then cmp1)
        (= if.else (ite (= cmp1 #b1) #b0 #b1))
        (= return #b1)
-       (= idxprom ((_ sign_extend 32) i)))
-  (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
+       (= idxprom ((_ sign_extend 32) i))
+       (not (and (bvsge idxprom #x0000000000000000)
+                 (bvslt idxprom #x0000000000000400)))))
 GEP arrayidx is safe.
+    visit br
+  <BB> return
+    visit phi
 ---------
 <Func> foo3: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> land.lhs.true
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit br
+  <BB> if.end
+    visit phi
+    visit sext
+    visit gep
 Checking with assertions:
 (ast-vector
   (and (= cmp (ite (bvsge i #x00000000) #b1 #b0))
@@ -36,15 +82,22 @@ Checking with assertions:
        (= if.end #b1)
        (=> (= if.then #b1) (= x.0 i))
        (=> (= if.else #b1) (= x.0 #x00000000))
-       (= idxprom ((_ sign_extend 32) x.0)))
-  (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
+       (= idxprom ((_ sign_extend 32) x.0))
+       (not (and (bvsge idxprom #x0000000000000000)
+                 (bvslt idxprom #x0000000000000400)))))
 GEP arrayidx is safe.
 ---------
 <Func> bar1: arg i
+  <BB> entry
+    visit and
+    visit sext
+    visit gep
 Checking with assertions:
 (ast-vector
-  (and (= and (bvand i #x000007ff)) (= idxprom ((_ sign_extend 32) and)))
-  (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
+  (and (= and (bvand i #x000007ff))
+       (= idxprom ((_ sign_extend 32) and))
+       (not (and (bvsge idxprom #x0000000000000000)
+                 (bvslt idxprom #x0000000000000400)))))
 GEP arrayidx is potentially out of bound.
 Model causing out of bound:
 (define-fun i () (_ BitVec 32)
@@ -55,6 +108,17 @@ Model causing out of bound:
   #x0000000000000400)
 ---------
 <Func> bar2: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> land.lhs.true
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit sext
+    visit gep
 Checking with assertions:
 (ast-vector
   (and (= cmp (ite (bvsge i #x00000000) #b1 #b0))
@@ -64,8 +128,9 @@ Checking with assertions:
        (= if.then cmp1)
        (= if.else (ite (= cmp1 #b1) #b0 #b1))
        (= return #b1)
-       (= idxprom ((_ sign_extend 32) i)))
-  (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
+       (= idxprom ((_ sign_extend 32) i))
+       (not (and (bvsge idxprom #x0000000000000000)
+                 (bvslt idxprom #x0000000000000400)))))
 GEP arrayidx is potentially out of bound.
 Model causing out of bound:
 (define-fun i () (_ BitVec 32)
@@ -84,8 +149,25 @@ Model causing out of bound:
   #b1)
 (define-fun return () (_ BitVec 1)
   #b1)
+    visit br
+  <BB> return
+    visit phi
 ---------
 <Func> bar3: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> land.lhs.true
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit br
+  <BB> if.end
+    visit phi
+    visit sext
+    visit gep
 Checking with assertions:
 (ast-vector
   (and (= cmp (ite (bvsge i #x00000000) #b1 #b0))
@@ -98,8 +180,9 @@ Checking with assertions:
        (= if.end #b1)
        (=> (= if.then #b1) (= x.0 i))
        (=> (= if.else #b1) (= x.0 #x00000000))
-       (= idxprom ((_ sign_extend 32) x.0)))
-  (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
+       (= idxprom ((_ sign_extend 32) x.0))
+       (not (and (bvsge idxprom #x0000000000000000)
+                 (bvslt idxprom #x0000000000000400)))))
 GEP arrayidx is potentially out of bound.
 Model causing out of bound:
 (define-fun i () (_ BitVec 32)
@@ -122,14 +205,23 @@ Model causing out of bound:
   #x00000400)
 ---------
 <Func> interproc: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit sext
+    visit gep
 Checking with assertions:
 (ast-vector
   (and (= cmp (ite (bvslt call #x00000400) #b1 #b0))
        (= if.then cmp)
        (= if.else (ite (= cmp #b1) #b0 #b1))
        (= return #b1)
-       (= idxprom ((_ sign_extend 32) call)))
-  (not (and (bvsge idxprom #x0000000000000000) (bvslt idxprom #x0000000000000400))))
+       (= idxprom ((_ sign_extend 32) call))
+       (not (and (bvsge idxprom #x0000000000000000)
+                 (bvslt idxprom #x0000000000000400)))))
 GEP arrayidx is potentially out of bound.
 Model causing out of bound:
 (define-fun if.else () (_ BitVec 1)
@@ -144,3 +236,6 @@ Model causing out of bound:
   #b1)
 (define-fun idxprom () (_ BitVec 64)
   #x0000000040000000)
+    visit br
+  <BB> return
+    visit phi
