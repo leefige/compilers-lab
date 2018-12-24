@@ -1,3 +1,12 @@
+new z3walker
 <Module> test/bar.ll, size is 1
 ---------
 <Func> foo: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> if.then
+    visit gep
+    visit br
+  <BB> return
+    visit phi

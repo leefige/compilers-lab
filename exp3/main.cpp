@@ -408,11 +408,11 @@ public:
           z3::expr inbounds = (ptr >= lb && ptr < ub);
 
           solver.push();
+          z3::expr check = (getAst(ast_name) && !inbounds)
 #ifdef NDEBUG
-          z3::expr check = (getAst(ast_name) && !inbounds).simplify();
-#else
-          z3::expr check = (getAst(ast_name) && !inbounds);
+            .simplify()
 #endif
+          ;
           solver.add(check); 
 //          std::cout << "bound added" << std::endl << solver << std::endl;
           checkAndReport(solver, I);

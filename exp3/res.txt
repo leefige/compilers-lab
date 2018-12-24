@@ -1,59 +1,43 @@
+new z3walker
 <Module> selftest/foo-opt.ll, size is 5
 ---------
 <Func> foo__: arg %0 arg %1
+  <BB> %2
+    visit icmp
+    visit br
+  <BB> %19
+    visit and
+    visit br
+  <BB> %5
+    visit xor
+    visit add
+
+    visit shl
+    visit icmp
+    visit br
+  <BB> %16
+    visit or
+    visit br
+  <BB> %10
+    visit sext
+    visit gep
 Checking with assertions:
 (ast-vector
-  (let ((a!1 (= %20 (bvnot (bvor (bvnot %1) (bvnot %0)))))
-        (a!2 (not (and (bvsle #x0000000000000000 %11)
-                       (not (bvsle #x0000000000000080 %11))))))
-    (and (= %4 (ite (bvsle %0 #x00000000) #b0 #b1))
-         (= %5 %4)
-         (= %19 (ite (= %4 #b1) #b0 #b1))
-         a!1
-         (= %21 #b1)
-         (= %6 #x00000000)
-         (= %7 (bvadd %6 %0))
-         (= %8 (concat ((_ extract 30 0) %7) #b0))
-         (= %9 (ite (bvsle #x00000040 %8) #b0 #b1))
-         (= %10 %9)
-         (= %16 (ite (= %9 #b1) #b0 #b1))
-         (= %17 (bvor %8 %0))
-         (= %18 #b1)
-         (= %11
-            (concat ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    ((_ extract 31 31) %8)
-                    %8))
-         a!2)))
+  (and (= %4 (ite (bvsgt %0 #x00000000) #b1 #b0))
+       (= %5 %4)
+       (= %19 (ite (= %4 #b1) #b0 #b1))
+       (= %20 (bvand %1 %0))
+       (= %21 #b1)
+       (= %6 (bvxor %1 %1))
+       (= %7 (bvadd %6 %0))
+       (= %8 (bvshl %7 #x00000001))
+       (= %9 (ite (bvslt %8 #x00000040) #b1 #b0))
+       (= %10 %9)
+       (= %16 (ite (= %9 #b1) #b0 #b1))
+       (= %17 (bvor %8 %0))
+       (= %18 #b1)
+       (= %11 ((_ sign_extend 32) %8))
+       (not (and (bvsge %11 #x0000000000000000) (bvslt %11 #x0000000000000080)))))
 GEP %12 is potentially out of bound.
 Model causing out of bound:
 (define-fun %17 () (_ BitVec 32)
@@ -88,93 +72,57 @@ Model causing out of bound:
   #x40000000)
 (define-fun %11 () (_ BitVec 64)
   #xffffffff80000000)
+    visit add
+
+    visit xor
+    visit br
+  <BB> %18
+    visit phi
+    visit br
+  <BB> %21
+    visit phi
 ---------
 <Func> foo: arg %0
+  <BB> %1
+    visit icmp
+    visit br
+  <BB> %6
+    visit mul
+    visit shl
+    visit ashr
+    visit br
+  <BB> %3
+    visit add
+
+    visit sub
+    visit br
+  <BB> %12
+    visit phi
 ---------
 <Func> foo1: arg %0
+  <BB> %1
+    visit sext
+    visit gep
 Checking with assertions:
 (ast-vector
-  (let ((a!1 (not (and (bvsle #x0000000000000000 %4)
-                       (not (bvsle #x0000000000000040 %4))))))
-    (and (= %4
-            (concat ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    ((_ extract 31 31) %0)
-                    %0))
-         a!1)))
+  (and (= %4 ((_ sign_extend 32) %0))
+       (not (and (bvsge %4 #x0000000000000000) (bvslt %4 #x0000000000000040)))))
 GEP %5 is potentially out of bound.
 Model causing out of bound:
 (define-fun %4 () (_ BitVec 64)
   #xffffffff80000000)
 (define-fun %0 () (_ BitVec 32)
   #x80000000)
+    visit add
+
+    visit sext
+    visit gep
 Checking with assertions:
 (ast-vector
-  (let ((a!1 (concat ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     ((_ extract 31 31) %0)
-                     %0))
-        (a!2 (not (and (bvsle #x0000000000000000 %8)
-                       (not (bvsle #x0000000000000040 %8))))))
-    (and (= %4 a!1) (= %7 (bvadd %6 %3)) (= %8 a!1) a!2)))
+  (and (= %4 ((_ sign_extend 32) %0))
+       (= %7 (bvadd %6 %3))
+       (= %8 ((_ sign_extend 32) %0))
+       (not (and (bvsge %8 #x0000000000000000) (bvslt %8 #x0000000000000040)))))
 GEP %9 is potentially out of bound.
 Model causing out of bound:
 (define-fun %4 () (_ BitVec 64)
@@ -191,5 +139,13 @@ Model causing out of bound:
   #xffffffff80000000)
 ---------
 <Func> bar: arg %0
+  <BB> %1
+    visit shl
+    visit and
+    visit or
+    visit xor
 ---------
 <Func> foobar:
+  <BB> %0
+    visit and
+    visit xor
