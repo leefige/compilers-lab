@@ -479,6 +479,7 @@ public:
           }
           solver.add(!inbounds); 
 //          std::cout << "bound added" << std::endl << solver << std::endl;
+          debug << "----<solver>--------\n" << solver << "\n-------------\n";
           checkAndReport(solver, I);
           solver.pop();
 //          std::cout << "===check popped===" << std::endl;

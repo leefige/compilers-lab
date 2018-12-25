@@ -19,6 +19,17 @@ in slt
     visit and
     visit sext
     visit gep
+----<solver>--------
+(declare-fun and ((_ BitVec 32)) (_ BitVec 32))
+(declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
+(assert (forall ((i (_ BitVec 32))) (= (and i) (bvand i #x000003ff))))
+(assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (and i)))))
+(assert (let ((a!1 (forall ((i (_ BitVec 32)))
+             (and (bvsge (idxprom i) #x0000000000000000)
+                  (bvslt (idxprom i) #x0000000000000400)))))
+  (not a!1)))
+
+-------------
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32))) (= (and i) (bvand i #x000003ff)))
@@ -42,6 +53,28 @@ in slt
   <BB> if.then
     visit sext
     visit gep
+----<solver>--------
+(declare-fun cmp ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun land.lhs.true ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.else ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun cmp1 ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.then ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun return ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
+(assert (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))))
+(assert (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i))))
+(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1))))
+(assert (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvslt i #x00000400) #b1 #b0))))
+(assert (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i))))
+(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1))))
+(assert (forall ((i (_ BitVec 32))) (= (return i) #b1)))
+(assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) i))))
+(assert (let ((a!1 (forall ((i (_ BitVec 32)))
+             (and (bvsge (idxprom i) #x0000000000000000)
+                  (bvslt (idxprom i) #x0000000000000400)))))
+  (not a!1)))
+
+-------------
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0)))
@@ -77,6 +110,32 @@ in slt
     visit phi
     visit sext
     visit gep
+----<solver>--------
+(declare-fun cmp ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun land.lhs.true ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.else ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun cmp1 ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.then ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.end ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun x.0 ((_ BitVec 32)) (_ BitVec 32))
+(declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
+(assert (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))))
+(assert (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i))))
+(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1))))
+(assert (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvslt i #x00000400) #b1 #b0))))
+(assert (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i))))
+(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1))))
+(assert (forall ((i (_ BitVec 32))) (= (if.end i) #b1)))
+(assert (forall ((i (_ BitVec 32))) (= (if.end i) #b1)))
+(assert (forall ((i (_ BitVec 32))) (=> (= (if.then i) #b1) (= (x.0 i) i))))
+(assert (forall ((i (_ BitVec 32))) (=> (= (if.else i) #b1) (= (x.0 i) #x00000000))))
+(assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (x.0 i)))))
+(assert (let ((a!1 (forall ((i (_ BitVec 32)))
+             (and (bvsge (idxprom i) #x0000000000000000)
+                  (bvslt (idxprom i) #x0000000000000400)))))
+  (not a!1)))
+
+-------------
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0)))
@@ -101,6 +160,17 @@ GEP arrayidx is safe.
     visit and
     visit sext
     visit gep
+----<solver>--------
+(declare-fun and ((_ BitVec 32)) (_ BitVec 32))
+(declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
+(assert (forall ((i (_ BitVec 32))) (= (and i) (bvand i #x000007ff))))
+(assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (and i)))))
+(assert (let ((a!1 (forall ((i (_ BitVec 32)))
+             (and (bvsge (idxprom i) #x0000000000000000)
+                  (bvslt (idxprom i) #x0000000000000400)))))
+  (not a!1)))
+
+-------------
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32))) (= (and i) (bvand i #x000007ff)))
@@ -162,6 +232,28 @@ Model causing out of bound:
   <BB> if.then
     visit sext
     visit gep
+----<solver>--------
+(declare-fun cmp ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun land.lhs.true ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.else ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun cmp1 ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.then ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun return ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
+(assert (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))))
+(assert (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i))))
+(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1))))
+(assert (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvsle i #x00000400) #b1 #b0))))
+(assert (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i))))
+(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1))))
+(assert (forall ((i (_ BitVec 32))) (= (return i) #b1)))
+(assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) i))))
+(assert (let ((a!1 (forall ((i (_ BitVec 32)))
+             (and (bvsge (idxprom i) #x0000000000000000)
+                  (bvslt (idxprom i) #x0000000000000400)))))
+  (not a!1)))
+
+-------------
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0)))
@@ -196,6 +288,32 @@ GEP arrayidx is safe.
     visit phi
     visit sext
     visit gep
+----<solver>--------
+(declare-fun cmp ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun land.lhs.true ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.else ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun cmp1 ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.then ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.end ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun x.0 ((_ BitVec 32)) (_ BitVec 32))
+(declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
+(assert (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))))
+(assert (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i))))
+(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1))))
+(assert (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvsle i #x00000400) #b1 #b0))))
+(assert (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i))))
+(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1))))
+(assert (forall ((i (_ BitVec 32))) (= (if.end i) #b1)))
+(assert (forall ((i (_ BitVec 32))) (= (if.end i) #b1)))
+(assert (forall ((i (_ BitVec 32))) (=> (= (if.then i) #b1) (= (x.0 i) i))))
+(assert (forall ((i (_ BitVec 32))) (=> (= (if.else i) #b1) (= (x.0 i) #x00000000))))
+(assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (x.0 i)))))
+(assert (let ((a!1 (forall ((i (_ BitVec 32)))
+             (and (bvsge (idxprom i) #x0000000000000000)
+                  (bvslt (idxprom i) #x0000000000000400)))))
+  (not a!1)))
+
+-------------
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0)))
@@ -225,6 +343,25 @@ in slt
   <BB> if.then
     visit sext
     visit gep
+----<solver>--------
+(declare-fun call ((_ BitVec 32)) (_ BitVec 32))
+(declare-fun cmp ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.then ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun if.else ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun return ((_ BitVec 32)) (_ BitVec 1))
+(declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
+(assert (forall ((i (_ BitVec 32)))
+  (= (cmp i) (ite (bvslt (call i) #x00000400) #b1 #b0))))
+(assert (forall ((i (_ BitVec 32))) (= (if.then i) (cmp i))))
+(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1))))
+(assert (forall ((i (_ BitVec 32))) (= (return i) #b1)))
+(assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (call i)))))
+(assert (let ((a!1 (forall ((i (_ BitVec 32)))
+             (and (bvsge (idxprom i) #x0000000000000000)
+                  (bvslt (idxprom i) #x0000000000000400)))))
+  (not a!1)))
+
+-------------
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32)))
