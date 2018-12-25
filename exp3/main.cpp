@@ -82,13 +82,13 @@ private:
   }
 
   void astAdd(const z3::expr& exp) {
-    debug << "in ast add\n";
+//    debug << "in ast add\n";
     std::string ast_name = getName(*current_fun);
     auto vec = predicate_map[ast_name];
     vec.push_back(exp);
-    debug << "want to insert back to map\n";
+//    debug << "want to insert back to map\n";
     predicate_map[ast_name] = vec;
-    debug << "ast added: " << exp << std::endl;
+//    debug << "ast added: " << exp << std::endl;
   }
 
   z3::expr getAst(Function* func) {
@@ -178,6 +178,10 @@ private:
       arg_svec.push_back(st);
       unsigned size = st.bv_size();
       arg_evec.push_back(ctx.bv_const(getName(*arg).c_str(), size));
+    }
+    if (arg_evec.size() == 0) {
+      arg_evec.push_back(ctx.bv_const("dummy", 32));
+      arg_svec.push_back(ctx.bv_sort(32));
     }
   }
 
@@ -279,11 +283,11 @@ public:
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    debug << "shl gen_ed" << std::endl;
+//    debug << "shl gen_ed" << std::endl;
     z3::expr ex = (r == z3::shl(a, b));
-    debug << "2nd: " << ex << std::endl;
+//    debug << "2nd: " << ex << std::endl;
     z3::expr all = z3::forall(arg_evec, ex);
-    debug << "all: " << all << std::endl;
+//    debug << "all: " << all << std::endl;
     astAdd(all);
   }
 
@@ -319,7 +323,11 @@ public:
 //          ((a == i1_true()) && (b == i1_true())),
 //          i1_true(), i1_false())
 //        );
-    astAdd(z3::forall(arg_evec, r == (a & b)));
+    z3::expr ex = (r == (a & b));
+//    debug << "ex: " << ex << "\n";
+    z3::expr all = z3::forall(arg_evec, ex);
+//    debug << "all:" << all << "\n";
+    astAdd(all);
   }
 
   void visitOr(BinaryOperator &I) {
@@ -382,7 +390,7 @@ public:
         astAdd(z3::forall(arg_evec, r == z3::ite((a < b), i1_true(), i1_false()))/*simp*/);
         break;
       case CmpInst::ICMP_SLE:  ///< signed less or equal
-        astAdd(z3::forall(arg_evec, (r == z3::ite((a <= b), i1_true(), i1_false()))/*simp*/));
+        astAdd(z3::forall(arg_evec, r == z3::ite((a <= b), i1_true(), i1_false()))/*simp*/);
         break;
       default:
         errs() << "Unsupported ICMP_OP: " << cond << "\n";
@@ -400,6 +408,7 @@ public:
       z3::expr cd = gen_i1(cond);
       z3::expr tr = gen_i1(tar_tr);
       z3::expr fls = gen_i1(tar_fls);
+
       astAdd(z3::forall(arg_evec, tr == cd));
       astAdd(z3::forall(arg_evec, fls == z3::ite(
               (cd == i1_true()), i1_false(), i1_true()
@@ -457,7 +466,7 @@ public:
           z3::expr ptr = gen_i64(ptrOp);
           z3::expr lb = ctx.bv_val(0, 64);
           z3::expr ub = ctx.bv_val(size, 64); 
-          z3::expr inbounds = z3::forall(arg_evec, ptr >= lb && ptr < ub);
+          z3::expr inbounds = z3::forall(arg_evec, (ptr >= lb && ptr < ub));
 
           solver.push();
 //          z3::expr check = (getAst(I.getFunction()) && !inbounds)

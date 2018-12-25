@@ -12,3 +12,284 @@ new z3walker
     visit xor
     visit add
     visit shl
+    visit icmp
+in slt
+    visit br
+  <BB> %16
+    visit or
+    visit br
+  <BB> %10
+    visit sext
+    visit gep
+Checking with assertions:
+(ast-vector
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32)))
+    (= (%4 %0 %1) (ite (bvsgt %0 #x00000000) #b1 #b0)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32))) (= (%5 %0 %1) (%4 %0 %1)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32)))
+    (= (%19 %0 %1) (ite (= (%4 %0 %1) #b1) #b0 #b1)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32))) (= (%20 %0 %1) (bvand %1 %0)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32))) (= (%21 %0 %1) #b1))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32))) (= (%6 %0 %1) (bvxor %1 %1)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32)))
+    (= (%7 %0 %1) (bvadd (%6 %0 %1) %0)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32)))
+    (= (%8 %0 %1) (bvshl (%7 %0 %1) #x00000001)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32)))
+    (= (%9 %0 %1) (ite (bvslt (%8 %0 %1) #x00000040) #b1 #b0)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32))) (= (%10 %0 %1) (%9 %0 %1)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32)))
+    (= (%16 %0 %1) (ite (= (%9 %0 %1) #b1) #b0 #b1)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32)))
+    (= (%17 %0 %1) (bvor (%8 %0 %1) %0)))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32))) (= (%18 %0 %1) #b1))
+  (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32)))
+    (= (%11 %0 %1) ((_ sign_extend 32) (%8 %0 %1))))
+  (let ((a!1 (forall ((%0 (_ BitVec 32)) (%1 (_ BitVec 32)))
+               (and (bvsge (%11 %0 %1) #x0000000000000000)
+                    (bvslt (%11 %0 %1) #x0000000000000080)))))
+    (not a!1)))
+GEP %12 is potentially out of bound.
+Model causing out of bound:
+(define-fun %6 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 32)
+  #x00000000)
+(define-fun %7 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 32)
+  (ite (and (= x!0 #x40000000) (= x!1 #x00000000)) #x40000000
+    (bvadd x!0 (%6 x!0 x!1))))
+(define-fun %8 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 32)
+  (ite (and (= x!0 #x40000000) (= x!1 #x00000000)) #x80000000
+    (concat ((_ extract 30 0) (%7 x!0 x!1)) #b0)))
+(define-fun %9 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 1)
+  (ite (and (= x!0 #x40000000) (= x!1 #x00000000)) #b1
+    (ite (bvsle #x00000040 (%8 x!0 x!1)) #b0 #b1)))
+(define-fun %16 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 1)
+  (ite (and (= x!0 #x40000000) (= x!1 #x00000000)) #b0
+    (ite (= (%9 x!0 x!1) #b1) #b0 #b1)))
+(define-fun %10 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 1)
+  (ite (and (= x!0 #x40000000) (= x!1 #x00000000)) #b1
+    (%9 x!0 x!1)))
+(define-fun %21 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 1)
+  #b1)
+(define-fun %4 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 1)
+  (ite (bvsle x!0 #x00000000) #b0 #b1))
+(define-fun %19 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 1)
+  (ite (= (%4 x!0 x!1) #b1) #b0 #b1))
+(define-fun %11 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 64)
+  (ite (and (= x!0 #x40000000) (= x!1 #x00000000)) #xffffffff80000000
+    (concat ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            ((_ extract 31 31) (%8 x!0 x!1))
+            (%8 x!0 x!1))))
+(define-fun %5 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 1)
+  (%4 x!0 x!1))
+(define-fun %20 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 32)
+  (bvnot (bvor (bvnot x!1) (bvnot x!0))))
+(define-fun %18 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 1)
+  #b1)
+(define-fun %17 ((x!0 (_ BitVec 32)) (x!1 (_ BitVec 32))) (_ BitVec 32)
+  (ite (and (= x!0 #x40000000) (= x!1 #x00000000)) #xc0000000
+    (bvor (%8 x!0 x!1) x!0)))
+    visit add
+    visit xor
+    visit br
+  <BB> %18
+    visit phi
+    visit br
+  <BB> %21
+    visit phi
+---------
+<Func> foo: arg %0
+  <BB> %1
+    visit icmp
+    visit br
+  <BB> %6
+    visit mul
+    visit shl
+    visit ashr
+    visit br
+  <BB> %3
+    visit add
+    visit sub
+    visit br
+  <BB> %12
+    visit phi
+---------
+<Func> foo1: arg %0
+  <BB> %1
+    visit sext
+    visit gep
+Checking with assertions:
+(ast-vector
+  (forall ((%0 (_ BitVec 32))) (= (%4 %0) ((_ sign_extend 32) %0)))
+  (let ((a!1 (forall ((%0 (_ BitVec 32)))
+               (and (bvsge (%4 %0) #x0000000000000000)
+                    (bvslt (%4 %0) #x0000000000000040)))))
+    (not a!1)))
+GEP %5 is potentially out of bound.
+Model causing out of bound:
+(define-fun %4 ((x!0 (_ BitVec 32))) (_ BitVec 64)
+  (ite (= x!0 #x80000000) #xffffffff80000000
+    (concat ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            x!0)))
+    visit add
+    visit sext
+    visit gep
+Checking with assertions:
+(ast-vector
+  (forall ((%0 (_ BitVec 32))) (= (%4 %0) ((_ sign_extend 32) %0)))
+  (forall ((%0 (_ BitVec 32))) (= (%7 %0) (bvadd (%6 %0) (%3 %0))))
+  (forall ((%0 (_ BitVec 32))) (= (%8 %0) ((_ sign_extend 32) %0)))
+  (let ((a!1 (forall ((%0 (_ BitVec 32)))
+               (and (bvsge (%8 %0) #x0000000000000000)
+                    (bvslt (%8 %0) #x0000000000000040)))))
+    (not a!1)))
+GEP %9 is potentially out of bound.
+Model causing out of bound:
+(define-fun %4 ((x!0 (_ BitVec 32))) (_ BitVec 64)
+  (ite (= x!0 #x80000000) #xffffffff80000000
+    (concat ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            x!0)))
+(define-fun %6 ((x!0 (_ BitVec 32))) (_ BitVec 32)
+  #x80000000)
+(define-fun %3 ((x!0 (_ BitVec 32))) (_ BitVec 32)
+  #x80000000)
+(define-fun %7 ((x!0 (_ BitVec 32))) (_ BitVec 32)
+  (bvadd (%6 x!0) (%3 x!0)))
+(define-fun %8 ((x!0 (_ BitVec 32))) (_ BitVec 64)
+  (ite (= x!0 #x80000000) #xffffffff80000000
+    (concat ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            x!0)))
+---------
+<Func> bar: arg %0
+  <BB> %1
+    visit shl
+    visit and
+    visit or
+    visit xor
+---------
+<Func> foobar:
+  <BB> %0
+    visit and
+    visit xor
