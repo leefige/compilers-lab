@@ -13,6 +13,8 @@ in slt
     visit br
   <BB> if.end
     visit phi
+tar: (sub i)branch cond: (= (cmp i) #b1)
+tar: ibranch cond: (= (cmp i) #b0)
 ---------
 <Func> foo1: arg i
   <BB> entry
@@ -55,18 +57,11 @@ in slt
     visit gep
 ----<solver>--------
 (declare-fun cmp ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun land.lhs.true ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun if.else ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun cmp1 ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun if.then ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun return ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
 (assert (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))))
-(assert (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i))))
-(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1))))
 (assert (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvslt i #x00000400) #b1 #b0))))
-(assert (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i))))
-(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1))))
 (assert (forall ((i (_ BitVec 32))) (= (return i) #b1)))
 (assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) i))))
 (assert (let ((a!1 (forall ((i (_ BitVec 32)))
@@ -78,21 +73,61 @@ in slt
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0)))
-  (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i)))
-  (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1)))
   (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvslt i #x00000400) #b1 #b0)))
-  (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i)))
-  (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1)))
   (forall ((i (_ BitVec 32))) (= (return i) #b1))
   (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) i)))
   (let ((a!1 (forall ((i (_ BitVec 32)))
                (and (bvsge (idxprom i) #x0000000000000000)
                     (bvslt (idxprom i) #x0000000000000400)))))
     (not a!1)))
-GEP arrayidx is safe.
+GEP arrayidx is potentially out of bound.
+Model causing out of bound:
+(define-fun return ((x!0 (_ BitVec 32))) (_ BitVec 1)
+  #b1)
+(define-fun idxprom ((x!0 (_ BitVec 32))) (_ BitVec 64)
+  (ite (= x!0 #x80000000) #xffffffff80000000
+    (concat ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            x!0)))
+(define-fun cmp ((x!0 (_ BitVec 32))) (_ BitVec 1)
+  (ite (bvsle #x00000000 x!0) #b1 #b0))
+(define-fun cmp1 ((x!0 (_ BitVec 32))) (_ BitVec 1)
+  (ite (bvsle #x00000400 x!0) #b0 #b1))
     visit br
   <BB> return
     visit phi
+tar: (%0 i)branch cond: (= (cmp1 i) #b1)
+tar: #xffffffffbranch cond: (or (= (cmp i) #b0) (= (cmp1 i) #b0))
 ---------
 <Func> foo3: arg i
   <BB> entry
@@ -108,27 +143,23 @@ in slt
     visit br
   <BB> if.end
     visit phi
+tar: ibranch cond: (= (cmp1 i) #b1)
+tar: #x00000000branch cond: (or (= (cmp i) #b0) (= (cmp1 i) #b0))
     visit sext
     visit gep
 ----<solver>--------
 (declare-fun cmp ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun land.lhs.true ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun if.else ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun cmp1 ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun if.then ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun if.end ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun x.0 ((_ BitVec 32)) (_ BitVec 32))
 (declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
 (assert (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))))
-(assert (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i))))
-(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1))))
 (assert (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvslt i #x00000400) #b1 #b0))))
-(assert (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i))))
-(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1))))
 (assert (forall ((i (_ BitVec 32))) (= (if.end i) #b1)))
 (assert (forall ((i (_ BitVec 32))) (= (if.end i) #b1)))
-(assert (forall ((i (_ BitVec 32))) (=> (= (if.then i) #b1) (= (x.0 i) i))))
-(assert (forall ((i (_ BitVec 32))) (=> (= (if.else i) #b1) (= (x.0 i) #x00000000))))
+(assert (forall ((i (_ BitVec 32))) (=> (= (cmp1 i) #b1) (= (x.0 i) i))))
+(assert (forall ((i (_ BitVec 32)))
+  (=> (or (= (cmp i) #b0) (= (cmp1 i) #b0)) (= (x.0 i) #x00000000))))
 (assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (x.0 i)))))
 (assert (let ((a!1 (forall ((i (_ BitVec 32)))
              (and (bvsge (idxprom i) #x0000000000000000)
@@ -139,15 +170,12 @@ in slt
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0)))
-  (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i)))
-  (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1)))
   (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvslt i #x00000400) #b1 #b0)))
-  (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i)))
-  (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1)))
   (forall ((i (_ BitVec 32))) (= (if.end i) #b1))
   (forall ((i (_ BitVec 32))) (= (if.end i) #b1))
-  (forall ((i (_ BitVec 32))) (=> (= (if.then i) #b1) (= (x.0 i) i)))
-  (forall ((i (_ BitVec 32))) (=> (= (if.else i) #b1) (= (x.0 i) #x00000000)))
+  (forall ((i (_ BitVec 32))) (=> (= (cmp1 i) #b1) (= (x.0 i) i)))
+  (forall ((i (_ BitVec 32)))
+    (=> (or (= (cmp i) #b0) (= (cmp1 i) #b0)) (= (x.0 i) #x00000000)))
   (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (x.0 i))))
   (let ((a!1 (forall ((i (_ BitVec 32)))
                (and (bvsge (idxprom i) #x0000000000000000)
@@ -234,18 +262,11 @@ Model causing out of bound:
     visit gep
 ----<solver>--------
 (declare-fun cmp ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun land.lhs.true ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun if.else ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun cmp1 ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun if.then ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun return ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
 (assert (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))))
-(assert (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i))))
-(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1))))
 (assert (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvsle i #x00000400) #b1 #b0))))
-(assert (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i))))
-(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1))))
 (assert (forall ((i (_ BitVec 32))) (= (return i) #b1)))
 (assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) i))))
 (assert (let ((a!1 (forall ((i (_ BitVec 32)))
@@ -257,21 +278,61 @@ Model causing out of bound:
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0)))
-  (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i)))
-  (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1)))
   (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvsle i #x00000400) #b1 #b0)))
-  (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i)))
-  (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1)))
   (forall ((i (_ BitVec 32))) (= (return i) #b1))
   (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) i)))
   (let ((a!1 (forall ((i (_ BitVec 32)))
                (and (bvsge (idxprom i) #x0000000000000000)
                     (bvslt (idxprom i) #x0000000000000400)))))
     (not a!1)))
-GEP arrayidx is safe.
+GEP arrayidx is potentially out of bound.
+Model causing out of bound:
+(define-fun return ((x!0 (_ BitVec 32))) (_ BitVec 1)
+  #b1)
+(define-fun idxprom ((x!0 (_ BitVec 32))) (_ BitVec 64)
+  (ite (= x!0 #x80000000) #xffffffff80000000
+    (concat ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            x!0)))
+(define-fun cmp ((x!0 (_ BitVec 32))) (_ BitVec 1)
+  (ite (bvsle #x00000000 x!0) #b1 #b0))
+(define-fun cmp1 ((x!0 (_ BitVec 32))) (_ BitVec 1)
+  (ite (bvsle x!0 #x00000400) #b1 #b0))
     visit br
   <BB> return
     visit phi
+tar: (%0 i)branch cond: (= (cmp1 i) #b1)
+tar: #xffffffffbranch cond: (or (= (cmp i) #b0) (= (cmp1 i) #b0))
 ---------
 <Func> bar3: arg i
   <BB> entry
@@ -286,27 +347,23 @@ GEP arrayidx is safe.
     visit br
   <BB> if.end
     visit phi
+tar: ibranch cond: (= (cmp1 i) #b1)
+tar: #x00000000branch cond: (or (= (cmp i) #b0) (= (cmp1 i) #b0))
     visit sext
     visit gep
 ----<solver>--------
 (declare-fun cmp ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun land.lhs.true ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun if.else ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun cmp1 ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun if.then ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun if.end ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun x.0 ((_ BitVec 32)) (_ BitVec 32))
 (declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
 (assert (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))))
-(assert (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i))))
-(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1))))
 (assert (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvsle i #x00000400) #b1 #b0))))
-(assert (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i))))
-(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1))))
 (assert (forall ((i (_ BitVec 32))) (= (if.end i) #b1)))
 (assert (forall ((i (_ BitVec 32))) (= (if.end i) #b1)))
-(assert (forall ((i (_ BitVec 32))) (=> (= (if.then i) #b1) (= (x.0 i) i))))
-(assert (forall ((i (_ BitVec 32))) (=> (= (if.else i) #b1) (= (x.0 i) #x00000000))))
+(assert (forall ((i (_ BitVec 32))) (=> (= (cmp1 i) #b1) (= (x.0 i) i))))
+(assert (forall ((i (_ BitVec 32)))
+  (=> (or (= (cmp i) #b0) (= (cmp1 i) #b0)) (= (x.0 i) #x00000000))))
 (assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (x.0 i)))))
 (assert (let ((a!1 (forall ((i (_ BitVec 32)))
              (and (bvsge (idxprom i) #x0000000000000000)
@@ -317,15 +374,12 @@ GEP arrayidx is safe.
 Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32))) (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0)))
-  (forall ((i (_ BitVec 32))) (= (land.lhs.true i) (cmp i)))
-  (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1)))
   (forall ((i (_ BitVec 32))) (= (cmp1 i) (ite (bvsle i #x00000400) #b1 #b0)))
-  (forall ((i (_ BitVec 32))) (= (if.then i) (cmp1 i)))
-  (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp1 i) #b1) #b0 #b1)))
   (forall ((i (_ BitVec 32))) (= (if.end i) #b1))
   (forall ((i (_ BitVec 32))) (= (if.end i) #b1))
-  (forall ((i (_ BitVec 32))) (=> (= (if.then i) #b1) (= (x.0 i) i)))
-  (forall ((i (_ BitVec 32))) (=> (= (if.else i) #b1) (= (x.0 i) #x00000000)))
+  (forall ((i (_ BitVec 32))) (=> (= (cmp1 i) #b1) (= (x.0 i) i)))
+  (forall ((i (_ BitVec 32)))
+    (=> (or (= (cmp i) #b0) (= (cmp1 i) #b0)) (= (x.0 i) #x00000000)))
   (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (x.0 i))))
   (let ((a!1 (forall ((i (_ BitVec 32)))
                (and (bvsge (idxprom i) #x0000000000000000)
@@ -346,14 +400,10 @@ in slt
 ----<solver>--------
 (declare-fun call ((_ BitVec 32)) (_ BitVec 32))
 (declare-fun cmp ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun if.then ((_ BitVec 32)) (_ BitVec 1))
-(declare-fun if.else ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun return ((_ BitVec 32)) (_ BitVec 1))
 (declare-fun idxprom ((_ BitVec 32)) (_ BitVec 64))
 (assert (forall ((i (_ BitVec 32)))
   (= (cmp i) (ite (bvslt (call i) #x00000400) #b1 #b0))))
-(assert (forall ((i (_ BitVec 32))) (= (if.then i) (cmp i))))
-(assert (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1))))
 (assert (forall ((i (_ BitVec 32))) (= (return i) #b1)))
 (assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (call i)))))
 (assert (let ((a!1 (forall ((i (_ BitVec 32)))
@@ -366,8 +416,6 @@ Checking with assertions:
 (ast-vector
   (forall ((i (_ BitVec 32)))
     (= (cmp i) (ite (bvslt (call i) #x00000400) #b1 #b0)))
-  (forall ((i (_ BitVec 32))) (= (if.then i) (cmp i)))
-  (forall ((i (_ BitVec 32))) (= (if.else i) (ite (= (cmp i) #b1) #b0 #b1)))
   (forall ((i (_ BitVec 32))) (= (return i) #b1))
   (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (call i))))
   (let ((a!1 (forall ((i (_ BitVec 32)))
@@ -376,16 +424,8 @@ Checking with assertions:
     (not a!1)))
 GEP arrayidx is potentially out of bound.
 Model causing out of bound:
-(define-fun return ((x!0 (_ BitVec 32))) (_ BitVec 1)
-  #b1)
 (define-fun call ((x!0 (_ BitVec 32))) (_ BitVec 32)
   #x80000000)
-(define-fun cmp ((x!0 (_ BitVec 32))) (_ BitVec 1)
-  (ite (= x!0 #x00000000) #b1
-    (ite (bvsle #x00000400 (call x!0)) #b0 #b1)))
-(define-fun if.else ((x!0 (_ BitVec 32))) (_ BitVec 1)
-  (ite (= x!0 #x00000000) #b0
-    (ite (= (cmp x!0) #b1) #b0 #b1)))
 (define-fun idxprom ((x!0 (_ BitVec 32))) (_ BitVec 64)
   (ite (= x!0 #x00000000) #xffffffff80000000
     (concat ((_ extract 31 31) (call x!0))
@@ -421,9 +461,13 @@ Model causing out of bound:
             ((_ extract 31 31) (call x!0))
             ((_ extract 31 31) (call x!0))
             (call x!0))))
-(define-fun if.then ((x!0 (_ BitVec 32))) (_ BitVec 1)
+(define-fun cmp ((x!0 (_ BitVec 32))) (_ BitVec 1)
   (ite (= x!0 #x00000000) #b1
-    (cmp x!0)))
+    (ite (bvsle #x00000400 (call x!0)) #b0 #b1)))
+(define-fun return ((x!0 (_ BitVec 32))) (_ BitVec 1)
+  #b1)
     visit br
   <BB> return
     visit phi
+tar: (%0 i)branch cond: (= (cmp i) #b1)
+tar: #xffffffffbranch cond: (= (cmp i) #b0)

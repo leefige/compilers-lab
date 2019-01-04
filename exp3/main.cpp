@@ -71,6 +71,7 @@ private:
   z3::expr_vector arg_evec;
   z3::sort_vector arg_svec;
   std::set<std::string> arg_names; 
+  std::map<std::string, std::vector<z3::expr> > branch_targ;
 
   void astInit(Function* func) {
     current_fun = func;
@@ -78,6 +79,15 @@ private:
     predicate_map.insert(
         std::pair<std::string, std::vector<z3::expr> >(ast_name, std::vector<z3::expr>())
     );
+    branch_targ.clear();
+    // get args
+    while (!arg_evec.empty()) {
+      arg_evec.pop_back();
+    }
+    while (!arg_svec.empty()) {
+      arg_svec.pop_back();
+    }
+    arg_names.clear();
     this->getArgInfo(func);
   }
 
@@ -100,6 +110,33 @@ private:
       ast = ast && *eit;
     }
     //ast = ast.simplify();
+    return ast;
+  }
+
+  void addBranch (Value* tar, const z3::expr& cond){
+    std::string name = getName(*tar);
+    if (!branch_targ.count(name)) {
+      std::vector<z3::expr> vec;
+      vec.push_back(cond);
+      branch_targ.insert(
+          std::pair<std::string, std::vector<z3::expr> >(name, vec)
+          );
+    } else {
+      auto vec = branch_targ[name];
+      vec.push_back(cond);
+      branch_targ[name] = vec;
+    }
+  }
+
+  z3::expr getBranchCond (Value* tar) {
+    std::string name = getName(*tar);
+    assert(branch_targ.count(name));
+    auto vec = branch_targ[name];
+    assert(!vec.empty());
+    auto ast = *vec.begin();
+    for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
+      ast = ast || *eit;
+    }
     return ast;
   }
 
@@ -163,14 +200,6 @@ private:
   }
 
   void getArgInfo(Function* F) {
-    while (!arg_evec.empty()) {
-      arg_evec.pop_back();
-    }
-    while (!arg_svec.empty()) {
-      arg_svec.pop_back();
-    }
-    arg_names.clear();
-
     for (auto ait = F->arg_begin(); ait != F->arg_end(); ait++) {
       Argument* arg = &(*ait);
       arg_names.insert(getName(*ait));
@@ -408,11 +437,11 @@ public:
       z3::expr cd = gen_i1(cond);
       z3::expr tr = gen_i1(tar_tr);
       z3::expr fls = gen_i1(tar_fls);
-
-      astAdd(z3::forall(arg_evec, tr == cd));
-      astAdd(z3::forall(arg_evec, fls == z3::ite(
-              (cd == i1_true()), i1_false(), i1_true()
-            )));
+      
+      addBranch(tar_tr, cd == i1_true());
+      addBranch(tar_fls, cd == i1_false());
+      //astAdd(z3::forall(arg_evec, z3::implies(cd == i1_true(), tr == i1_true()) && z3::implies(cd == i1_false(), fls == i1_true())));
+      //astAdd(z3::forall(arg_evec, fls == z3::ite((cd == i1_true()), i1_false(), i1_true())));
     } else {
       auto tar = I.getOperand(0);     // true
       z3::expr tr = gen_i1(tar);
@@ -427,11 +456,12 @@ public:
       auto val = I.getIncomingValue(i);
       auto bb = I.getIncomingBlock(i);
       z3::expr v = gen_i32(val);
-      z3::expr b = gen_i1(bb);
+      z3::expr b = getBranchCond(bb);
+      debug << "tar: " << v << "branch cond: " << b << "\n";
       z3::expr dst = gen_i32(&I);
       astAdd(z3::forall(arg_evec, 
             z3::implies(
-              (b == i1_true()), (dst == v)
+              b, (dst == v)
             )));
     }
   }
@@ -476,6 +506,11 @@ public:
 //          ;
           for (z3::expr e: predicate_map[getName(*current_fun)]) {
             solver.add(e);
+          }
+          BasicBlock* bb = I.getParent();
+          std::string bb_name = getName(*bb);
+          if (branch_targ.count(bb_name)) {
+            solver.add()
           }
           solver.add(!inbounds); 
 //          std::cout << "bound added" << std::endl << solver << std::endl;
