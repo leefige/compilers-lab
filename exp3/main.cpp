@@ -140,7 +140,7 @@ private:
     putBranchCond(tar, cond);
   }
 
-  void addBranch (Value* tar, const z3::expr& cc){
+  void addBranch (Value* tar){
     // inherit cond from cur bb
     z3::expr cond = bb_cond.at(getName(*cur_bb));
     cond = cond && cc;
@@ -307,9 +307,9 @@ public:
     if (!bb_cond.count(name)) {
       putBranchCond(cur_bb, gen_bool(true));
     } 
-    z3::expr bb_cond = bb_cond.at(name);
+    z3::expr cond = bb_cond.at(name);
     z3::expr bb_val = gen_bool(cur_bb);
-    astAdd(bb_val == bb_cond);
+    astAdd(bb_val == cond);
 
     debug << "  <BB> " << getName(B) << std::endl;
     for (auto iit = B.begin(); iit != B.end(); iit++) {
