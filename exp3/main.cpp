@@ -127,6 +127,7 @@ private:
   // NOTE: should also add cond of current bb
   void addBranch (Value* tar, const z3::expr& cc){
     // inherit cond from cur bb
+    debug << "in addbranch, tar-cond: " << getName(*tar) << cc << "\n";
     z3::expr cond = bb_cond.at(getName(*cur_bb));
     cond = cond && cc;
 
@@ -142,8 +143,9 @@ private:
 
   void addBranch (Value* tar){
     // inherit cond from cur bb
+    debug << "in addbranch(tar), tar: " << getName(*tar) << "\n";
     z3::expr cond = bb_cond.at(getName(*cur_bb));
-    cond = cond && cc;
+    debug << "before put cond, cond: " << cond << "\n";
     putBranchCond(tar, cond);
   }
 
@@ -154,6 +156,7 @@ private:
   }
 
   z3::expr putBranchCond (Value* tar, const z3::expr& c) {
+    debug << "in put cond, tar-cond: " << getName(*tar) << "-" << c << "\n";
     std::string name = getName(*tar);
     bb_cond.insert(std::pair<std::string, z3::expr>(name, c));
   }
@@ -488,7 +491,7 @@ public:
     } 
     else {
       auto tar = I.getOperand(0);
-      z3::expr tr = gen_i1(tar);
+      debug << "before add branch\n";
       addBranch(tar);
     }
   }
