@@ -67,11 +67,12 @@ private:
   z3::solver solver;
 
   Function* current_fun;
+  BasicBlock* cur_bb;
   // args
   z3::expr_vector arg_evec;
   z3::sort_vector arg_svec;
   std::set<std::string> arg_names; 
-  std::map<std::string, std::vector<z3::expr> > branch_targ;
+  std::map<std::string, z3::expr> branch_targ;
 
   void astInit(Function* func) {
     current_fun = func;
@@ -95,7 +96,9 @@ private:
 //    debug << "in ast add\n";
     std::string ast_name = getName(*current_fun);
     auto vec = predicate_map[ast_name];
-    vec.push_back(exp);
+    z3::expr cond = branch_targ.at(getName(*cur_bb));
+    cond = cond && exp;
+    vec.push_back(cond);
 //    debug << "want to insert back to map\n";
     predicate_map[ast_name] = vec;
 //    debug << "ast added: " << exp << std::endl;
@@ -113,31 +116,24 @@ private:
     return ast;
   }
 
-  void addBranch (Value* tar, const z3::expr& cond){
+  void addBranch (Value* tar, const z3::expr& c){
     std::string name = getName(*tar);
-    if (!branch_targ.count(name)) {
-      std::vector<z3::expr> vec;
-      vec.push_back(cond);
-      branch_targ.insert(
-          std::pair<std::string, std::vector<z3::expr> >(name, vec)
-          );
-    } else {
-      auto vec = branch_targ[name];
-      vec.push_back(cond);
-      branch_targ[name] = vec;
+    z3::expr cond = ctx.bool_val(true);
+    if (branch_targ.count(getName(*cur_bb))) {
+      cond = branch_targ.at(getName(*cur_bb));
     }
+    cond = cond && c;
+    if (branch_targ.count(name)) {
+      z3::expr cur = branch_targ.at(name);
+      cur = cur || cond;
+    } 
+    branch_targ.insert(std::pair<std::string, z3::expr>(name, cond));
   }
 
   z3::expr getBranchCond (Value* tar) {
     std::string name = getName(*tar);
     assert(branch_targ.count(name));
-    auto vec = branch_targ[name];
-    assert(!vec.empty());
-    auto ast = *vec.begin();
-    for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
-      ast = ast || *eit;
-    }
-    return ast;
+    return branch_targ.at(name);
   }
 
   z3::func_decl gen_func(Value* var, unsigned n) {
@@ -268,6 +264,15 @@ public:
   }
 
   void visitBasicBlock(BasicBlock &B) {
+    cur_bb = &B;
+    std::string name = getName(B);
+    // get self cond 
+    if (!branch_targ.count(name)) {
+      addBranch(cur_bb, ctx.bool_val(true));
+    }
+    z3::expr bb = branch_targ.at(name);
+    z3::func_decl bfunc = z3::function(name, arg_svec, ctx.bool_sort());
+    astAdd(z3::forall(arg_evec, bfunc(arg_evec) == bb));
     debug << "  <BB> " << getName(B) << std::endl;
     for (auto iit = B.begin(); iit != B.end(); iit++) {
       this->visit(*iit);
@@ -445,7 +450,7 @@ public:
     } else {
       auto tar = I.getOperand(0);     // true
       z3::expr tr = gen_i1(tar);
-      astAdd(z3::forall(arg_evec, tr == i1_true()));
+      addBranch(tar, ctx.bool_val(true));
     }
   }
 
@@ -509,9 +514,6 @@ public:
           }
           BasicBlock* bb = I.getParent();
           std::string bb_name = getName(*bb);
-          if (branch_targ.count(bb_name)) {
-            solver.add()
-          }
           solver.add(!inbounds); 
 //          std::cout << "bound added" << std::endl << solver << std::endl;
           debug << "----<solver>--------\n" << solver << "\n-------------\n";
