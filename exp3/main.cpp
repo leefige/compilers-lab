@@ -68,19 +68,21 @@ private:
 
   Function* current_fun;
   BasicBlock* cur_bb;
+  std::map<std::string, z3::expr> bb_cond;
+
   // args
   z3::expr_vector arg_evec;
   z3::sort_vector arg_svec;
   std::set<std::string> arg_names; 
-  std::map<std::string, z3::expr> branch_targ;
 
+  /*================== AST =======================*/
   void astInit(Function* func) {
     current_fun = func;
     std::string ast_name = getName(*current_fun);
     predicate_map.insert(
         std::pair<std::string, std::vector<z3::expr> >(ast_name, std::vector<z3::expr>())
     );
-    branch_targ.clear();
+    bb_cond.clear();
     // get args
     while (!arg_evec.empty()) {
       arg_evec.pop_back();
@@ -96,15 +98,17 @@ private:
 //    debug << "in ast add\n";
     std::string ast_name = getName(*current_fun);
     auto vec = predicate_map[ast_name];
-    z3::expr cond = branch_targ.at(getName(*cur_bb));
-    cond = cond && exp;
+
+    // we are sure that 
+    // every bb has its own cond (including 'true')
+    z3::expr cond = bb_cond.at(getName(*cur_bb));
+    // every ast is a func
+    cond = z3::forall(arg_evec, (cond && exp));
     vec.push_back(cond);
-//    debug << "want to insert back to map\n";
     predicate_map[ast_name] = vec;
-//    debug << "ast added: " << exp << std::endl;
   }
 
-  z3::expr getAst(Function* func) {
+  z3::expr astGet(Function* func) {
     std::string name = getName(*func);
     auto vec = predicate_map[name];
     assert(!vec.empty());
@@ -116,39 +120,71 @@ private:
     return ast;
   }
 
-  void addBranch (Value* tar, const z3::expr& c){
+  /*================== BRANCH =======================*/
+  // add branch cond in BranchInst, temporarily
+  // NOTE: each time this is called, 
+  // this bb has never been visited
+  // NOTE: should also add cond of current bb
+  void addBranch (Value* tar, const z3::expr& cc){
+    // inherit cond from cur bb
+    z3::expr cond = bb_cond.at(getName(*cur_bb));
+    cond = cond && cc;
+
+    // check additional cond
     std::string name = getName(*tar);
-    z3::expr cond = ctx.bool_val(true);
-    if (branch_targ.count(getName(*cur_bb))) {
-      cond = branch_targ.at(getName(*cur_bb));
-    }
-    cond = cond && c;
-    if (branch_targ.count(name)) {
-      z3::expr cur = branch_targ.at(name);
-      cur = cur || cond;
+    if (bb_cond.count(name)) {
+      z3::expr cur = bb_cond.at(name);
+      cond = cur || cond;
     } 
-    branch_targ.insert(std::pair<std::string, z3::expr>(name, cond));
+
+    putBranchCond(tar, cond);
+  }
+
+  void addBranch (Value* tar, const z3::expr& cc){
+    // inherit cond from cur bb
+    z3::expr cond = bb_cond.at(getName(*cur_bb));
+    cond = cond && cc;
+    putBranchCond(tar, cond);
   }
 
   z3::expr getBranchCond (Value* tar) {
     std::string name = getName(*tar);
-    assert(branch_targ.count(name));
-    return branch_targ.at(name);
+    assert(bb_cond.count(name));
+    return bb_cond.at(name);
+  }
+
+  z3::expr putBranchCond (Value* tar, const z3::expr& c) {
+    std::string name = getName(*tar);
+    bb_cond.insert(std::pair<std::string, z3::expr>(name, c));
+  }
+
+  /*================ Z3 VAR ======================*/
+  z3::func_decl gen_func(Value* var) {
+    return z3::function(getName(*var), arg_svec, ctx.bool_sort());
   }
 
   z3::func_decl gen_func(Value* var, unsigned n) {
     return z3::function(getName(*var), arg_svec, ctx.bv_sort(n));
   }
 
+  z3::expr gen_bool(Value* var) {
+    z3::func_decl b = gen_func(var);
+    return b(arg_evec);
+  }
+
+  z3::expr gen_bool(bool bl) {
+    return ctx.bool_val(bl);
+  }
+
   z3::expr gen_i(Value* var, unsigned n) {
+    // var indeed is a ConstantInt, we can use CI here
     if (ConstantInt* CI = dyn_cast<ConstantInt>(var)) {
-      // var indeed is a ConstantInt, we can use CI here
       return ctx.bv_val(CI->getSExtValue(), n);
     }
+    // var was not actually a ConstantInt
     else {
-      // var was not actually a ConstantInt
       std::string reg = getName(*var);
-      // if this is arg
+      // then, if this is arg
       if (arg_names.count(reg)) {
         return ctx.bv_const(reg.c_str(), n);
       } 
@@ -266,13 +302,15 @@ public:
   void visitBasicBlock(BasicBlock &B) {
     cur_bb = &B;
     std::string name = getName(B);
-    // get self cond 
-    if (!branch_targ.count(name)) {
-      addBranch(cur_bb, ctx.bool_val(true));
-    }
-    z3::expr bb = branch_targ.at(name);
-    z3::func_decl bfunc = z3::function(name, arg_svec, ctx.bool_sort());
-    astAdd(z3::forall(arg_evec, bfunc(arg_evec) == bb));
+
+    // check and merge current bb cond
+    if (!bb_cond.count(name)) {
+      putBranchCond(cur_bb, gen_bool(true));
+    } 
+    z3::expr bb_cond = bb_cond.at(name);
+    z3::expr bb_val = gen_bool(cur_bb);
+    astAdd(bb_val == bb_cond);
+
     debug << "  <BB> " << getName(B) << std::endl;
     for (auto iit = B.begin(); iit != B.end(); iit++) {
       this->visit(*iit);
@@ -287,7 +325,7 @@ public:
     z3::expr b = gen_i32(op2);
     // the Instruction itself is the ret val
     z3::expr r = gen_i32(&I);
-    astAdd(z3::forall(arg_evec, r == a + b));
+    astAdd(r == a + b);
   }
 
   void visitSub(BinaryOperator &I) {
@@ -297,7 +335,7 @@ public:
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    astAdd(z3::forall(arg_evec, r == a - b));
+    astAdd(r == a - b);
   }
   
   void visitMul(BinaryOperator &I) {
@@ -307,7 +345,7 @@ public:
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    astAdd(z3::forall(arg_evec, r == a * b));
+    astAdd(r == a * b);
   }
 
   void visitShl(BinaryOperator &I) {
@@ -320,7 +358,7 @@ public:
 //    debug << "shl gen_ed" << std::endl;
     z3::expr ex = (r == z3::shl(a, b));
 //    debug << "2nd: " << ex << std::endl;
-    z3::expr all = z3::forall(arg_evec, ex);
+    z3::expr all = ex;
 //    debug << "all: " << all << std::endl;
     astAdd(all);
   }
@@ -332,7 +370,7 @@ public:
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    astAdd(z3::forall(arg_evec, r == z3::lshr(a, b)));
+    astAdd(r == z3::lshr(a, b));
   }
 
   void visitAShr(BinaryOperator &I) {
@@ -342,7 +380,7 @@ public:
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    astAdd(z3::forall(arg_evec, r == z3::ashr(a, b)));
+    astAdd(r == z3::ashr(a, b));
   }
 
   void visitAnd(BinaryOperator &I) {
@@ -359,7 +397,7 @@ public:
 //        );
     z3::expr ex = (r == (a & b));
 //    debug << "ex: " << ex << "\n";
-    z3::expr all = z3::forall(arg_evec, ex);
+    z3::expr all = ex;
 //    debug << "all:" << all << "\n";
     astAdd(all);
   }
@@ -371,7 +409,7 @@ public:
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    astAdd(z3::forall(arg_evec, r == (a | b)));
+    astAdd(r == (a | b));
   }
 
   void visitXor(BinaryOperator &I) {
@@ -381,7 +419,7 @@ public:
     z3::expr a = gen_i32(op1);
     z3::expr b = gen_i32(op2);
     z3::expr r = gen_i32(&I);
-    astAdd(z3::forall(arg_evec, r == (a ^ b)));
+    astAdd(r == (a ^ b));
   }
 
   void visitICmp(ICmpInst &I) { 
@@ -396,35 +434,35 @@ public:
     auto cond = I.getPredicate();
     switch (cond) {
       case CmpInst::ICMP_EQ :  ///< equal 
-        astAdd(z3::forall(arg_evec, r == z3::ite((a == b), i1_true(), i1_false()))/*simp*/);
+        astAdd(r == z3::ite((a == b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_NE :  ///< not equal
-        astAdd(z3::forall(arg_evec, r == z3::ite((a != b), i1_true(), i1_false()))/*simp*/);
+        astAdd(r == z3::ite((a != b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_UGT:  ///< unsigned greater than
-        astAdd(z3::forall(arg_evec, r == z3::ite(z3::ugt(a, b), i1_true(), i1_false()))/*simp*/);
+        astAdd(r == z3::ite(z3::ugt(a, b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_UGE:  ///< unsigned greater or equal
-        astAdd(z3::forall(arg_evec, r == z3::ite(z3::uge(a, b), i1_true(), i1_false()))/*simp*/);
+        astAdd(r == z3::ite(z3::uge(a, b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_ULT:  ///< unsigned less than
-        astAdd(z3::forall(arg_evec, r == z3::ite(z3::ult(a, b), i1_true(), i1_false()))/*simp*/);
+        astAdd(r == z3::ite(z3::ult(a, b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_ULE:  ///< unsigned less or equal
-        astAdd(z3::forall(arg_evec, r == z3::ite(z3::ule(a, b), i1_true(), i1_false()))/*simp*/);
+        astAdd(r == z3::ite(z3::ule(a, b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_SGT:  ///< signed greater than
-        astAdd(z3::forall(arg_evec, r == z3::ite((a > b), i1_true(), i1_false()))/*simp*/);
+        astAdd(r == z3::ite((a > b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_SGE:  ///< signed greater or equal
-        astAdd(z3::forall(arg_evec, r == z3::ite((a >= b), i1_true(), i1_false()))/*simp*/);
+        astAdd(r == z3::ite((a >= b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_SLT:  ///< signed less than
         debug << "in slt" << std::endl;
-        astAdd(z3::forall(arg_evec, r == z3::ite((a < b), i1_true(), i1_false()))/*simp*/);
+        astAdd(r == z3::ite((a < b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_SLE:  ///< signed less or equal
-        astAdd(z3::forall(arg_evec, r == z3::ite((a <= b), i1_true(), i1_false()))/*simp*/);
+        astAdd(r == z3::ite((a <= b), i1_true(), i1_false())/*simp*/);
         break;
       default:
         errs() << "Unsupported ICMP_OP: " << cond << "\n";
@@ -445,12 +483,13 @@ public:
       
       addBranch(tar_tr, cd == i1_true());
       addBranch(tar_fls, cd == i1_false());
-      //astAdd(z3::forall(arg_evec, z3::implies(cd == i1_true(), tr == i1_true()) && z3::implies(cd == i1_false(), fls == i1_true())));
-      //astAdd(z3::forall(arg_evec, fls == z3::ite((cd == i1_true()), i1_false(), i1_true())));
-    } else {
-      auto tar = I.getOperand(0);     // true
+      //astAdd(z3::implies(cd == i1_true(), tr == i1_true()) && z3::implies(cd == i1_false(), fls == i1_true())));
+      //astAdd(fls == z3::ite((cd == i1_true()), i1_false(), i1_true())));
+    } 
+    else {
+      auto tar = I.getOperand(0);
       z3::expr tr = gen_i1(tar);
-      addBranch(tar, ctx.bool_val(true));
+      addBranch(tar);
     }
   }
 
@@ -461,13 +500,10 @@ public:
       auto val = I.getIncomingValue(i);
       auto bb = I.getIncomingBlock(i);
       z3::expr v = gen_i32(val);
-      z3::expr b = getBranchCond(bb);
+      z3::expr b = gen_bool(bb);
       debug << "tar: " << v << "branch cond: " << b << "\n";
       z3::expr dst = gen_i32(&I);
-      astAdd(z3::forall(arg_evec, 
-            z3::implies(
-              b, (dst == v)
-            )));
+      astAdd(z3::implies(b, (dst == v)));
     }
   }
 
@@ -476,7 +512,7 @@ public:
     auto srcv = I.getOperand(0);
     z3::expr src = gen_i32(srcv);
     z3::expr dst = gen_i64(&I);
-    astAdd(z3::forall(arg_evec, dst == z3::sext(src, 32)));
+    astAdd(dst == z3::sext(src, 32));
   }
   
   void visitZExtInst(ZExtInst & I) {
@@ -484,7 +520,7 @@ public:
     auto srcv = I.getOperand(0);
     z3::expr src = gen_i32(srcv);
     z3::expr dst = gen_i64(&I);
-    astAdd(z3::forall(arg_evec, dst == z3::zext(src, 32)));
+    astAdd(dst == z3::zext(src, 32));
   }
 
   // Call checkAndReport here.
@@ -501,10 +537,10 @@ public:
           z3::expr ptr = gen_i64(ptrOp);
           z3::expr lb = ctx.bv_val(0, 64);
           z3::expr ub = ctx.bv_val(size, 64); 
-          z3::expr inbounds = z3::forall(arg_evec, (ptr >= lb && ptr < ub));
+          z3::expr inbounds = (ptr >= lb && ptr < ub);
 
           solver.push();
-//          z3::expr check = (getAst(I.getFunction()) && !inbounds)
+//          z3::expr check = (astGet(I.getFunction()) && !inbounds)
 //#ifdef NDEBUG
 //            .simplify()
 //#endif
