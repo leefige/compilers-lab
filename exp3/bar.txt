@@ -13,3 +13,11 @@ in put cond, tar-cond: return-(and true (= (cmp i) #b0))
   <BB> if.then
     visit gep
     visit br
+before add branch
+in addbranch(tar), tar: return
+before put cond, cond: (and true (= (cmp i) #b1))
+in put cond, tar-cond: return-(and true (= (cmp i) #b1))
+  <BB> return
+    visit phi
+tar: (ai i)branch cond: (if.then i)
+tar: #xffffffffbranch cond: (entry i)

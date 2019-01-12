@@ -104,7 +104,7 @@ private:
     z3::expr cond = bb_cond.at(getName(*cur_bb));
     // every ast is a func
     cond = z3::forall(arg_evec, (cond && exp));
-    vec.push_back(cond);
+    vec.push_back(cond.simplify());
     predicate_map[ast_name] = vec;
   }
 
@@ -127,7 +127,6 @@ private:
   // NOTE: should also add cond of current bb
   void addBranch (Value* tar, const z3::expr& cc){
     // inherit cond from cur bb
-    debug << "in addbranch, tar-cond: " << getName(*tar) << cc << "\n";
     z3::expr cond = bb_cond.at(getName(*cur_bb));
     cond = cond && cc;
 
@@ -138,14 +137,12 @@ private:
       cond = cur || cond;
     } 
 
-    putBranchCond(tar, cond);
+    putBranchCond(tar, cond.simplify());
   }
 
   void addBranch (Value* tar){
     // inherit cond from cur bb
-    debug << "in addbranch(tar), tar: " << getName(*tar) << "\n";
     z3::expr cond = bb_cond.at(getName(*cur_bb));
-    debug << "before put cond, cond: " << cond << "\n";
     putBranchCond(tar, cond);
   }
 
@@ -155,8 +152,7 @@ private:
     return bb_cond.at(name);
   }
 
-  z3::expr putBranchCond (Value* tar, const z3::expr& c) {
-    debug << "in put cond, tar-cond: " << getName(*tar) << "-" << c << "\n";
+  void putBranchCond (Value* tar, const z3::expr& c) {
     std::string name = getName(*tar);
     bb_cond.insert(std::pair<std::string, z3::expr>(name, c));
   }
@@ -461,7 +457,6 @@ public:
         astAdd(r == z3::ite((a >= b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_SLT:  ///< signed less than
-        debug << "in slt" << std::endl;
         astAdd(r == z3::ite((a < b), i1_true(), i1_false())/*simp*/);
         break;
       case CmpInst::ICMP_SLE:  ///< signed less or equal
@@ -491,7 +486,6 @@ public:
     } 
     else {
       auto tar = I.getOperand(0);
-      debug << "before add branch\n";
       addBranch(tar);
     }
   }
@@ -540,7 +534,7 @@ public:
           z3::expr ptr = gen_i64(ptrOp);
           z3::expr lb = ctx.bv_val(0, 64);
           z3::expr ub = ctx.bv_val(size, 64); 
-          z3::expr inbounds = (ptr >= lb && ptr < ub);
+          z3::expr inbounds = z3::forall(arg_evec, (ptr >= lb && ptr < ub));
 
           solver.push();
 //          z3::expr check = (astGet(I.getFunction()) && !inbounds)

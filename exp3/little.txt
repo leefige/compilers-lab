@@ -2,3 +2,62 @@ new z3walker
 <Module> selftest/little-opt.ll, size is 1
 ---------
 <Func> test: arg %0
+in put cond, tar-cond: %1-true
+  <BB> %1
+    visit sext
+    visit gep
+----<solver>--------
+(declare-fun %1 ((_ BitVec 32)) Bool)
+(declare-fun %2 ((_ BitVec 32)) (_ BitVec 64))
+(declare-fun %0 () (_ BitVec 32))
+(assert (forall ((%0 (_ BitVec 32))) (and true (= (%1 %0) true))))
+(assert (forall ((%0 (_ BitVec 32))) (and true (= (%2 %0) ((_ sign_extend 32) %0)))))
+(assert (not (and (bvsge (%2 %0) #x0000000000000000) (bvslt (%2 %0) #x0000000000000400))))
+
+-------------
+Checking with assertions:
+(ast-vector
+  (forall ((%0 (_ BitVec 32))) (and true (= (%1 %0) true)))
+  (forall ((%0 (_ BitVec 32))) (and true (= (%2 %0) ((_ sign_extend 32) %0))))
+  (not (and (bvsge (%2 %0) #x0000000000000000) (bvslt (%2 %0) #x0000000000000400))))
+GEP %3 is potentially out of bound.
+Model causing out of bound:
+(define-fun %0 () (_ BitVec 32)
+  #x08000000)
+(define-fun %2 ((x!0 (_ BitVec 32))) (_ BitVec 64)
+  (ite (= x!0 #x08000000) #x0000000008000000
+    (concat ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            ((_ extract 31 31) x!0)
+            x!0)))
+(define-fun %1 ((x!0 (_ BitVec 32))) Bool
+  true)
