@@ -339,6 +339,9 @@ public:
     debug << "    visit ret" << std::endl;
     auto re = I.getReturnValue();
     if (re != NULL) {
+      z3::expr func_ret = gen_i32(re);
+      z3::expr this_func = gen_i32(current_fun);
+      astAdd(this_func == func_ret);
       // generate model
       solver.push();
       for (z3::expr e: ast_vec[getName(*current_fun)]) {
@@ -347,7 +350,7 @@ public:
       solver.check();
       z3::model mo = solver.get_model();
       std::string fun_name = getName(*current_fun);
-      z3::func_decl fun = z3::function(getName(*re), arg_svec, ctx.bv_sort(32));
+      z3::func_decl fun = z3::function(fun_name, arg_svec, ctx.bv_sort(32));
       model_map.insert(std::pair<std::string, z3::model>(fun_name, mo));
       function_map.insert(std::pair<std::string, z3::func_decl>(fun_name, fun));
       solver.pop();
@@ -355,7 +358,7 @@ public:
 #ifndef NDEBUG
       z3::model gen = model_map.at(fun_name);
       z3::func_decl fun__ = function_map.at(fun_name);
-      debug << "  ### fun__ is\n" << fun__ << "\n";
+      // debug << "  ### fun__ is\n" << fun__ << "\n";
       debug << "  ### model formal eval: " << fun_name << "(x)=" << 
         gen.eval(fun__(ctx.bv_const("x", 32))) 
         << "\n";
