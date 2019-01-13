@@ -286,7 +286,6 @@ public:
     astInit(&F);
     
     // parse args
-    unsigned arg_cnt = F.arg_size();
     for (auto ait = F.arg_begin(); ait != F.arg_end(); ait++) {
       Argument* arg = &(*ait);
       auto argname = getName(*arg);
@@ -324,7 +323,10 @@ public:
     model_map.insert(std::pair<std::string, z3::model>(getName(F), mo));
     solver.pop();
     z3::model gen = model_map.at(getName(F));
-    debug << "  ### model eval: " << getName(F) << "(-2)=" << gen.eval(ctx.bv_val(-2, 32)) << "\n";
+    debug << "  ### model is: \n" << gen << "\n";
+    debug << "  ### model eval: " << getName(F) << "(-2)=" << 
+      gen.eval(z3::function("a.0", arg_svec, ctx.bv_sort(32))(ctx.bv_val(-2, 32))) 
+      << "\n";
   }
 
   void visitBasicBlock(BasicBlock &B) {
@@ -528,7 +530,7 @@ public:
       auto bb = I.getIncomingBlock(i);
       z3::expr v = gen_i32(val);
       z3::expr b = gen_bool(bb);
-      debug << "\t\ttar: " << v << "branch cond: " << b << "\n";
+      debug << "      tar: " << v << "branch cond: " << b << "\n";
       z3::expr dst = gen_i32(&I);
       astAdd(z3::implies(b, (dst == v)));
     }
