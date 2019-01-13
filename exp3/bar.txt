@@ -1,23 +1,11 @@
-new z3walker
 <Module> test/bar.ll, size is 1
+=================================
+*** BOTTOM UP PARSING... ***
+=================================
 ---------
 <Func> foo: arg i
-in put cond, tar-cond: entry-true
-  <BB> entry
-    visit icmp
-    visit br
-in addbranch, tar-cond: if.then(= (cmp i) #b1)
-in put cond, tar-cond: if.then-(and true (= (cmp i) #b1))
-in addbranch, tar-cond: return(= (cmp i) #b0)
-in put cond, tar-cond: return-(and true (= (cmp i) #b0))
-  <BB> if.then
-    visit gep
-    visit br
-before add branch
-in addbranch(tar), tar: return
-before put cond, cond: (and true (= (cmp i) #b1))
-in put cond, tar-cond: return-(and true (= (cmp i) #b1))
-  <BB> return
-    visit phi
-tar: (ai i)branch cond: (if.then i)
-tar: #xffffffffbranch cond: (entry i)
+=================================
+*** BOTTOM UP FINISHED ***
+=================================
+---------
+<Func> foo: arg i

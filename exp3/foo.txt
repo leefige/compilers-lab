@@ -1,41 +1,30 @@
-new z3walker
 <Module> test/foo.ll, size is 8
+=================================
+*** BOTTOM UP PARSING... ***
+=================================
 ---------
 <Func> abs: arg i
-  <BB> entry
-    visit icmp
-    visit br
-  <BB> if.else
-    visit br
-  <BB> if.then
-    visit sub
-    visit br
-  <BB> if.end
-    visit phi
-      tar: (sub i)branch cond: (if.then i)
-      tar: ibranch cond: (if.else i)
-    visit ret
-  ### fun__ is
-(declare-fun a.0 ((_ BitVec 32)) (_ BitVec 32))
-  ### model formal eval: abs(x)=(let ((a!1 (= (ite (bvule #x80000000 x)
-                   (ite (= x #xffffffff) #xffffffff #x80000000)
-                   #x00000000)
-              #x00000000)))
-(let ((a!2 (ite a!1
-                x
-                (ite (= x #x80000000)
-                     #x80000000
-                     (ite (= x #xffffffff) #x00000001 (bvmul #xffffffff x))))))
-  (ite (= x #x80000000)
-       #x80000000
-       (ite (= x #x00000000) #x00000000 (ite (= x #xffffffff) #x00000001 a!2)))))
-  ### model actual eval: abs(-2)=#x00000002
 ---------
 <Func> foo1: arg i
-  <BB> entry
-    visit and
-    visit sext
-    visit gep
+---------
+<Func> foo2: arg i
+---------
+<Func> foo3: arg i
+---------
+<Func> bar1: arg i
+---------
+<Func> bar2: arg i
+---------
+<Func> bar3: arg i
+---------
+<Func> interproc: arg i
+=================================
+*** BOTTOM UP FINISHED ***
+=================================
+---------
+<Func> abs: arg i
+---------
+<Func> foo1: arg i
 Checking with assertions:
 (ast-vector
   (= (entry i) true)
@@ -45,24 +34,8 @@ Checking with assertions:
   (not (and (bvsge (idxprom i) #x0000000000000000)
             (bvslt (idxprom i) #x0000000000000400))))
 GEP arrayidx is safe.
-    visit ret
-  ### fun__ is
-(declare-fun %0 ((_ BitVec 32)) (_ BitVec 32))
-  ### model formal eval: foo1(x)=(%0 x)
-  ### model actual eval: foo1(-2)=(%0 #xfffffffe)
 ---------
 <Func> foo2: arg i
-  <BB> entry
-    visit icmp
-    visit br
-  <BB> land.lhs.true
-    visit icmp
-    visit br
-  <BB> if.else
-    visit br
-  <BB> if.then
-    visit sext
-    visit gep
 Checking with assertions:
 (ast-vector
   (= (entry i) true)
@@ -78,34 +51,8 @@ Checking with assertions:
   (not (and (bvsge (idxprom i) #x0000000000000000)
             (bvslt (idxprom i) #x0000000000000400))))
 GEP arrayidx is safe.
-    visit br
-  <BB> return
-    visit phi
-      tar: (%0 i)branch cond: (if.then i)
-      tar: #xffffffffbranch cond: (if.else i)
-    visit ret
-  ### fun__ is
-(declare-fun retval.0 ((_ BitVec 32)) (_ BitVec 32))
-  ### model formal eval: foo2(x)=(ite (= x #x00000000) #x00000000 #xffffffff)
-  ### model actual eval: foo2(-2)=#xffffffff
 ---------
 <Func> foo3: arg i
-  <BB> entry
-    visit icmp
-    visit br
-  <BB> land.lhs.true
-    visit icmp
-    visit br
-  <BB> if.else
-    visit br
-  <BB> if.then
-    visit br
-  <BB> if.end
-    visit phi
-      tar: ibranch cond: (if.then i)
-      tar: #x00000000branch cond: (if.else i)
-    visit sext
-    visit gep
 Checking with assertions:
 (ast-vector
   (= (entry i) true)
@@ -129,17 +76,8 @@ Checking with assertions:
   (not (and (bvsge (idxprom i) #x0000000000000000)
             (bvslt (idxprom i) #x0000000000000400))))
 GEP arrayidx is safe.
-    visit ret
-  ### fun__ is
-(declare-fun %0 ((_ BitVec 32)) (_ BitVec 32))
-  ### model formal eval: foo3(x)=(%0 x)
-  ### model actual eval: foo3(-2)=(%0 #xfffffffe)
 ---------
 <Func> bar1: arg i
-  <BB> entry
-    visit and
-    visit sext
-    visit gep
 Checking with assertions:
 (ast-vector
   (= (entry i) true)
@@ -158,24 +96,8 @@ Model causing out of bound:
   true)
 (define-fun idxprom ((x!0 (_ BitVec 32))) (_ BitVec 64)
   #x0000000000000400)
-    visit ret
-  ### fun__ is
-(declare-fun %0 ((_ BitVec 32)) (_ BitVec 32))
-  ### model formal eval: bar1(x)=(%0 x)
-  ### model actual eval: bar1(-2)=(%0 #xfffffffe)
 ---------
 <Func> bar2: arg i
-  <BB> entry
-    visit icmp
-    visit br
-  <BB> land.lhs.true
-    visit icmp
-    visit br
-  <BB> if.else
-    visit br
-  <BB> if.then
-    visit sext
-    visit gep
 Checking with assertions:
 (ast-vector
   (= (entry i) true)
@@ -208,34 +130,8 @@ Model causing out of bound:
   true)
 (define-fun cmp1 ((x!0 (_ BitVec 32))) (_ BitVec 1)
   #b1)
-    visit br
-  <BB> return
-    visit phi
-      tar: (%0 i)branch cond: (if.then i)
-      tar: #xffffffffbranch cond: (if.else i)
-    visit ret
-  ### fun__ is
-(declare-fun retval.0 ((_ BitVec 32)) (_ BitVec 32))
-  ### model formal eval: bar2(x)=(ite (= x #x00000000) #x00000000 (ite (= x #x00000400) #x00000000 #xffffffff))
-  ### model actual eval: bar2(-2)=#xffffffff
 ---------
 <Func> bar3: arg i
-  <BB> entry
-    visit icmp
-    visit br
-  <BB> land.lhs.true
-    visit icmp
-    visit br
-  <BB> if.else
-    visit br
-  <BB> if.then
-    visit br
-  <BB> if.end
-    visit phi
-      tar: ibranch cond: (if.then i)
-      tar: #x00000000branch cond: (if.else i)
-    visit sext
-    visit gep
 Checking with assertions:
 (ast-vector
   (= (entry i) true)
@@ -280,24 +176,12 @@ Model causing out of bound:
   #x00000400)
 (define-fun idxprom ((x!0 (_ BitVec 32))) (_ BitVec 64)
   #x0000000000000400)
-    visit ret
-  ### fun__ is
-(declare-fun %0 ((_ BitVec 32)) (_ BitVec 32))
-  ### model formal eval: bar3(x)=(%0 x)
-  ### model actual eval: bar3(-2)=(%0 #xfffffffe)
 ---------
 <Func> interproc: arg i
-  <BB> entry
-    visit icmp
-    visit br
-  <BB> if.else
-    visit br
-  <BB> if.then
-    visit sext
-    visit gep
 Checking with assertions:
 (ast-vector
   (= (entry i) true)
+  (= (call i) #x00000000)
   (= (cmp i) (ite (bvslt (call i) #x00000400) #b1 #b0))
   (= (if.else i) (and true (= (cmp i) #b0)))
   (= (if.then i) (and true (= (cmp i) #b1)))
@@ -305,25 +189,4 @@ Checking with assertions:
   (and true (= (cmp i) #b1))
   (not (and (bvsge (idxprom i) #x0000000000000000)
             (bvslt (idxprom i) #x0000000000000400))))
-GEP arrayidx is potentially out of bound.
-Model causing out of bound:
-(define-fun i () (_ BitVec 32)
-  #x00000000)
-(define-fun idxprom ((x!0 (_ BitVec 32))) (_ BitVec 64)
-  #xffffffff80000000)
-(define-fun entry ((x!0 (_ BitVec 32))) Bool
-  true)
-(define-fun call ((x!0 (_ BitVec 32))) (_ BitVec 32)
-  #x80000000)
-(define-fun cmp ((x!0 (_ BitVec 32))) (_ BitVec 1)
-  #b1)
-(define-fun if.else ((x!0 (_ BitVec 32))) Bool
-  false)
-(define-fun if.then ((x!0 (_ BitVec 32))) Bool
-  true)
-    visit br
-  <BB> return
-    visit phi
-      tar: (%0 i)branch cond: (if.then i)
-      tar: #xffffffffbranch cond: (if.else i)
-    visit ret
+GEP arrayidx is safe.
