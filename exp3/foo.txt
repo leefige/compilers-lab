@@ -1,192 +1,262 @@
+new z3walker
 <Module> test/foo.ll, size is 8
 =================================
 *** BOTTOM UP PARSING... ***
 =================================
 ---------
 <Func> abs: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit sub
+    visit br
+  <BB> if.end
+    visit phi
+      tar: (sub i)branch cond: (if.then i)
+      tar: ibranch cond: (if.else i)
+    visit ret
+  ### model formal eval: abs(x)=(let ((a!1 (ite (= (ite (bvule #x80000000 x) #x80000000 #x00000000) #x00000000)
+                x
+                (ite (= x #x80000000)
+                     #x80000000
+                     (ite (= x #x00000000) #x00000000 (bvmul #xffffffff x))))))
+(let ((a!2 (ite (= x #x00000000)
+                #x00000000
+                (ite (= x #x80000000)
+                     #x80000000
+                     (ite (= x #x00000000) #x00000000 a!1)))))
+  (ite (= x #x80000000) #x80000000 a!2)))
+  ### model actual eval: abs(-2)=#x00000002
 ---------
 <Func> foo1: arg i
+  <BB> entry
+    visit and
+    visit sext
+    visit gep
+    visit ret
+  ### model formal eval: foo1(x)=#x00000000
+  ### model actual eval: foo1(-2)=#x00000000
 ---------
 <Func> foo2: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> land.lhs.true
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit sext
+    visit gep
+    visit br
+  <BB> return
+    visit phi
+      tar: (%0 i)branch cond: (if.then i)
+      tar: #xffffffffbranch cond: (if.else i)
+    visit ret
+  ### model formal eval: foo2(x)=(ite (= x #x80000000) #xffffffff (ite (= x #x00000000) #x00000000 #xffffffff))
+  ### model actual eval: foo2(-2)=#xffffffff
 ---------
 <Func> foo3: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> land.lhs.true
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit br
+  <BB> if.end
+    visit phi
+      tar: ibranch cond: (if.then i)
+      tar: #x00000000branch cond: (if.else i)
+    visit sext
+    visit gep
+    visit ret
+  ### model formal eval: foo3(x)=#x00000000
+  ### model actual eval: foo3(-2)=#x00000000
 ---------
 <Func> bar1: arg i
+  <BB> entry
+    visit and
+    visit sext
+    visit gep
+    visit ret
+  ### model formal eval: bar1(x)=#x00000000
+  ### model actual eval: bar1(-2)=#x00000000
 ---------
 <Func> bar2: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> land.lhs.true
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit sext
+    visit gep
+    visit br
+  <BB> return
+    visit phi
+      tar: (%0 i)branch cond: (if.then i)
+      tar: #xffffffffbranch cond: (if.else i)
+    visit ret
+  ### model formal eval: bar2(x)=(ite (= x #x80000000) #xffffffff (ite (= x #x00000000) #x00000000 #xffffffff))
+  ### model actual eval: bar2(-2)=#xffffffff
 ---------
 <Func> bar3: arg i
+  <BB> entry
+    visit icmp
+    visit br
+  <BB> land.lhs.true
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit br
+  <BB> if.end
+    visit phi
+      tar: ibranch cond: (if.then i)
+      tar: #x00000000branch cond: (if.else i)
+    visit sext
+    visit gep
+    visit ret
+  ### model formal eval: bar3(x)=#x00000000
+  ### model actual eval: bar3(-2)=#x00000000
 ---------
 <Func> interproc: arg i
-=================================
-*** BOTTOM UP FINISHED ***
-=================================
----------
-<Func> abs: arg i
----------
-<Func> foo1: arg i
-Checking with assertions:
+  <BB> entry
+    visit call, callee: abs
+      call-res: (let ((a!1 (ite (= (ite (bvule #x80000000 absarg0) #x80000000 #x00000000)
+                   #x00000000)
+                absarg0
+                (ite (= absarg0 #x80000000)
+                     #x80000000
+                     (ite (= absarg0 #x00000000)
+                          #x00000000
+                          (bvmul #xffffffff absarg0))))))
+(let ((a!2 (ite (= absarg0 #x00000000)
+                #x00000000
+                (ite (= absarg0 #x80000000)
+                     #x80000000
+                     (ite (= absarg0 #x00000000) #x00000000 a!1)))))
+  (ite (= absarg0 #x80000000) #x80000000 a!2)))
+    visit icmp
+    visit br
+  <BB> if.else
+    visit br
+  <BB> if.then
+    visit sext
+    visit gep
+    visit br
+  <BB> return
+    visit phi
+      tar: (%0 i)branch cond: (if.then i)
+      tar: #xffffffffbranch cond: (if.else i)
+    visit ret
+UNSAT!
 (ast-vector
-  (= (entry i) true)
-  (= (and i) (bvand i #x000003ff))
-  (= (idxprom i) ((_ sign_extend 32) (and i)))
-  true
-  (not (and (bvsge (idxprom i) #x0000000000000000)
-            (bvslt (idxprom i) #x0000000000000400))))
-GEP arrayidx is safe.
----------
-<Func> foo2: arg i
-Checking with assertions:
-(ast-vector
-  (= (entry i) true)
-  (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))
-  (= (land.lhs.true i) (and true (= (cmp i) #b1)))
-  (= (cmp1 i) (ite (bvslt i #x00000400) #b1 #b0))
-  (let ((a!1 (or (and true (= (cmp i) #b0))
-                 (and true (= (cmp i) #b1) (= (cmp1 i) #b0)))))
-    (= (if.else i) a!1))
-  (= (if.then i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1)))
-  (= (idxprom i) ((_ sign_extend 32) i))
-  (and true (= (cmp i) #b1) (= (cmp1 i) #b1))
-  (not (and (bvsge (idxprom i) #x0000000000000000)
-            (bvslt (idxprom i) #x0000000000000400))))
-GEP arrayidx is safe.
----------
-<Func> foo3: arg i
-Checking with assertions:
-(ast-vector
-  (= (entry i) true)
-  (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))
-  (= (land.lhs.true i) (and true (= (cmp i) #b1)))
-  (= (cmp1 i) (ite (bvslt i #x00000400) #b1 #b0))
-  (let ((a!1 (or (and true (= (cmp i) #b0))
-                 (and true (= (cmp i) #b1) (= (cmp1 i) #b0)))))
-    (= (if.else i) a!1))
-  (= (if.then i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1)))
-  (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
-        (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
-  (let ((a!3 (or (and true (= (cmp i) #b0)) a!1 a!2)))
-    (= (if.end i) a!3)))
-  (=> (if.then i) (= (x.0 i) i))
-  (=> (if.else i) (= (x.0 i) #x00000000))
-  (= (idxprom i) ((_ sign_extend 32) (x.0 i)))
-  (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
-        (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
-    (or (and true (= (cmp i) #b0)) a!1 a!2))
-  (not (and (bvsge (idxprom i) #x0000000000000000)
-            (bvslt (idxprom i) #x0000000000000400))))
-GEP arrayidx is safe.
----------
-<Func> bar1: arg i
-Checking with assertions:
-(ast-vector
-  (= (entry i) true)
-  (= (and i) (bvand i #x000007ff))
-  (= (idxprom i) ((_ sign_extend 32) (and i)))
-  true
-  (not (and (bvsge (idxprom i) #x0000000000000000)
-            (bvslt (idxprom i) #x0000000000000400))))
-GEP arrayidx is potentially out of bound.
-Model causing out of bound:
-(define-fun i () (_ BitVec 32)
-  #x00000400)
-(define-fun and ((x!0 (_ BitVec 32))) (_ BitVec 32)
-  #x00000400)
-(define-fun entry ((x!0 (_ BitVec 32))) Bool
-  true)
-(define-fun idxprom ((x!0 (_ BitVec 32))) (_ BitVec 64)
-  #x0000000000000400)
----------
-<Func> bar2: arg i
-Checking with assertions:
-(ast-vector
-  (= (entry i) true)
-  (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))
-  (= (land.lhs.true i) (and true (= (cmp i) #b1)))
-  (= (cmp1 i) (ite (bvsle i #x00000400) #b1 #b0))
-  (let ((a!1 (or (and true (= (cmp i) #b0))
-                 (and true (= (cmp i) #b1) (= (cmp1 i) #b0)))))
-    (= (if.else i) a!1))
-  (= (if.then i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1)))
-  (= (idxprom i) ((_ sign_extend 32) i))
-  (and true (= (cmp i) #b1) (= (cmp1 i) #b1))
-  (not (and (bvsge (idxprom i) #x0000000000000000)
-            (bvslt (idxprom i) #x0000000000000400))))
-GEP arrayidx is potentially out of bound.
-Model causing out of bound:
-(define-fun i () (_ BitVec 32)
-  #x00000400)
-(define-fun if.then ((x!0 (_ BitVec 32))) Bool
-  true)
-(define-fun idxprom ((x!0 (_ BitVec 32))) (_ BitVec 64)
-  #x0000000000000400)
-(define-fun entry ((x!0 (_ BitVec 32))) Bool
-  true)
-(define-fun if.else ((x!0 (_ BitVec 32))) Bool
-  false)
-(define-fun cmp ((x!0 (_ BitVec 32))) (_ BitVec 1)
-  #b1)
-(define-fun land.lhs.true ((x!0 (_ BitVec 32))) Bool
-  true)
-(define-fun cmp1 ((x!0 (_ BitVec 32))) (_ BitVec 1)
-  #b1)
----------
-<Func> bar3: arg i
-Checking with assertions:
-(ast-vector
-  (= (entry i) true)
-  (= (cmp i) (ite (bvsge i #x00000000) #b1 #b0))
-  (= (land.lhs.true i) (and true (= (cmp i) #b1)))
-  (= (cmp1 i) (ite (bvsle i #x00000400) #b1 #b0))
-  (let ((a!1 (or (and true (= (cmp i) #b0))
-                 (and true (= (cmp i) #b1) (= (cmp1 i) #b0)))))
-    (= (if.else i) a!1))
-  (= (if.then i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1)))
-  (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
-        (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
-  (let ((a!3 (or (and true (= (cmp i) #b0)) a!1 a!2)))
-    (= (if.end i) a!3)))
-  (=> (if.then i) (= (x.0 i) i))
-  (=> (if.else i) (= (x.0 i) #x00000000))
-  (= (idxprom i) ((_ sign_extend 32) (x.0 i)))
-  (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
-        (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
-    (or (and true (= (cmp i) #b0)) a!1 a!2))
-  (not (and (bvsge (idxprom i) #x0000000000000000)
-            (bvslt (idxprom i) #x0000000000000400))))
-GEP arrayidx is potentially out of bound.
-Model causing out of bound:
-(define-fun i () (_ BitVec 32)
-  #x00000400)
-(define-fun if.else ((x!0 (_ BitVec 32))) Bool
-  false)
-(define-fun cmp ((x!0 (_ BitVec 32))) (_ BitVec 1)
-  #b1)
-(define-fun land.lhs.true ((x!0 (_ BitVec 32))) Bool
-  true)
-(define-fun if.then ((x!0 (_ BitVec 32))) Bool
-  true)
-(define-fun cmp1 ((x!0 (_ BitVec 32))) (_ BitVec 1)
-  #b1)
-(define-fun if.end ((x!0 (_ BitVec 32))) Bool
-  true)
-(define-fun entry ((x!0 (_ BitVec 32))) Bool
-  true)
-(define-fun x.0 ((x!0 (_ BitVec 32))) (_ BitVec 32)
-  #x00000400)
-(define-fun idxprom ((x!0 (_ BitVec 32))) (_ BitVec 64)
-  #x0000000000000400)
----------
-<Func> interproc: arg i
-Checking with assertions:
-(ast-vector
-  (= (entry i) true)
-  (= (call i) #x00000000)
-  (= (cmp i) (ite (bvslt (call i) #x00000400) #b1 #b0))
-  (= (if.else i) (and true (= (cmp i) #b0)))
-  (= (if.then i) (and true (= (cmp i) #b1)))
-  (= (idxprom i) ((_ sign_extend 32) (call i)))
-  (and true (= (cmp i) #b1))
-  (not (and (bvsge (idxprom i) #x0000000000000000)
-            (bvslt (idxprom i) #x0000000000000400))))
-GEP arrayidx is safe.
+  (entry i)
+  (= absarg0 i)
+  (let ((a!1 (ite (= (ite (bvule #x80000000 absarg0) #x80000000 #x00000000)
+                     #x00000000)
+                  absarg0
+                  (ite (= absarg0 #x80000000)
+                       #x80000000
+                       (ite (= absarg0 #x00000000)
+                            #x00000000
+                            (bvmul #xffffffff absarg0))))))
+  (let ((a!2 (ite (= absarg0 #x00000000)
+                  #x00000000
+                  (ite (= absarg0 #x80000000)
+                       #x80000000
+                       (ite (= absarg0 #x00000000) #x00000000 a!1)))))
+    (= (call i) (ite (= absarg0 #x80000000) #x80000000 a!2))))
+  (= (cmp i) (ite (bvsle #x00000400 (call i)) #b0 #b1))
+  (= (cmp i) (ite (if.else i) #b0 #b1))
+  (= (cmp i) (ite (if.then i) #b1 #b0))
+  (= (idxprom i)
+     (concat ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             ((_ extract 31 31) (call i))
+             (call i)))
+  (= (return i) (or (= (cmp i) #b0) (= (cmp i) #b1)))
+  (or (not (if.then i)) (= (retval.0 i) (%0 i)))
+  (or (not (if.else i)) (= (retval.0 i) #xffffffff))
+  (= (interproc i) (retval.0 i))
+  (forall ((i (_ BitVec 32))) (entry i))
+  (forall ((i (_ BitVec 32))) (= absarg0 i))
+  (forall ((i (_ BitVec 32)))
+    (let ((a!1 (ite (= (ite (bvule #x80000000 absarg0) #x80000000 #x00000000)
+                       #x00000000)
+                    absarg0
+                    (ite (= absarg0 #x80000000)
+                         #x80000000
+                         (ite (= absarg0 #x00000000)
+                              #x00000000
+                              (bvmul #xffffffff absarg0))))))
+    (let ((a!2 (ite (= absarg0 #x00000000)
+                    #x00000000
+                    (ite (= absarg0 #x80000000)
+                         #x80000000
+                         (ite (= absarg0 #x00000000) #x00000000 a!1)))))
+      (= (call i) (ite (= absarg0 #x80000000) #x80000000 a!2)))))
+  (forall ((i (_ BitVec 32)))
+    (= (cmp i) (ite (bvsle #x00000400 (call i)) #b0 #b1)))
+  (forall ((i (_ BitVec 32))) (= (cmp i) (ite (if.else i) #b0 #b1)))
+  (forall ((i (_ BitVec 32))) (= (cmp i) (ite (if.then i) #b1 #b0)))
+  (forall ((i (_ BitVec 32)))
+    (= (idxprom i)
+       (concat ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+               ((_ extract 31 31) (call i))
+    

@@ -19,7 +19,7 @@
 #include <llvm/ADT/SCCIterator.h>
 #include <z3++.h>
 
-#define NDEBUG
+//#define NDEBUG
 
 using namespace llvm;
 
@@ -79,6 +79,7 @@ private:
   z3::expr_vector arg_evec;
   z3::sort_vector arg_svec;
   std::set<std::string> arg_names; 
+  bool abort_func;
   /*----------------------------------------------------------*/
 
   /*================== AST =======================*/
@@ -101,6 +102,7 @@ private:
     }
     arg_names.clear();
     this->getArgInfo(func);
+    abort_func = false;
   }
 
   void astAdd(const z3::expr& exp) {
@@ -116,7 +118,9 @@ private:
     vec.push_back(cond/*.simplify()*/);
     ast_vec[ast_name] = vec;
     // also add to solver
-    solver.add(exp.simplify());
+    if (done) {
+      solver.add(exp.simplify());
+    }
   }
 
   z3::expr astGet(Function* func) {
@@ -290,10 +294,9 @@ public:
     }
     // working in progress
     while (!wip.empty()) {
-      for (auto it = wip.begin(); it != wip.end(); it++) {
-        Function* fff = wip.pop_front();
-        this->visitFunction(*fff);
-      }
+      Function* fff = wip.front();
+      wip.pop_front();
+      this->visitFunction(*fff);
     }
 
     std::cout << "=================================\n" << "*** BOTTOM UP FINISHED ***\n"
@@ -365,8 +368,13 @@ public:
     debug << callee_name << "\n";
     if (function_map.count(callee_name)) {
       z3::expr_vector actual_arg(ctx);
+      int cnt = 0;
       for (auto arit = I.arg_begin(); arit != I.arg_end(); arit++) {
-        actual_arg.push_back(gen_i32(arit->get()));
+        std::stringstream ss;
+        ss << callee_name << "arg"  << cnt;
+        z3::expr argggg = ctx.bv_const(ss.str().c_str(), 32);
+        actual_arg.push_back(argggg);
+        astAdd(argggg == gen_i32(arit->get()));
       }
       z3::expr call_res = model_map.at(callee_name).eval(
         function_map.at(callee_name)(actual_arg)
@@ -376,12 +384,17 @@ public:
       z3::expr caller = gen_i32(&I);
       astAdd(caller == call_res);
     } else {
+      wip.push_back(callee);
       wip.push_back(current_fun);
+      abort_func = true;
     }
   }
 
   void visitReturnInst(ReturnInst &I) {
     debug << "    visit ret" << std::endl;
+    if (abort_func) {
+      return;
+    }
     auto re = I.getReturnValue();
     if (re != NULL) {
       z3::expr func_ret = gen_i32(re);
@@ -392,25 +405,29 @@ public:
       for (z3::expr e: ast_vec[getName(*current_fun)]) {
         solver.add(e);
       }
-      solver.check();
-      z3::model mo = solver.get_model();
       std::string fun_name = getName(*current_fun);
-      z3::func_decl fun = z3::function(fun_name, arg_svec, ctx.bv_sort(32));
-      model_map.insert(std::pair<std::string, z3::model>(fun_name, mo));
-      function_map.insert(std::pair<std::string, z3::func_decl>(fun_name, fun));
-      solver.pop();
-      // test
+      if (solver.check() == z3::unsat) {
+        std::cout << "UNSAT!\n";
+        std::cout << solver.assertions() << "\n";
+      } else {
+        z3::model mo = solver.get_model();
+        z3::func_decl fun = z3::function(fun_name, arg_svec, ctx.bv_sort(32));
+        model_map.insert(std::pair<std::string, z3::model>(fun_name, mo));
+        function_map.insert(std::pair<std::string, z3::func_decl>(fun_name, fun));
+        // test
 #ifndef NDEBUG
-      z3::model gen = model_map.at(fun_name);
-      z3::func_decl fun__ = function_map.at(fun_name);
-      // debug << "  ### fun__ is\n" << fun__ << "\n";
-      debug << "  ### model formal eval: " << fun_name << "(x)=" << 
-        gen.eval(fun__(ctx.bv_const("x", 32))) 
-        << "\n";
-      debug << "  ### model actual eval: " << fun_name << "(-2)=" << 
-        gen.eval(fun__(ctx.bv_val(-2, 32))) 
-        << "\n";
+        z3::model gen = model_map.at(fun_name);
+        z3::func_decl fun__ = function_map.at(fun_name);
+        // debug << "  ### fun__ is\n" << fun__ << "\n";
+        debug << "  ### model formal eval: " << fun_name << "(x)=" << 
+          gen.eval(fun__(ctx.bv_const("x", 32))) 
+          << "\n";
+        debug << "  ### model actual eval: " << fun_name << "(-2)=" << 
+          gen.eval(fun__(ctx.bv_val(-2, 32))) 
+          << "\n";
 #endif  
+      }
+      solver.pop();
     }
   }
 
