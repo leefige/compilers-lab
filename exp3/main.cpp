@@ -106,6 +106,8 @@ private:
     cond = z3::forall(arg_evec, (exp));
     vec.push_back(cond/*.simplify()*/);
     predicate_map[ast_name] = vec;
+    // also add to solver
+    solver.add(exp);
   }
 
   z3::expr astGet(Function* func) {
@@ -278,7 +280,7 @@ public:
 
   void visitFunction(Function &F) {
     std::cout << "---------" << std::endl << "<Func> " << getName(F) << ":";
-//    solver.push();
+    solver.push();
     astInit(&F);
     
     // parse args
@@ -309,7 +311,7 @@ public:
     }
 //    debug << "------------" << std::endl << "<Solver>" << std::endl 
 //      << solver << "============" << std::endl;
-//    solver.pop();
+    solver.pop();
   }
 
   void visitBasicBlock(BasicBlock &B) {
@@ -549,7 +551,7 @@ public:
           z3::expr ptr = gen_i64(ptrOp);
           z3::expr lb = ctx.bv_val(0, 64);
           z3::expr ub = ctx.bv_val(size, 64); 
-          z3::expr inbounds = z3::forall(arg_evec, (ptr >= lb && ptr < ub));
+          z3::expr inbounds = (ptr >= lb && ptr < ub);
 
           solver.push();
 //          z3::expr check = (astGet(I.getFunction()) && !inbounds)
@@ -557,9 +559,9 @@ public:
 //            .simplify()
 //#endif
 //          ;
-          for (z3::expr e: predicate_map[getName(*current_fun)]) {
-            solver.add(e);
-          }
+          // for (z3::expr e: predicate_map[getName(*current_fun)]) {
+          //   solver.add(e);
+          // }
           BasicBlock* bb = I.getParent();
           std::string bb_name = getName(*bb);
           solver.add(bb_cond.at(bb_name));
