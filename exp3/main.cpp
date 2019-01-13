@@ -67,6 +67,7 @@ private:
   std::map<std::string, z3::func_decl> function_map;
   z3::context ctx;
   z3::solver solver;
+  bool done;
 
   /*------------ used only inside one function ---------------*/
   Function* current_fun;
@@ -276,6 +277,13 @@ public:
     std::cout << "<Module> " << M.getName().str();
     // iterate functions
     std::cout << ", size is " << M.size() << std::endl;
+    done = false;
+    for(auto it = M.begin(); it != M.end(); it++) {
+      this->visitFunction(*it);
+    }
+    std::cout << "=================================\n" << "*** BOTTOM UP FINISHED ***\n"
+       << "=================================\n";
+    done = true;
     for(auto it = M.begin(); it != M.end(); it++) {
       this->visitFunction(*it);
     }
@@ -336,6 +344,10 @@ public:
   }
 
   void visitReturnInst(ReturnInst &I) {
+    if (done) {
+      return;
+    }
+
     debug << "    visit ret" << std::endl;
     auto re = I.getReturnValue();
     if (re != NULL) {
@@ -371,6 +383,9 @@ public:
 
 
   void visitAdd(BinaryOperator &I) {
+    if (done) {
+      return;
+    }
     debug << "    visit add" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -382,6 +397,9 @@ public:
   }
 
   void visitSub(BinaryOperator &I) {
+    if (done) {
+      return;
+    }
     debug << "    visit sub" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -392,6 +410,9 @@ public:
   }
   
   void visitMul(BinaryOperator &I) {
+    if (done) {
+      return;
+    }
     debug << "    visit mul" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -402,6 +423,9 @@ public:
   }
 
   void visitShl(BinaryOperator &I) {
+    if (done) {
+      return;
+    }
     debug << "    visit shl" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -417,6 +441,9 @@ public:
   }
 
   void visitLShr(BinaryOperator &I) {
+    if (done) {
+      return;
+    }
     debug << "    visit lshr" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -427,6 +454,9 @@ public:
   }
 
   void visitAShr(BinaryOperator &I) {
+    if (done) {
+      return;
+    }
     debug << "    visit ashr" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -437,6 +467,9 @@ public:
   }
 
   void visitAnd(BinaryOperator &I) {
+    if (done) {
+      return;
+    }
     debug << "    visit and" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -456,6 +489,9 @@ public:
   }
 
   void visitOr(BinaryOperator &I) {
+    if (done) {
+      return;
+    }
     debug << "    visit or" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -466,6 +502,9 @@ public:
   }
 
   void visitXor(BinaryOperator &I) {
+    if (done) {
+      return;
+    }
     debug << "    visit xor" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -476,6 +515,9 @@ public:
   }
 
   void visitICmp(ICmpInst &I) { 
+    if (done) {
+      return;
+    }
     debug << "    visit icmp" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -523,6 +565,9 @@ public:
   }
 
   void visitBranchInst(BranchInst &I) { 
+    if (done) {
+      return;
+    }
     debug << "    visit br"<< std::endl;
     // only consider conditional jump
     if (I.isConditional()) {
@@ -545,6 +590,9 @@ public:
   }
 
   void visitPHINode(PHINode &I) { 
+    if (done) {
+      return;
+    }
     debug << "    visit phi" << std::endl;
     unsigned cnt = I.getNumIncomingValues();
     for (unsigned i = 0; i != cnt; i++) {
@@ -559,6 +607,9 @@ public:
   }
 
   void visitSExtInst(SExtInst & I) {
+    if (done) {
+      return;
+    }
     debug << "    visit sext" << std::endl;
     auto srcv = I.getOperand(0);
     z3::expr src = gen_i32(srcv);
@@ -567,6 +618,9 @@ public:
   }
   
   void visitZExtInst(ZExtInst & I) {
+    if (done) {
+      return;
+    }
     debug << "    visit zext" << std::endl;
     auto srcv = I.getOperand(0);
     z3::expr src = gen_i32(srcv);
@@ -577,6 +631,10 @@ public:
   // Call checkAndReport here.
   void visitGetElementPtrInst(GetElementPtrInst &I) {
     debug << "    visit gep" << std::endl;
+    if (!done) {
+      return;
+    }
+
     if (I.isInBounds()) {
       if (I.getSourceElementType()->isArrayTy()) {
         ArrayType* type = (ArrayType*) I.getSourceElementType();
