@@ -6,6 +6,7 @@
 #include <string>
 #include <stack>
 #include <set>
+#include <deque>
 #include <assert.h>
 
 #include <llvm/IR/CFG.h>
@@ -65,6 +66,7 @@ private:
   std::map<std::string, std::vector<z3::expr> > ast_vec;
   std::map<std::string, z3::model> model_map;
   std::map<std::string, z3::func_decl> function_map;
+  std::deque<Function*> wip;
   z3::context ctx;
   z3::solver solver;
   bool done;
@@ -110,11 +112,11 @@ private:
     // every bb has its own cond (including 'true')
     z3::expr cond = bb_cond.at(getName(*cur_bb));
     // every ast is a func
-    cond = z3::forall(arg_evec, (exp));
+    cond = z3::forall(arg_evec, (exp.simplify()));
     vec.push_back(cond/*.simplify()*/);
     ast_vec[ast_name] = vec;
     // also add to solver
-    solver.add(exp);
+    solver.add(exp.simplify());
   }
 
   z3::expr astGet(Function* func) {
@@ -123,7 +125,7 @@ private:
     assert(!vec.empty());
     auto ast = *vec.begin();
     for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
-      ast = ast && *eit;
+      ast = (ast && *eit).simplify();
     }
     //ast = ast.simplify();
     return ast;
@@ -148,7 +150,7 @@ private:
 //      debug << "*** After OR: " << cond << "\n";
     } 
 //    debug << "### PUT: TAR-COND: " << name << "-" << cond << "\n";
-    putBranchCond(tar, cond/*.simplify()*/);
+    putBranchCond(tar, cond.simplify());
 //    debug << "### AFTER PUT: TAR-COND: "<< name << "-" << bb_cond.at(name) << "\n";
   }
 
@@ -163,7 +165,7 @@ private:
       cond = cur || cond;
 //      debug << "*** After OR: " << cond << "\n";
     } 
-    putBranchCond(tar, cond);
+    putBranchCond(tar, cond.simplify());
   }
 
   z3::expr getBranchCond (Value* tar) {
@@ -286,6 +288,14 @@ public:
     for(auto it = M.begin(); it != M.end(); it++) {
       this->visitFunction(*it);
     }
+    // working in progress
+    while (!wip.empty()) {
+      for (auto it = wip.begin(); it != wip.end(); it++) {
+        Function* fff = wip.pop_front();
+        this->visitFunction(*fff);
+      }
+    }
+
     std::cout << "=================================\n" << "*** BOTTOM UP FINISHED ***\n"
        << "=================================\n";
     done = true;
@@ -366,7 +376,7 @@ public:
       z3::expr caller = gen_i32(&I);
       astAdd(caller == call_res);
     } else {
-      done = false;
+      wip.push_back(current_fun);
     }
   }
 
