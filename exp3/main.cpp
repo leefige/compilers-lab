@@ -64,6 +64,7 @@ class Z3Walker : public InstVisitor<Z3Walker> {
 private:
   std::map<std::string, std::vector<z3::expr> > ast_vec;
   std::map<std::string, z3::model> model_map;
+  std::map<std::string, z3::func_decl> function_map;
   z3::context ctx;
   z3::solver solver;
 
@@ -313,20 +314,6 @@ public:
 //    debug << "------------" << std::endl << "<Solver>" << std::endl 
 //      << solver << "============" << std::endl;
     solver.pop();
-    // generate model
-    solver.push();
-    for (z3::expr e: ast_vec[getName(*current_fun)]) {
-      solver.add(e);
-    }
-    solver.check();
-    z3::model mo = solver.get_model();
-    model_map.insert(std::pair<std::string, z3::model>(getName(F), mo));
-    solver.pop();
-    z3::model gen = model_map.at(getName(F));
-    debug << "  ### model is: \n" << gen << "\n";
-    debug << "  ### model eval: " << getName(F) << "(-2)=" << 
-      gen.eval(z3::function("a.0", arg_svec, ctx.bv_sort(32))(ctx.bv_val(-2, 32))) 
-      << "\n";
   }
 
   void visitBasicBlock(BasicBlock &B) {
@@ -347,6 +334,37 @@ public:
       this->visit(*iit);
     }
   }
+
+  void visitReturnInst(ReturnInst &I) {
+    debug << "    visit ret" << std::endl;
+    auto re = I.getReturnValue();
+    if (re != null) {
+      // generate model
+      solver.push();
+      for (z3::expr e: ast_vec[getName(*current_fun)]) {
+        solver.add(e);
+      }
+      solver.check();
+      z3::model mo = solver.get_model();
+      std::string fun_name = getName(*current_fun);
+      z3::func_decl fun = z3::function(fun_name, arg_svec, ctx.bv_sort(32));
+      model_map.insert(std::pair<std::string, z3::model>(fun_name, mo));
+      function_map.insert(std::pair<std::string, z3::model>(fun_name, fun))
+      solver.pop();
+      // test
+#ifndef NDEBUG
+      z3::model gen = model_map.at(fun_name);
+      z3::func_decl fun__ = function_map.at(fun_name);
+      debug << "  ### model formal eval: " << getName(F) << "(-2)=" << 
+        gen.eval(fun__(arg_evec)) 
+        << "\n";
+      debug << "  ### model actual eval: " << getName(F) << "(-2)=" << 
+        gen.eval(fun__(ctx.bv_val(-2, 32))) 
+        << "\n";
+#endif
+    }
+  }
+
 
   void visitAdd(BinaryOperator &I) {
     debug << "    visit add" << std::endl;
