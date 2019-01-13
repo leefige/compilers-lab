@@ -14,7 +14,7 @@ $$$ BB cond: (and true (= (cmp i) #b1))
     visit sub
     visit br
   <BB> if.end
-$$$ BB cond: (and true (= (cmp i) #b1))
+$$$ BB cond: (or (and true (= (cmp i) #b0)) (and true (= (cmp i) #b1)))
     visit phi
 tar: (sub i)branch cond: (if.then i)
 tar: ibranch cond: (if.else i)
@@ -174,7 +174,9 @@ Model causing out of bound:
             x!0)))
     visit br
   <BB> return
-$$$ BB cond: (and true (= (cmp i) #b1) (= (cmp1 i) #b1))
+$$$ BB cond: (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+      (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+  (or (and true (= (cmp i) #b0)) a!1 a!2))
     visit phi
 tar: (%0 i)branch cond: (if.then i)
 tar: #xffffffffbranch cond: (if.else i)
@@ -195,7 +197,9 @@ $$$ BB cond: (or (and true (= (cmp i) #b0)) (and true (= (cmp i) #b1) (= (cmp1 i
 $$$ BB cond: (and true (= (cmp i) #b1) (= (cmp1 i) #b1))
     visit br
   <BB> if.end
-$$$ BB cond: (and true (= (cmp i) #b1) (= (cmp1 i) #b1))
+$$$ BB cond: (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+      (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+  (or (and true (= (cmp i) #b0)) a!1 a!2))
     visit phi
 tar: ibranch cond: (if.then i)
 tar: #x00000000branch cond: (if.else i)
@@ -223,11 +227,16 @@ tar: #x00000000branch cond: (if.else i)
 (assert (forall ((i (_ BitVec 32)))
   (= (if.then i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1)))))
 (assert (forall ((i (_ BitVec 32)))
-  (= (if.end i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1)))))
+  (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+        (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+  (let ((a!3 (or (and true (= (cmp i) #b0)) a!1 a!2)))
+    (= (if.end i) a!3)))))
 (assert (forall ((i (_ BitVec 32))) (=> (if.then i) (= (x.0 i) i))))
 (assert (forall ((i (_ BitVec 32))) (=> (if.else i) (= (x.0 i) #x00000000))))
 (assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (x.0 i)))))
-(assert (and true (= (cmp i) #b1) (= (cmp1 i) #b1)))
+(assert (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+      (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+  (or (and true (= (cmp i) #b0)) a!1 a!2)))
 (assert (let ((a!1 (forall ((i (_ BitVec 32)))
              (and (bvsge (idxprom i) #x0000000000000000)
                   (bvslt (idxprom i) #x0000000000000400)))))
@@ -247,11 +256,16 @@ Checking with assertions:
   (forall ((i (_ BitVec 32)))
     (= (if.then i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1))))
   (forall ((i (_ BitVec 32)))
-    (= (if.end i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1))))
+    (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+          (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+    (let ((a!3 (or (and true (= (cmp i) #b0)) a!1 a!2)))
+      (= (if.end i) a!3))))
   (forall ((i (_ BitVec 32))) (=> (if.then i) (= (x.0 i) i)))
   (forall ((i (_ BitVec 32))) (=> (if.else i) (= (x.0 i) #x00000000)))
   (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (x.0 i))))
-  (and true (= (cmp i) #b1) (= (cmp1 i) #b1))
+  (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+        (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+    (or (and true (= (cmp i) #b0)) a!1 a!2))
   (let ((a!1 (forall ((i (_ BitVec 32)))
                (and (bvsge (idxprom i) #x0000000000000000)
                     (bvslt (idxprom i) #x0000000000000400)))))
@@ -398,7 +412,8 @@ Model causing out of bound:
   #x00000000)
 (define-fun cmp1 ((x!0 (_ BitVec 32))) (_ BitVec 1)
   (ite (= x!0 #x00000000) #b1
-    (ite (bvsle x!0 #x00000400) #b1 #b0)))
+  (ite (= x!0 #x80000000) #b1
+    (ite (bvsle x!0 #x00000400) #b1 #b0))))
 (define-fun cmp ((x!0 (_ BitVec 32))) (_ BitVec 1)
   (ite (= (ite (bvule #x80000000 x!0) #x80000000 #x00000000) #x00000000)
        #b1
@@ -454,7 +469,9 @@ Model causing out of bound:
             x!0)))
     visit br
   <BB> return
-$$$ BB cond: (and true (= (cmp i) #b1) (= (cmp1 i) #b1))
+$$$ BB cond: (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+      (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+  (or (and true (= (cmp i) #b0)) a!1 a!2))
     visit phi
 tar: (%0 i)branch cond: (if.then i)
 tar: #xffffffffbranch cond: (if.else i)
@@ -475,7 +492,9 @@ $$$ BB cond: (or (and true (= (cmp i) #b0)) (and true (= (cmp i) #b1) (= (cmp1 i
 $$$ BB cond: (and true (= (cmp i) #b1) (= (cmp1 i) #b1))
     visit br
   <BB> if.end
-$$$ BB cond: (and true (= (cmp i) #b1) (= (cmp1 i) #b1))
+$$$ BB cond: (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+      (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+  (or (and true (= (cmp i) #b0)) a!1 a!2))
     visit phi
 tar: ibranch cond: (if.then i)
 tar: #x00000000branch cond: (if.else i)
@@ -503,11 +522,16 @@ tar: #x00000000branch cond: (if.else i)
 (assert (forall ((i (_ BitVec 32)))
   (= (if.then i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1)))))
 (assert (forall ((i (_ BitVec 32)))
-  (= (if.end i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1)))))
+  (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+        (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+  (let ((a!3 (or (and true (= (cmp i) #b0)) a!1 a!2)))
+    (= (if.end i) a!3)))))
 (assert (forall ((i (_ BitVec 32))) (=> (if.then i) (= (x.0 i) i))))
 (assert (forall ((i (_ BitVec 32))) (=> (if.else i) (= (x.0 i) #x00000000))))
 (assert (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (x.0 i)))))
-(assert (and true (= (cmp i) #b1) (= (cmp1 i) #b1)))
+(assert (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+      (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+  (or (and true (= (cmp i) #b0)) a!1 a!2)))
 (assert (let ((a!1 (forall ((i (_ BitVec 32)))
              (and (bvsge (idxprom i) #x0000000000000000)
                   (bvslt (idxprom i) #x0000000000000400)))))
@@ -527,11 +551,16 @@ Checking with assertions:
   (forall ((i (_ BitVec 32)))
     (= (if.then i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1))))
   (forall ((i (_ BitVec 32)))
-    (= (if.end i) (and true (= (cmp i) #b1) (= (cmp1 i) #b1))))
+    (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+          (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+    (let ((a!3 (or (and true (= (cmp i) #b0)) a!1 a!2)))
+      (= (if.end i) a!3))))
   (forall ((i (_ BitVec 32))) (=> (if.then i) (= (x.0 i) i)))
   (forall ((i (_ BitVec 32))) (=> (if.else i) (= (x.0 i) #x00000000)))
   (forall ((i (_ BitVec 32))) (= (idxprom i) ((_ sign_extend 32) (x.0 i))))
-  (and true (= (cmp i) #b1) (= (cmp1 i) #b1))
+  (let ((a!1 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b0)))
+        (a!2 (and (and true (= (cmp i) #b1)) (= (cmp1 i) #b1))))
+    (or (and true (= (cmp i) #b0)) a!1 a!2))
   (let ((a!1 (forall ((i (_ BitVec 32)))
                (and (bvsge (idxprom i) #x0000000000000000)
                     (bvslt (idxprom i) #x0000000000000400)))))
@@ -540,89 +569,98 @@ GEP arrayidx is potentially out of bound.
 Model causing out of bound:
 (define-fun i () (_ BitVec 32)
   #x00000001)
-(define-fun k!185 ((x!0 (_ BitVec 32))) (_ BitVec 32)
-  (let ((a!1 (ite (bvule #x20000000 x!0)
-                  (ite (bvule #x40000000 x!0)
-                       (ite (bvule #x80000000 x!0) #x80000000 #x40000000)
-                       #x20000000)
-                  #x00000500)))
-  (let ((a!2 (ite (bvule #x00000401 x!0)
-                  (ite (bvule #x00000402 x!0)
-                       (ite (bvule #x00000500 x!0) a!1 #x00000402)
-                       #x00000401)
-                  #x00000400)))
+(define-fun k!186 ((x!0 (_ BitVec 32))) (_ BitVec 32)
+  (let ((a!1 (ite (bvule #x00000410 x!0)
+                  (ite (bvule #x00000440 x!0)
+                       (ite (bvule #x80000000 x!0) #x80000000 #x00000440)
+                       #x00000410)
+                  #x00000408)))
+  (let ((a!2 (ite (bvule #x00000402 x!0)
+                  (ite (bvule #x00000404 x!0)
+                       (ite (bvule #x00000408 x!0) a!1 #x00000404)
+                       #x00000402)
+                  #x00000401)))
     (ite (bvule #x00000001 x!0)
-         (ite (bvule #x00000400 x!0) a!2 #x00000001)
+         (ite (bvule #x00000400 x!0)
+              (ite (bvule #x00000401 x!0) a!2 #x00000400)
+              #x00000001)
          #x00000000))))
 (define-fun if.else ((x!0 (_ BitVec 32))) Bool
-  (or (= (k!185 x!0) #x00000401)
-      (= (k!185 x!0) #x00000402)
-      (= (k!185 x!0) #x00000500)
-      (= (k!185 x!0) #x20000000)
-      (= (k!185 x!0) #x40000000)
-      (= (k!185 x!0) #x80000000)))
+  (or (= (k!186 x!0) #x00000401)
+      (= (k!186 x!0) #x00000402)
+      (= (k!186 x!0) #x00000404)
+      (= (k!186 x!0) #x00000408)
+      (= (k!186 x!0) #x00000410)
+      (= (k!186 x!0) #x00000440)
+      (= (k!186 x!0) #x80000000)))
 (define-fun land.lhs.true ((x!0 (_ BitVec 32))) Bool
-  (or (= (k!185 x!0) #x00000402)
-      (= (k!185 x!0) #x40000000)
-      (= (k!185 x!0) #x00000400)
-      (= (k!185 x!0) #x00000401)
-      (= (k!185 x!0) #x00000500)
-      (= (k!185 x!0) #x20000000)
-      (= (k!185 x!0) #x00000000)
-      (= (k!185 x!0) #x00000001)))
+  (or (= (k!186 x!0) #x00000001)
+      (= (k!186 x!0) #x00000400)
+      (= (k!186 x!0) #x00000401)
+      (= (k!186 x!0) #x00000402)
+      (= (k!186 x!0) #x00000404)
+      (= (k!186 x!0) #x00000408)
+      (= (k!186 x!0) #x00000410)
+      (= (k!186 x!0) #x00000440)
+      (= (k!186 x!0) #x00000000)))
 (define-fun cmp ((x!0 (_ BitVec 32))) (_ BitVec 1)
-  (let ((a!1 (ite (= (k!185 x!0) #x00000400)
+  (let ((a!1 (ite (= (k!186 x!0) #x00000000)
                   #b1
-                  (ite (= (k!185 x!0) #x00000001) #b1 #b0))))
-  (let ((a!2 (ite (= (k!185 x!0) #x40000000)
+                  (ite (= (k!186 x!0) #x00000001) #b1 #b0))))
+  (let ((a!2 (ite (= (k!186 x!0) #x00000440)
                   #b1
-                  (ite (= (k!185 x!0) #x00000000) #b1 a!1))))
-  (let ((a!3 (ite (= (k!185 x!0) #x00000500)
+                  (ite (= (k!186 x!0) #x00000400) #b1 a!1))))
+  (let ((a!3 (ite (= (k!186 x!0) #x00000408)
                   #b1
-                  (ite (= (k!185 x!0) #x20000000) #b1 a!2))))
-    (ite (= (k!185 x!0) #x00000401)
-         #b1
-         (ite (= (k!185 x!0) #x00000402) #b1 a!3))))))
+                  (ite (= (k!186 x!0) #x00000410) #b1 a!2))))
+  (let ((a!4 (ite (= (k!186 x!0) #x00000402)
+                  #b1
+                  (ite (= (k!186 x!0) #x00000404) #b1 a!3))))
+    (ite (= (k!186 x!0) #x00000401) #b1 a!4))))))
 (define-fun cmp1 ((x!0 (_ BitVec 32))) (_ BitVec 1)
-  (let ((a!1 (ite (= (k!185 x!0) #x00000400)
+  (let ((a!1 (ite (= (k!186 x!0) #x00000000)
                   #b1
-                  (ite (= (k!185 x!0) #x00000001) #b1 #b0))))
-    (ite (= (k!185 x!0) #x80000000)
+                  (ite (= (k!186 x!0) #x00000001) #b1 #b0))))
+    (ite (= (k!186 x!0) #x80000000)
          #b1
-         (ite (= (k!185 x!0) #x00000000) #b1 a!1))))
+         (ite (= (k!186 x!0) #x00000400) #b1 a!1))))
 (define-fun if.end ((x!0 (_ BitVec 32))) Bool
-  (ite (= x!0 #x00000001) true
   (ite (= x!0 #x00000000) true
-  (ite (= x!0 #x80000000) false
-  (ite (= x!0 #x40000000) false
-  (ite (= x!0 #x20000000) false
-  (ite (= x!0 #x00000500) false
-  (ite (= x!0 #x00000402) false
-  (ite (= x!0 #x00000401) false
   (ite (= x!0 #x00000400) true
-    (let ((a!1 (or (not (= (cmp x!0) #b1)) (not (= (cmp1 x!0) #b1)))))
-      (not a!1))))))))))))
+  (ite (= x!0 #x80000000) true
+  (ite (= x!0 #x00000440) true
+  (ite (= x!0 #x00000410) true
+  (ite (= x!0 #x00000408) true
+  (ite (= x!0 #x00000404) true
+  (ite (= x!0 #x00000402) true
+  (ite (= x!0 #x00000401) true
+  (ite (= x!0 #x00000001) true
+    (let ((a!1 (or (not (= (cmp x!0) #b1)) (not (= (cmp1 x!0) #b0))))
+          (a!2 (or (not (= (cmp x!0) #b1)) (not (= (cmp1 x!0) #b1)))))
+      (or (= (cmp x!0) #b0) (not a!1) (not a!2))))))))))))))
 (define-fun x.0 ((x!0 (_ BitVec 32))) (_ BitVec 32)
   (ite (= x!0 #x00000001) #x00000001
-  (ite (= x!0 #x00000400) #x00000400
   (ite (= x!0 #x00000000) #x00000000
+  (ite (= x!0 #x00000400) #x00000400
   (ite (= x!0 #x80000000) #x00000000
-  (ite (= x!0 #x40000000) #x00000000
-  (ite (= x!0 #x20000000) #x00000000
-  (ite (= x!0 #x00000500) #x00000000
+  (ite (= x!0 #x00000440) #x00000000
+  (ite (= x!0 #x00000410) #x00000000
+  (ite (= x!0 #x00000408) #x00000000
+  (ite (= x!0 #x00000404) #x00000000
   (ite (= x!0 #x00000402) #x00000000
   (ite (= x!0 #x00000401) #x00000000
-    (ite (if.else x!0) #x00000000 x!0)))))))))))
+    (ite (if.else x!0) #x00000000 x!0))))))))))))
 (define-fun idxprom ((x!0 (_ BitVec 32))) (_ BitVec 64)
-  (ite (= x!0 #x00000400) #x0000000000000400
-  (ite (= x!0 #x00000001) #x0000000000000001
   (ite (= x!0 #x00000000) #x0000000000000000
   (ite (= x!0 #x80000000) #x0000000000000000
-  (ite (= x!0 #x20000000) #x0000000000000000
-  (ite (= x!0 #x00000500) #x0000000000000000
-  (ite (= x!0 #x00000401) #x0000000000000000
-  (ite (= x!0 #x40000000) #x0000000000000000
+  (ite (= x!0 #x00000440) #x0000000000000000
+  (ite (= x!0 #x00000410) #x0000000000000000
+  (ite (= x!0 #x00000408) #x0000000000000000
+  (ite (= x!0 #x00000404) #x0000000000000000
   (ite (= x!0 #x00000402) #x0000000000000000
+  (ite (= x!0 #x00000401) #x0000000000000000
+  (ite (= x!0 #x00000400) #x0000000000000400
+  (ite (= x!0 #x00000001) #x0000000000000001
     (concat ((_ extract 31 31) (x.0 x!0))
             ((_ extract 31 31) (x.0 x!0))
             ((_ extract 31 31) (x.0 x!0))
@@ -655,11 +693,11 @@ Model causing out of bound:
             ((_ extract 31 31) (x.0 x!0))
             ((_ extract 31 31) (x.0 x!0))
             ((_ extract 31 31) (x.0 x!0))
-            (x.0 x!0))))))))))))
+            (x.0 x!0)))))))))))))
 (define-fun if.then ((x!0 (_ BitVec 32))) Bool
-  (or (= (k!185 x!0) #x00000000)
-      (= (k!185 x!0) #x00000400)
-      (= (k!185 x!0) #x00000001)))
+  (or (= (k!186 x!0) #x00000001)
+      (= (k!186 x!0) #x00000400)
+      (= (k!186 x!0) #x00000000)))
 (define-fun entry ((x!0 (_ BitVec 32))) Bool
   true)
 ---------
@@ -760,7 +798,7 @@ Model causing out of bound:
             (call x!0))))
     visit br
   <BB> return
-$$$ BB cond: (and true (= (cmp i) #b1))
+$$$ BB cond: (or (and true (= (cmp i) #b0)) (and true (= (cmp i) #b1)))
     visit phi
 tar: (%0 i)branch cond: (if.then i)
 tar: #xffffffffbranch cond: (if.else i)

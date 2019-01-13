@@ -146,6 +146,14 @@ private:
   void addBranch (Value* tar){
     // inherit cond from cur bb
     z3::expr cond = bb_cond.at(getName(*cur_bb));
+    // check additional cond
+    std::string name = getName(*tar);
+    if (bb_cond.count(name)) {
+//      debug << "*** Before OR: " << cond << "\n";
+      z3::expr cur = bb_cond.at(name);
+      cond = cur || cond;
+//      debug << "*** After OR: " << cond << "\n";
+    } 
     putBranchCond(tar, cond);
   }
 
