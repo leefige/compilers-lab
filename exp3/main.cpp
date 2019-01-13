@@ -62,24 +62,26 @@ namespace {
 
 class Z3Walker : public InstVisitor<Z3Walker> {
 private:
-  std::map<std::string, std::vector<z3::expr>> predicate_map;
+  std::map<std::string, std::vector<z3::expr> > ast_vec;
+  std::map<std::string, z3::model> model_map;
   z3::context ctx;
   z3::solver solver;
 
+  /*------------ used only inside one function ---------------*/
   Function* current_fun;
   BasicBlock* cur_bb;
   std::map<std::string, z3::expr> bb_cond;
-
   // args
   z3::expr_vector arg_evec;
   z3::sort_vector arg_svec;
   std::set<std::string> arg_names; 
+  /*----------------------------------------------------------*/
 
   /*================== AST =======================*/
   void astInit(Function* func) {
     current_fun = func;
     std::string ast_name = getName(*current_fun);
-    predicate_map.insert(
+    ast_vec.insert(
         std::pair<std::string, std::vector<z3::expr> >(ast_name, std::vector<z3::expr>())
     );
     bb_cond.clear();
@@ -97,7 +99,7 @@ private:
   void astAdd(const z3::expr& exp) {
 //    debug << "in ast add\n";
     std::string ast_name = getName(*current_fun);
-    auto vec = predicate_map[ast_name];
+    auto vec = ast_vec[ast_name];
 
     // we are sure that 
     // every bb has its own cond (including 'true')
@@ -105,14 +107,14 @@ private:
     // every ast is a func
     cond = z3::forall(arg_evec, (exp));
     vec.push_back(cond/*.simplify()*/);
-    predicate_map[ast_name] = vec;
+    ast_vec[ast_name] = vec;
     // also add to solver
     solver.add(exp);
   }
 
   z3::expr astGet(Function* func) {
     std::string name = getName(*func);
-    auto vec = predicate_map[name];
+    auto vec = ast_vec[name];
     assert(!vec.empty());
     auto ast = *vec.begin();
     for (auto eit = vec.begin() + 1; eit != vec.end(); eit++) {
@@ -312,6 +314,17 @@ public:
 //    debug << "------------" << std::endl << "<Solver>" << std::endl 
 //      << solver << "============" << std::endl;
     solver.pop();
+    // generate model
+    solver.push();
+    for (z3::expr e: ast_vec[getName(*current_fun)]) {
+      solver.add(e);
+    }
+    solver.check();
+    z3::model mo = solver.get_model();
+    model_map.insert(std::pair<std::string, z3::model>(getName(F), mo));
+    solver.pop();
+    z3::model gen = model_map.at(getName(F));
+    debug << "  ### model eval: " << getName(F) << "(-2)=" << gen.eval(ctx.bv_val(-2, 32)) << "\n";
   }
 
   void visitBasicBlock(BasicBlock &B) {
@@ -325,7 +338,7 @@ public:
     } 
     z3::expr cond = bb_cond.at(name);
     z3::expr bb_val = gen_bool(cur_bb);
-    debug << "$$$ BB cond: " << cond << "\n";
+//    debug << "$$$ BB cond: " << cond << "\n";
     astAdd(bb_val == cond);
 
     for (auto iit = B.begin(); iit != B.end(); iit++) {
@@ -515,7 +528,7 @@ public:
       auto bb = I.getIncomingBlock(i);
       z3::expr v = gen_i32(val);
       z3::expr b = gen_bool(bb);
-      debug << "tar: " << v << "branch cond: " << b << "\n";
+      debug << "\t\ttar: " << v << "branch cond: " << b << "\n";
       z3::expr dst = gen_i32(&I);
       astAdd(z3::implies(b, (dst == v)));
     }
@@ -559,7 +572,7 @@ public:
 //            .simplify()
 //#endif
 //          ;
-          // for (z3::expr e: predicate_map[getName(*current_fun)]) {
+          // for (z3::expr e: ast_vec[getName(*current_fun)]) {
           //   solver.add(e);
           // }
           BasicBlock* bb = I.getParent();
@@ -567,7 +580,7 @@ public:
           solver.add(bb_cond.at(bb_name));
           solver.add(!inbounds); 
 //          std::cout << "bound added" << std::endl << solver << std::endl;
-          debug << "----<solver>--------\n" << solver << "\n-------------\n";
+          // debug << "----<solver>--------\n" << solver << "\n-------------\n";
           checkAndReport(solver, I);
           solver.pop();
 //          std::cout << "===check popped===" << std::endl;
