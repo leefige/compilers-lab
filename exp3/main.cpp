@@ -346,6 +346,28 @@ public:
     }
   }
 
+  void visitCallInst(CallInst &I) {
+    debug << "    visit call, callee: ";
+    Function* callee = I.getCalledFunction();
+    std::string callee_name = getName(*callee);
+    debug << getName(callee_name) << "\n";
+    if (function_map.count(callee_name)) {
+      z3::expr_vector actual_arg;
+      for (auto arit = I.arg_begin(); arit != I.arg_end(); arit++) {
+        actual_arg.push_back(gen_i32(&(*arit)));
+      }
+      z3::expr call_res = model_map.at(callee_name).eval(
+        function_map.at(callee_name)(actual_arg)
+      );
+      debug << "      call-res: " << call_res << "\n";
+
+      z3::expr caller = gen_i32(&I);
+      astAdd(caller == cal_res);
+    } else {
+      done = false;
+    }
+  }
+
   void visitReturnInst(ReturnInst &I) {
     debug << "    visit ret" << std::endl;
     auto re = I.getReturnValue();
