@@ -103,8 +103,8 @@ private:
     // every bb has its own cond (including 'true')
     z3::expr cond = bb_cond.at(getName(*cur_bb));
     // every ast is a func
-    cond = z3::forall(arg_evec, (cond && exp));
-    vec.push_back(cond.simplify());
+    cond = z3::forall(arg_evec, (exp));
+    vec.push_back(cond/*.simplify()*/);
     predicate_map[ast_name] = vec;
   }
 
@@ -133,11 +133,14 @@ private:
     // check additional cond
     std::string name = getName(*tar);
     if (bb_cond.count(name)) {
+//      debug << "*** Before OR: " << cond << "\n";
       z3::expr cur = bb_cond.at(name);
       cond = cur || cond;
+//      debug << "*** After OR: " << cond << "\n";
     } 
-
-    putBranchCond(tar, cond.simplify());
+//    debug << "### PUT: TAR-COND: " << name << "-" << cond << "\n";
+    putBranchCond(tar, cond/*.simplify()*/);
+//    debug << "### AFTER PUT: TAR-COND: "<< name << "-" << bb_cond.at(name) << "\n";
   }
 
   void addBranch (Value* tar){
@@ -154,6 +157,9 @@ private:
 
   void putBranchCond (Value* tar, const z3::expr& c) {
     std::string name = getName(*tar);
+    if (bb_cond.count(name)) {
+      bb_cond.erase(name);
+    }
     bb_cond.insert(std::pair<std::string, z3::expr>(name, c));
   }
 
@@ -301,16 +307,17 @@ public:
   void visitBasicBlock(BasicBlock &B) {
     cur_bb = &B;
     std::string name = getName(B);
-
+    debug << "  <BB> " << getName(B) << std::endl;
+    
     // check and merge current bb cond
     if (!bb_cond.count(name)) {
       putBranchCond(cur_bb, gen_bool(true));
     } 
     z3::expr cond = bb_cond.at(name);
     z3::expr bb_val = gen_bool(cur_bb);
+    debug << "$$$ BB cond: " << cond << "\n";
     astAdd(bb_val == cond);
 
-    debug << "  <BB> " << getName(B) << std::endl;
     for (auto iit = B.begin(); iit != B.end(); iit++) {
       this->visit(*iit);
     }
@@ -547,6 +554,7 @@ public:
           }
           BasicBlock* bb = I.getParent();
           std::string bb_name = getName(*bb);
+          solver.add(bb_cond.at(bb_name));
           solver.add(!inbounds); 
 //          std::cout << "bound added" << std::endl << solver << std::endl;
           debug << "----<solver>--------\n" << solver << "\n-------------\n";
