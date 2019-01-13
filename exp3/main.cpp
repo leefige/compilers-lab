@@ -83,6 +83,9 @@ private:
   void astInit(Function* func) {
     current_fun = func;
     std::string ast_name = getName(*current_fun);
+    if (ast_vec.count(ast_name)) {
+      ast_vec.erase(ast_name);
+    }
     ast_vec.insert(
         std::pair<std::string, std::vector<z3::expr> >(ast_name, std::vector<z3::expr>())
     );
@@ -344,10 +347,6 @@ public:
   }
 
   void visitReturnInst(ReturnInst &I) {
-    if (done) {
-      return;
-    }
-
     debug << "    visit ret" << std::endl;
     auto re = I.getReturnValue();
     if (re != NULL) {
@@ -383,9 +382,6 @@ public:
 
 
   void visitAdd(BinaryOperator &I) {
-    if (done) {
-      return;
-    }
     debug << "    visit add" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -397,9 +393,6 @@ public:
   }
 
   void visitSub(BinaryOperator &I) {
-    if (done) {
-      return;
-    }
     debug << "    visit sub" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -410,9 +403,6 @@ public:
   }
   
   void visitMul(BinaryOperator &I) {
-    if (done) {
-      return;
-    }
     debug << "    visit mul" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -423,9 +413,6 @@ public:
   }
 
   void visitShl(BinaryOperator &I) {
-    if (done) {
-      return;
-    }
     debug << "    visit shl" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -441,9 +428,6 @@ public:
   }
 
   void visitLShr(BinaryOperator &I) {
-    if (done) {
-      return;
-    }
     debug << "    visit lshr" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -454,9 +438,6 @@ public:
   }
 
   void visitAShr(BinaryOperator &I) {
-    if (done) {
-      return;
-    }
     debug << "    visit ashr" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -467,9 +448,6 @@ public:
   }
 
   void visitAnd(BinaryOperator &I) {
-    if (done) {
-      return;
-    }
     debug << "    visit and" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -489,9 +467,6 @@ public:
   }
 
   void visitOr(BinaryOperator &I) {
-    if (done) {
-      return;
-    }
     debug << "    visit or" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -502,9 +477,6 @@ public:
   }
 
   void visitXor(BinaryOperator &I) {
-    if (done) {
-      return;
-    }
     debug << "    visit xor" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -515,9 +487,6 @@ public:
   }
 
   void visitICmp(ICmpInst &I) { 
-    if (done) {
-      return;
-    }
     debug << "    visit icmp" << std::endl;
     auto op1 = I.getOperand(0);
     auto op2 = I.getOperand(1);
@@ -565,9 +534,6 @@ public:
   }
 
   void visitBranchInst(BranchInst &I) { 
-    if (done) {
-      return;
-    }
     debug << "    visit br"<< std::endl;
     // only consider conditional jump
     if (I.isConditional()) {
@@ -590,9 +556,6 @@ public:
   }
 
   void visitPHINode(PHINode &I) { 
-    if (done) {
-      return;
-    }
     debug << "    visit phi" << std::endl;
     unsigned cnt = I.getNumIncomingValues();
     for (unsigned i = 0; i != cnt; i++) {
@@ -607,9 +570,6 @@ public:
   }
 
   void visitSExtInst(SExtInst & I) {
-    if (done) {
-      return;
-    }
     debug << "    visit sext" << std::endl;
     auto srcv = I.getOperand(0);
     z3::expr src = gen_i32(srcv);
@@ -618,9 +578,6 @@ public:
   }
   
   void visitZExtInst(ZExtInst & I) {
-    if (done) {
-      return;
-    }
     debug << "    visit zext" << std::endl;
     auto srcv = I.getOperand(0);
     z3::expr src = gen_i32(srcv);
